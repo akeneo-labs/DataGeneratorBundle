@@ -1,0 +1,13 @@
+parameters:
+    pim_datagenerator.generator.product_csv.class : Pim\Bundle\DataGeneratorBundle\Generator\ProductCsvGenerator
+
+services:
+    pim_datagenerator.generator.product_csv:
+        class: %pim_datagenerator.generator.product_csv.class%
+        arguments:
+            - '@pim_catalog.repository.family'
+            - '@pim_catalog.repository.attribute'
+            - '@pim_catalog.repository.channel'
+            - '@pim_catalog.repository.locale'
+            - '@pim_catalog.repository.currency'
+
