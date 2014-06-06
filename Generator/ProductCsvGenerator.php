@@ -24,10 +24,20 @@ class ProductCsvGenerator implements GeneratorInterface
     const OUTFILE='products.csv';
     const SKU_PREFIX='sku-';
 
+    const DEFAULT_NUMBER_MIN = '0';
+    const DEFAULT_NUMBER_MAX = '1000';
+    const DEFAULT_NB_DECIMALS = '4';
+    const DEFAULT_DELIMITER = ',';
+
     /**
      * @var string
      */
     protected $outputDir;
+
+    /**
+     * @var string
+     */
+    protected $delimiter;
 
     /**
      * @var array
@@ -105,6 +115,10 @@ class ProductCsvGenerator implements GeneratorInterface
 
         $nbValuesBase = (int) $options['values-number'];
         $nbValueDeviation = (int) $options['values-number-standard-deviation'];
+        $mandatoryAttributes = $options['mandatory-attributes'];
+        $delimiter = $options['delimiter'];
+
+        $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
 
         $commonFaker = Faker\Factory::create();
 
@@ -138,6 +152,14 @@ class ProductCsvGenerator implements GeneratorInterface
                 $attribute = $this->getRandomAttributeFromFamily($attributeFaker, $family);
                 $valueData = $this->generateValue($attribute);
                 $product = array_merge($product, $valueData);
+            }
+
+            foreach ($mandatoryAttributes as $mandatoryAttribute) {
+                if (isset($this->attributesByFamily[$family->getCode()][$mandatoryAttribute])) {
+                    $attribute = $this->attributesByFamily[$family->getCode()][$mandatoryAttribute];
+                    $valueData = $this->generateValue($attribute);
+                    $product = array_merge($product, $valueData);
+                }
             }
 
             $products[] = $product;
@@ -195,7 +217,7 @@ class ProductCsvGenerator implements GeneratorInterface
 
                     foreach ($keys as $baseKey) {
                         $key = $baseKey.'-'.$locale->getCode().'-'.$channel->getCode();
-                        $updatedKeys[] = $baseKey;
+                        $updatedKeys[] = $key;
                     }
                 }
             }
@@ -205,7 +227,7 @@ class ProductCsvGenerator implements GeneratorInterface
             foreach ($this->getChannels() as $channel) {
                 foreach ($keys as $baseKey) {
                     $key = $baseKey.'-'.$channel->getCode();
-                    $updatedKeys[] = $baseKey;
+                    $updatedKeys[] = $key;
                 }
             }
 
@@ -214,7 +236,7 @@ class ProductCsvGenerator implements GeneratorInterface
             foreach ($this->getLocales() as $locale) {
                 foreach ($keys as $baseKey) {
                     $key = $baseKey.'-'.$locale->getCode();
-                    $updatedKeys[] = $baseKey;
+                    $updatedKeys[] = $key;
                 }
             }
             $keys = $updatedKeys;
@@ -247,16 +269,16 @@ class ProductCsvGenerator implements GeneratorInterface
                 $data = $data->format('Y-m-d');
                 break;
             case "metric":
-                $data = $faker->randomNumber(1, 100);
+            case "decimal":
+                break;
+                $min = ($attribute->getNumberMin() != null) ? $attribute->getNumberMin() : self::DEFAULT_NUMBER_MIN;
+                $max = ($attribute->getNumberMax() != null) ? $attribute->getNumberMax() : self::DEFAULT_NUMBER_MAX;
+
+                $decimals = $attribute->isDecimalsAllowed() ? self::DEFAULT_NB_DECIMALS : 0;
+
+                $data = $faker->randomFloat($decimals, $min, $max);
                 break;
             case "prices":
-            case "decimal":
-                $data = $faker->randomFloat();
-                if (!$attribute->isDecimalsAllowed()) {
-                    $data = round($data);
-                }
-                $data = $data;
-                break;
             case "boolean":
                 $data = $faker->boolean() ? "1" : "0";
                 break;
@@ -270,12 +292,10 @@ class ProductCsvGenerator implements GeneratorInterface
 
                 $data = $option->getCode();
 
-
                 break;
             default:
                 $data = '['.$attribute->getBackendType().']';
                 break;
-
         }
 
         return (string) $data;
@@ -376,8 +396,8 @@ class ProductCsvGenerator implements GeneratorInterface
         if (null === $this->locales) {
             $this->locales = array();
             $locales = $this->localeRepository->findBy(['activated' => 1]);
-            foreach ($locales as $currency) {
-                $this->currencies[$currency->getCode()] = $currency;
+            foreach ($locales as $locale) {
+                $this->locales[$locale->getCode()] = $locale;
             }
         }
         
@@ -432,12 +452,12 @@ class ProductCsvGenerator implements GeneratorInterface
     {
         $csvFile = fopen($this->outputDir.'/'.self::OUTFILE, 'w');
 
-        fputcsv($csvFile, $headers, ';');
+        fputcsv($csvFile, $headers, $this->delimiter);
         $headersAsKeys = array_fill_keys($headers, "");
 
         foreach ($products as $product) {
             $productData = array_merge($headersAsKeys, $product);
-            fputcsv($csvFile, $productData, ";");
+            fputcsv($csvFile, $productData, $this->delimiter);
         }
         fclose($csvFile);
     }

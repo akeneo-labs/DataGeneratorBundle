@@ -47,6 +47,18 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'd',
                 InputOption::VALUE_REQUIRED,
                 'Standard deviation for the number of values per product'
+            )
+            ->addOption(
+                'mandatory-attributes',
+                'm',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'List of mandatory attributes (the identifier is always included)'
+            )
+            ->addOption(
+                'delimiter',
+                'c',
+                InputOption::VALUE_REQUIRED,
+                'Character delimiter used for the CSV file'
             );
     }
 
@@ -62,7 +74,7 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'option'  => 'product',
                 'service' => 'pim_datagenerator.generator.product_csv',
                 'options' => [
-                        'values-number', 'values-number-standard-deviation'
+                        'values-number', 'values-number-standard-deviation', 'mandatory-attributes', 'delimiter'
                     ]
                 ]
         ];
