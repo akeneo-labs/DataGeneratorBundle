@@ -243,14 +243,19 @@ class ProductCsvGenerator implements GeneratorInterface
                 $data = $faker->text();
                 break;
             case "date":
-                $data = $faker->date();
+                $data = $faker->dateTimeBetween($attribute->getDateMin(), $attribute->getDateMax());
+                $data = $data->format('Y-m-d');
                 break;
             case "metric":
-                $data = (string) $faker->randomNumber(1, 100);
+                $data = $faker->randomNumber(1, 100);
                 break;
             case "prices":
             case "decimal":
-                $data = (string) $faker->randomFloat();
+                $data = $faker->randomFloat();
+                if (!$attribute->isDecimalsAllowed()) {
+                    $data = round($data);
+                }
+                $data = $data;
                 break;
             case "boolean":
                 $data = $faker->boolean() ? "1" : "0";
@@ -273,7 +278,7 @@ class ProductCsvGenerator implements GeneratorInterface
 
         }
 
-        return $data;
+        return (string) $data;
     }
     
 
