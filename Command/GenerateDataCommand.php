@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
 /**
  * Generates CSV files for selected entities
@@ -24,6 +25,11 @@ class GenerateDataCommand extends ContainerAwareCommand
         $this
             ->setName('pim:generate-data')
             ->setDescription('Generate test data for PIM entities')
+            ->addArgument(
+                'output_dir',
+                InputArgument::REQUIRED,
+                'Target directory where to generate the data'
+            )
             ->addOption(
                 'product',
                 'p',
@@ -34,13 +40,13 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'values-number',
                 'a',
                 InputOption::VALUE_REQUIRED,
-                'Number of products to generate'
+                'Mean number of values to generate per products'
             )
             ->addOption(
                 'values-number-standard-deviation',
                 'd',
                 InputOption::VALUE_REQUIRED,
-                'Number of products to generate'
+                'Standard deviation for the number of values per product'
             );
     }
 
@@ -49,9 +55,13 @@ class GenerateDataCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $outputDir = $input->getArgument('output_dir');
+
         $entities = [
             [
-                'option' => 'product', 'service' => 'pim_datagenerator.generator.product_csv', 'options' => [
+                'option'  => 'product',
+                'service' => 'pim_datagenerator.generator.product_csv',
+                'options' => [
                         'values-number', 'values-number-standard-deviation'
                     ]
                 ]
@@ -63,9 +73,10 @@ class GenerateDataCommand extends ContainerAwareCommand
             if ($amount > 0) {
                 $output->writeln(
                     sprintf(
-                        '<info>Generating %d instances of entity type %s<info>',
+                        '<info>Generating %d instances of entity type %s to %s directory<info>',
                         $amount,
-                        $entity['option']
+                        $entity['option'],
+                        $outputDir
                     )
                 );
                 $generator = $this->getContainer()->get($entity['service']);
@@ -73,7 +84,7 @@ class GenerateDataCommand extends ContainerAwareCommand
                 foreach ($entity['options'] as $option) {
                     $options[$option] = $input->getOption($option);
                 }
-                $generator->generate($amount, $options);
+                $generator->generate($amount, $outputDir, $options);
             }
         }
     }

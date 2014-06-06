@@ -14,10 +14,11 @@ interface GeneratorInterface
     /**
      * Generate the amount of entity
      *
-     * @param int   $amount
-     * @param array $options
+     * @param int    $amount
+     * @param string $outputDir
+     * @param array  $options
      *
      * @return $this
      */
-    public function generate($amount, array $options);
+    public function generate($amount, $outputDir, array $options = null);
 }

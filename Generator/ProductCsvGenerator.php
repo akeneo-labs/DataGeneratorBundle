@@ -21,8 +21,13 @@ use Faker;
  */
 class ProductCsvGenerator implements GeneratorInterface
 {
-    const OUTFILE='product.csv';
+    const OUTFILE='products.csv';
     const SKU_PREFIX='sku-';
+
+    /**
+     * @var string
+     */
+    protected $outputDir;
 
     /**
      * @var array
@@ -94,8 +99,10 @@ class ProductCsvGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($amount, array $options)
+    public function generate($amount, $outputDir, array $options = null)
     {
+        $this->outputDir = $outputDir;
+
         $nbValuesBase = (int) $options['values-number'];
         $nbValueDeviation = (int) $options['values-number-standard-deviation'];
 
@@ -138,7 +145,7 @@ class ProductCsvGenerator implements GeneratorInterface
 
         $headers = $this->getAllKeys($products);
 
-        print_r($headers);
+        $this->writeCsvFile($products, $headers);
 
         return $this;
     }
@@ -150,7 +157,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return array
      */
-    public function generateValue(AbstractAttribute $attribute)
+    protected function generateValue(AbstractAttribute $attribute)
     {
         $valueData = array();
         $keys = $this->getAttributeKeys($attribute);
@@ -169,7 +176,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return array
      */
-    public function getAttributeKeys(AbstractAttribute $attribute)
+    protected function getAttributeKeys(AbstractAttribute $attribute)
     {
         $keys = array();
 
@@ -223,7 +230,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return string
      */
-    public function generateValueData(AbstractAttribute $attribute)
+    protected function generateValueData(AbstractAttribute $attribute)
     {
         $data = "";
         $faker = Faker\Factory::create();
@@ -275,7 +282,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return Family
      */
-    public function getRandomFamily($faker)
+    protected function getRandomFamily($faker)
     {
         return $this->getRandomItem($faker, $this->familyRepository, $this->families);
     }
@@ -287,7 +294,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return Family
      */
-    public function getRandomAttribute($faker)
+    protected function getRandomAttribute($faker)
     {
         return $this->getRandomItem($faker, $this->attributeRepository, $this->attributes);
     }
@@ -300,7 +307,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return $attribute
      */
-    public function getRandomAttributeFromFamily($faker, Family $family)
+    protected function getRandomAttributeFromFamily($faker, Family $family)
     {
         $familyCode = $family->getCode();
 
@@ -323,7 +330,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return array
      */
-    public function getChannels()
+    protected function getChannels()
     {
         if (null === $this->channels) {
             $this->channels = array();
@@ -341,7 +348,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return array
      */
-    public function getCurrencies()
+    protected function getCurrencies()
     {
         if (null === $this->currencies) {
             $this->currencies = array();
@@ -359,7 +366,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return array
      */
-    public function getLocales()
+    protected function getLocales()
     {
         if (null === $this->locales) {
             $this->locales = array();
@@ -381,7 +388,7 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @return element
      */
-    public function getRandomItem($faker, ObjectRepository $repo, array &$items = null)
+    protected function getRandomItem($faker, ObjectRepository $repo, array &$items = null)
     {
         if (null === $items) {
             $items = array();
@@ -398,15 +405,35 @@ class ProductCsvGenerator implements GeneratorInterface
      *
      * @param array $products
      */
-    public function getAllKeys(array $products)
+    protected function getAllKeys(array $products)
     {
         $keys = [];
         
         foreach ($products as $product) {
-            $keys = array_unique($keys + array_keys($product));
+            $keys = array_merge($keys, array_keys($product));
+            $keys = array_unique($keys);
         }
 
         return $keys;
     }
 
+    /**
+     * Write the CSV file from products and headers
+     *
+     * @param array $products
+     * @param array $headers
+     */
+    protected function writeCsvFIle(array $products, array $headers)
+    {
+        $csvFile = fopen($this->outputDir.'/'.self::OUTFILE, 'w');
+
+        fputcsv($csvFile, $headers, ';');
+        $headersAsKeys = array_fill_keys($headers, "");
+
+        foreach ($products as $product) {
+            $productData = array_merge($headersAsKeys, $product);
+            fputcsv($csvFile, $productData, ";");
+        }
+        fclose($csvFile);
+    }
 }
