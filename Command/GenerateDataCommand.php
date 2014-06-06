@@ -59,6 +59,12 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'c',
                 InputOption::VALUE_REQUIRED,
                 'Character delimiter used for the CSV file'
+            )
+            ->addOption(
+                'force-attribute',
+                'f',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Force the value of an attribute to the provided value. Syntax: attribute_code:value'
             );
     }
 
@@ -74,7 +80,11 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'option'  => 'product',
                 'service' => 'pim_datagenerator.generator.product_csv',
                 'options' => [
-                        'values-number', 'values-number-standard-deviation', 'mandatory-attributes', 'delimiter'
+                        'values-number',
+                        'values-number-standard-deviation',
+                        'mandatory-attributes',
+                        'delimiter',
+                        'force-attribute'
                     ]
                 ]
         ];

@@ -42,6 +42,11 @@ class ProductCsvGenerator implements GeneratorInterface
     /**
      * @var array
      */
+    protected $forcedAttributes;
+
+    /**
+     * @var array
+     */
     protected $families;
 
     /**
@@ -119,6 +124,12 @@ class ProductCsvGenerator implements GeneratorInterface
         $delimiter = $options['delimiter'];
 
         $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
+
+        $this->forcedAttributes = array();
+        foreach ($options['force-attribute'] as $forcedAttribute) {
+            list($attributeCode, $value) = explode(':', $forcedAttribute);
+            $this->forcedAttributes[$attributeCode] = $value;
+        }
 
         $commonFaker = Faker\Factory::create();
 
@@ -256,6 +267,10 @@ class ProductCsvGenerator implements GeneratorInterface
     {
         $data = "";
         $faker = Faker\Factory::create();
+
+        if (isset($this->forcedAttributes[$attribute->getCode()])) {
+            return $this->forcedAttributes[$attribute->getCode()];
+        }
 
         switch ($attribute->getBackendType()) {
             case "varchar":
