@@ -13,7 +13,6 @@ Installation
 ------------
 ``
 composer require akeneo/data-generator-bundle dev-master
-``
 
 and update your app/AppKernel.php to add a new Pim\\Bundle\\DataGeneratorBundle\\PimDataGeneratorBundle to the bundle list.
 
@@ -32,20 +31,16 @@ Options:
  --values-number (-a)                    Mean number of values to generate per products
  --values-number-standard-deviation (-d) Standard deviation for the number of values per product
 
-``
-
 Example
 -------
 ``
 php app/console pim:generate -p 10000 /tmp/
-``
 
 Will generates 10000 products in `/tmp/products.csv` file
 
 Compatibility
 -------------
 Tested on PIM CE 1.1.
-
 
 Credits
 -------
