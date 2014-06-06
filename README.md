@@ -12,7 +12,7 @@ From there, this bundle will generate valid product data
 Installation
 ------------
 ```
-composer require akeneo/data-generator-bundle dev-master
+composer.phar require akeneo/data-generator-bundle dev-master
 ```
 and update your app/AppKernel.php to add a new Pim\\Bundle\\DataGeneratorBundle\\PimDataGeneratorBundle to the bundle list.
 
