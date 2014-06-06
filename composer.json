@@ -1,0 +1,40 @@
+{
+    "name": "akeneo/data-generator-bundle",
+    "type": "symfony-bundle",
+    "description": "Akeneo PIM Bundle to generate data in order to test high volume operations",
+    "keywords": ["pim", "akeneo", "ecommerce", "e-commerce", "data", "performances", "csv"],
+    "homepage": "http://akeneo.com",
+    "license": "OSL-3.0",
+    "authors": [
+        {
+            "name":     "Benoit Jacquemont",
+            "email":    "benoit@akeneo.com",
+            "homepage": "http://www.akeneo.com/"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/akeneo/pim-community-dev.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/akeneo/platform.git"
+        }
+    ],
+    "require": {
+        "akeneo/pim-community-dev": "1.1.*@stable",
+        "fzaninotto/faker": "v1.4.0"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "2.0.*@dev"
+    },
+    "autoload": {
+        "psr-0": { "Pim\\Bundle\\DataGeneratprBundme\\": "" }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "minimum-stability": "dev",
+    "target-dir": "Pim/Bundle/DataGeneratorBundle"
+}
