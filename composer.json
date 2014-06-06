@@ -30,7 +30,7 @@
         "phpspec/phpspec": "2.0.*@dev"
     },
     "autoload": {
-        "psr-0": { "Pim\\Bundle\\DataGeneratprBundme\\": "" }
+        "psr-0": { "Pim\\Bundle\\DataGeneratorBundle\\": "" }
     },
     "config": {
         "bin-dir": "bin"
