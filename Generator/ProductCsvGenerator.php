@@ -294,7 +294,7 @@ class ProductCsvGenerator implements GeneratorInterface
 
                 break;
             default:
-                $data = '['.$attribute->getBackendType().']';
+                $data = '';
                 break;
         }
 
