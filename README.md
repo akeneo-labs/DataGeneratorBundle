@@ -13,7 +13,6 @@ Installation
 ------------
 ```
 composer require akeneo/data-generator-bundle dev-master
-
 ```
 and update your app/AppKernel.php to add a new Pim\\Bundle\\DataGeneratorBundle\\PimDataGeneratorBundle to the bundle list.
 
