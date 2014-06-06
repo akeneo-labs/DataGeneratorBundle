@@ -14,6 +14,7 @@ Installation
 ``
 composer require akeneo/data-generator-bundle dev-master
 ``
+
 and update your app/AppKernel.php to add a new Pim\\Bundle\\DataGeneratorBundle\\PimDataGeneratorBundle to the bundle list.
 
 
@@ -37,6 +38,9 @@ Example
 -------
 ``
 php app/console pim:generate -p 10000 /tmp/
+``
+
+Will generates 10000 products in `/tmp/products.csv` file
 
 Compatibility
 -------------
