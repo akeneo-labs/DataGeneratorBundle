@@ -21,7 +21,7 @@ Usage
 -----
 ```
 Usage:
- pim:generate-data [-p|--product="..."] [-a|--values-number="..."] [-d|--values-number-standard-deviation="..."] output_dir
+ pim:generate-data [-p|--product="..."] [-a|--values-number="..."] [-d|--values-number-standard-deviation="..."] [-m|--mandatory-attributes="..."] [-c|--delimiter="..."] [-f|--force-attribute="..."] output_dir
 
 Arguments:
  output_dir                              Target directory where to generate the data
@@ -30,6 +30,9 @@ Options:
  --product (-p)                          Number of products to generate
  --values-number (-a)                    Mean number of values to generate per products
  --values-number-standard-deviation (-d) Standard deviation for the number of values per product
+ --mandatory-attributes (-m)             List of mandatory attributes (the identifier is always included) (multiple values allowed)
+ --delimiter (-c)                        Character delimiter used for the CSV file
+ --force-attribute (-f)                  Force the value of an attribute to the provided value. Syntax: attribute_code:value (multiple values allowed)
 ```
 
 Example
