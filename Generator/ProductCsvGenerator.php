@@ -274,7 +274,15 @@ class ProductCsvGenerator implements GeneratorInterface
 
         switch ($attribute->getBackendType()) {
             case "varchar":
-                $data = $faker->sentence();
+                $validationRule = $attribute->getValidationRule();
+                switch ($validationRule) {
+                    case 'url':
+                        $data = $faker->url();
+                        break;
+                    default:
+                        $data = $faker->sentence();
+                        break;
+                }
                 break;
             case "text":
                 $data = $faker->text();
@@ -305,7 +313,9 @@ class ProductCsvGenerator implements GeneratorInterface
                 }
                 $option = $faker->randomElement($options);
 
-                $data = $option->getCode();
+                if (is_object($option)) {
+                    $data = $option->getCode();
+                }
 
                 break;
             default:
