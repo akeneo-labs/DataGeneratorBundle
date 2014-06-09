@@ -285,7 +285,7 @@ class ProductCsvGenerator implements GeneratorInterface
                 }
                 break;
             case "text":
-                $data = $faker->text();
+                $data = $faker->sentence();
                 break;
             case "date":
                 $data = $faker->dateTimeBetween($attribute->getDateMin(), $attribute->getDateMax());
