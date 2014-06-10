@@ -22,7 +22,7 @@ use Faker;
 class ProductCsvGenerator implements GeneratorInterface
 {
     const OUTFILE='products.csv';
-    const SKU_PREFIX='sku-';
+    const IDENTIFIER_PREFIX='sku-';
 
     const DEFAULT_NUMBER_MIN = '0';
     const DEFAULT_NUMBER_MAX = '1000';
@@ -80,9 +80,9 @@ class ProductCsvGenerator implements GeneratorInterface
     protected $familyRepository;
 
     /**
-     * @var AttributeRepository
+     * @var string
      */
-    protected $attributeRepository;
+    protected $identifierCode;
 
     /**
      * @var CurrencyRepository
@@ -107,6 +107,8 @@ class ProductCsvGenerator implements GeneratorInterface
         $this->channelRepository = $channelRepository;
         $this->localeRepository = $localeRepository;
         $this->currencyRepository = $currencyRepository;
+
+        $this->identifierCode = $attributeRepository->getIdentifierCode();
 
         $this->attributeByFamily = array();
     }
@@ -137,7 +139,7 @@ class ProductCsvGenerator implements GeneratorInterface
 
         for ($i = 0; $i < $amount; $i++) {
             $product = array();
-            $product['sku'] = self::SKU_PREFIX . $i;
+            $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
             $family = $this->getRandomFamily($commonFaker);
             $product['family'] = $family->getCode();
 
