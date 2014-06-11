@@ -92,6 +92,11 @@ class ProductCsvGenerator implements GeneratorInterface
     protected $currencyRepository;
 
     /**
+     * @var Faker
+     */
+    protected $faker;
+
+    /**
      * @param FamilyRepository
      * @param AttributeRepository
      * @param ChannelRepository
@@ -135,19 +140,19 @@ class ProductCsvGenerator implements GeneratorInterface
             $this->forcedAttributes[$attributeCode] = $value;
         }
 
-        $commonFaker = Faker\Factory::create();
+        $this->faker = Faker\Factory::create();
 
         $products = [];
 
         for ($i = 0; $i < $amount; $i++) {
             $product = array();
             $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
-            $family = $this->getRandomFamily($commonFaker);
+            $family = $this->getRandomFamily($this->faker);
             $product['family'] = $family->getCode();
 
             if ($nbValuesBase > 0) {
                 if ($nbValueDeviation > 0) {
-                    $nbValues = $commonFaker->numberBetween(
+                    $nbValues = $this->faker->numberBetween(
                         $nbValuesBase - round($nbValueDeviation/2),
                         $nbValuesBase + round($nbValueDeviation/2)
                     );
@@ -160,11 +165,8 @@ class ProductCsvGenerator implements GeneratorInterface
                 $nbValues = $family->getAttributes()->count();
             }
 
-            $attributeFaker = Faker\Factory::create();
-            $attributeFaker = $attributeFaker->unique();
-
-            for ($j = 0; $j < $nbValues; $j++) {
-                $attribute = $this->getRandomAttributeFromFamily($attributeFaker, $family);
+            $attributes = $this->getRandomAttributesFromFamily($family, $nbValues);
+            foreach ($attributes as $attribute) {
                 $valueData = $this->generateValue($attribute);
                 $product = array_merge($product, $valueData);
             }
@@ -272,7 +274,6 @@ class ProductCsvGenerator implements GeneratorInterface
     protected function generateValueData(AbstractAttribute $attribute)
     {
         $data = "";
-        $faker = Faker\Factory::create();
 
         if (isset($this->forcedAttributes[$attribute->getCode()])) {
             return $this->forcedAttributes[$attribute->getCode()];
@@ -283,18 +284,18 @@ class ProductCsvGenerator implements GeneratorInterface
                 $validationRule = $attribute->getValidationRule();
                 switch ($validationRule) {
                     case 'url':
-                        $data = $faker->url();
+                        $data = $this->faker->url();
                         break;
                     default:
-                        $data = $faker->sentence();
+                        $data = $this->faker->sentence();
                         break;
                 }
                 break;
             case "text":
-                $data = $faker->sentence();
+                $data = $this->faker->sentence();
                 break;
             case "date":
-                $data = $faker->dateTimeBetween($attribute->getDateMin(), $attribute->getDateMax());
+                $data = $this->faker->dateTimeBetween($attribute->getDateMin(), $attribute->getDateMax());
                 $data = $data->format('Y-m-d');
                 break;
             case "metric":
@@ -305,11 +306,11 @@ class ProductCsvGenerator implements GeneratorInterface
 
                 $decimals = $attribute->isDecimalsAllowed() ? self::DEFAULT_NB_DECIMALS : 0;
 
-                $data = $faker->randomFloat($decimals, $min, $max);
+                $data = $this->faker->randomFloat($decimals, $min, $max);
                 break;
             case "prices":
             case "boolean":
-                $data = $faker->boolean() ? "1" : "0";
+                $data = $this->faker->boolean() ? "1" : "0";
                 break;
             case "option":
             case "options":
@@ -317,7 +318,7 @@ class ProductCsvGenerator implements GeneratorInterface
                 foreach ($attribute->getOptions() as $option) {
                     $options[] = $option;
                 }
-                $option = $faker->randomElement($options);
+                $option = $this->faker->randomElement($options);
 
                 if (is_object($option)) {
                     $data = $option->getCode();
@@ -358,12 +359,13 @@ class ProductCsvGenerator implements GeneratorInterface
     /**
      * Get a random attribute from the family
      *
-     * @param $faker
+     * @param Faker  $faker
      * @param Family $family
+     *,@param int    $count
      *
-     * @return $attribute
+     * @return array
      */
-    protected function getRandomAttributeFromFamily($faker, Family $family)
+    protected function getRandomAttributesFromFamily(Family $family, $count)
     {
         $familyCode = $family->getCode();
 
@@ -376,7 +378,7 @@ class ProductCsvGenerator implements GeneratorInterface
             }
         }
 
-        return $faker->randomElement($this->attributesByFamily[$familyCode]);
+        return $this->faker->randomElements($this->attributesByFamily[$familyCode], $count);
     }
 
 
