@@ -9,7 +9,9 @@ use Pim\Bundle\CatalogBundle\Entity\Repository\AttributeRepository;
 use Pim\Bundle\CatalogBundle\Entity\Repository\LocaleRepository;
 use Pim\Bundle\CatalogBundle\Entity\Repository\ChannelRepository;
 use Pim\Bundle\CatalogBundle\Entity\Repository\CurrencyRepository;
+
 use Doctrine\Common\Persistence\ObjectRepository;
+use Symfony\Component\Console\Helper\ProgressHelper;
 use Faker;
 
 /**
@@ -116,7 +118,7 @@ class ProductCsvGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($amount, $outputDir, array $options = null)
+    public function generate($amount, $outputDir, ProgressHelper $progress, array $options = null)
     {
         $this->outputDir = $outputDir;
 
@@ -145,7 +147,7 @@ class ProductCsvGenerator implements GeneratorInterface
 
             if ($nbValuesBase > 0) {
                 if ($nbValueDeviation > 0) {
-                    $nbValues = $commonFaker->randomNumber(
+                    $nbValues = $commonFaker->numberBetween(
                         $nbValuesBase - round($nbValueDeviation/2),
                         $nbValuesBase + round($nbValueDeviation/2)
                     );
@@ -176,11 +178,13 @@ class ProductCsvGenerator implements GeneratorInterface
             }
 
             $products[] = $product;
+            $progress->advance();
         }
 
         $headers = $this->getAllKeys($products);
 
         $this->writeCsvFile($products, $headers);
+        $progress->finish();
 
         return $this;
     }

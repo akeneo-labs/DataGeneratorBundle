@@ -88,6 +88,7 @@ class GenerateDataCommand extends ContainerAwareCommand
                     ]
                 ]
         ];
+        $progress = $this->getHelperSet()->get('progress');
 
         foreach ($entities as $entity) {
             $amount = (int) $input->getOption($entity['option']);
@@ -106,7 +107,8 @@ class GenerateDataCommand extends ContainerAwareCommand
                 foreach ($entity['options'] as $option) {
                     $options[$option] = $input->getOption($option);
                 }
-                $generator->generate($amount, $outputDir, $options);
+                $progress->start($output, $amount);
+                $generator->generate($amount, $outputDir, $progress, $options);
             }
         }
     }
