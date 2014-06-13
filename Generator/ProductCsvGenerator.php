@@ -300,7 +300,7 @@ class ProductCsvGenerator implements GeneratorInterface
                 break;
             case "metric":
             case "decimal":
-                break;
+            case "prices":
                 $min = ($attribute->getNumberMin() != null) ? $attribute->getNumberMin() : self::DEFAULT_NUMBER_MIN;
                 $max = ($attribute->getNumberMax() != null) ? $attribute->getNumberMax() : self::DEFAULT_NUMBER_MAX;
 
@@ -308,7 +308,6 @@ class ProductCsvGenerator implements GeneratorInterface
 
                 $data = $this->faker->randomFloat($decimals, $min, $max);
                 break;
-            case "prices":
             case "boolean":
                 $data = $this->faker->boolean() ? "1" : "0";
                 break;
