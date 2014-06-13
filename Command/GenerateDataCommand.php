@@ -61,7 +61,7 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'Character delimiter used for the CSV file'
             )
             ->addOption(
-                'force-attribute',
+                'force-value',
                 'f',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'Force the value of an attribute to the provided value. Syntax: attribute_code:value'
@@ -84,7 +84,7 @@ class GenerateDataCommand extends ContainerAwareCommand
                         'values-number-standard-deviation',
                         'mandatory-attributes',
                         'delimiter',
-                        'force-attribute'
+                        'force-value'
                     ]
                 ]
         ];
