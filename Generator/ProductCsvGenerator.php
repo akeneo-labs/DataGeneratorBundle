@@ -25,6 +25,7 @@ class ProductCsvGenerator implements GeneratorInterface
 {
     const OUTFILE='products.csv';
     const IDENTIFIER_PREFIX='sku-';
+    const METRIC_UNIT = 'unit';
 
     const DEFAULT_NUMBER_MIN = '0';
     const DEFAULT_NUMBER_MAX = '1000';
@@ -204,7 +205,7 @@ class ProductCsvGenerator implements GeneratorInterface
         $keys = $this->getAttributeKeys($attribute);
 
         foreach ($keys as $key) {
-            $valueData[$key] = $this->generateValueData($attribute);
+            $valueData[$key] = $this->generateValueData($attribute, $key);
         }
 
         return $valueData;
@@ -221,12 +222,19 @@ class ProductCsvGenerator implements GeneratorInterface
     {
         $keys = array();
 
-        if ('prices' === $attribute->getBackendType()) {
-            foreach ($this->getCurrencies() as $currency) {
-                $keys[] = $attribute->getCode().'-'.$currency->getCode();
-            }
-        } else {
-            $keys[] = $attribute->getCode();
+        switch ($attribute->getBackendType()) {
+            case 'prices':
+                foreach ($this->getCurrencies() as $currency) {
+                    $keys[] = $attribute->getCode().'-'.$currency->getCode();
+                }
+                break;
+            case 'metric':
+                $keys[] = $attribute->getCode();
+                $keys[] = $attribute->getCode().'-'.self::METRIC_UNIT;
+                break;
+            default:
+                $keys[] = $attribute->getCode();
+                break;
         }
 
         $updatedKeys = array();
@@ -268,10 +276,11 @@ class ProductCsvGenerator implements GeneratorInterface
      * Generate value content based on backend type
      *
      * @param AbstractAttribute $attribute
+     * @param string            $key
      *
      * @return string
      */
-    protected function generateValueData(AbstractAttribute $attribute)
+    protected function generateValueData(AbstractAttribute $attribute, $key)
     {
         $data = "";
 
@@ -301,12 +310,16 @@ class ProductCsvGenerator implements GeneratorInterface
             case "metric":
             case "decimal":
             case "prices":
-                $min = ($attribute->getNumberMin() != null) ? $attribute->getNumberMin() : self::DEFAULT_NUMBER_MIN;
-                $max = ($attribute->getNumberMax() != null) ? $attribute->getNumberMax() : self::DEFAULT_NUMBER_MAX;
+                if ($attribute->getBackendType() && preg_match('/-'.self::METRIC_UNIT.'$/', $key)) {
+                    $data = $attribute->getDefaultMetricUnit();
+                } else {
+                    $min = ($attribute->getNumberMin() != null) ? $attribute->getNumberMin() : self::DEFAULT_NUMBER_MIN;
+                    $max = ($attribute->getNumberMax() != null) ? $attribute->getNumberMax() : self::DEFAULT_NUMBER_MAX;
 
-                $decimals = $attribute->isDecimalsAllowed() ? self::DEFAULT_NB_DECIMALS : 0;
+                    $decimals = $attribute->isDecimalsAllowed() ? self::DEFAULT_NB_DECIMALS : 0;
 
-                $data = $this->faker->randomFloat($decimals, $min, $max);
+                    $data = $this->faker->randomFloat($decimals, $min, $max);
+                }
                 break;
             case "boolean":
                 $data = $this->faker->boolean() ? "1" : "0";
