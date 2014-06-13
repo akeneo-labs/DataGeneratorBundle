@@ -374,7 +374,9 @@ class ProductCsvGenerator implements GeneratorInterface
 
             $attributes = $family->getAttributes();
             foreach ($attributes as $attribute) {
-                $this->attributesByFamily[$familyCode][$attribute->getCode()] = $attribute;
+                if ($attribute->getCode() !== $this->identifierCode) {
+                    $this->attributesByFamily[$familyCode][$attribute->getCode()] = $attribute;
+                }
             }
         }
 
