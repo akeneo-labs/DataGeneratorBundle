@@ -88,6 +88,16 @@ class ProductCsvGenerator implements GeneratorInterface
     protected $identifierCode;
 
     /**
+     * @var LocaleRepository
+     */
+    protected $localeRepository;
+
+    /**
+     * @var ChannelRepository
+     */
+    protected $channelRepository;
+
+    /**
      * @var CurrencyRepository
      */
     protected $currencyRepository;
