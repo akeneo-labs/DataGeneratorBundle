@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "akeneo/pim-community-dev": "1.1.*@stable",
+        "akeneo/pim-community-dev": ">=1.1",
         "fzaninotto/faker": "v1.4.0"
     },
     "require-dev": {
