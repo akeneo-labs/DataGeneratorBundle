@@ -239,10 +239,6 @@ class ProductCsvGenerator implements GeneratorInterface
                     $keys[] = $attribute->getCode().'-'.$currency->getCode();
                 }
                 break;
-            case 'metric':
-                $keys[] = $attribute->getCode();
-                $keys[] = $attribute->getCode().'-'.self::METRIC_UNIT;
-                break;
             default:
                 $keys[] = $attribute->getCode();
                 break;
@@ -276,6 +272,17 @@ class ProductCsvGenerator implements GeneratorInterface
                     $key = $baseKey.'-'.$locale->getCode();
                     $updatedKeys[] = $key;
                 }
+            }
+            $keys = $updatedKeys;
+        }
+
+        if ('metric' === $attribute->getBackendType()) {
+            $updatedKeys = array();
+
+            foreach ($keys as $key) {
+                $updatedKeys[] = $key;
+                $updatedKeys[] = $key.'-'.self::METRIC_UNIT;
+
             }
             $keys = $updatedKeys;
         }
