@@ -171,9 +171,10 @@ class ProductCsvGenerator implements GeneratorInterface
                     $nbValues = $nbValuesBase;
                 }
             }
+            $familyAttributesCount = count($this->getAttributesFromFamily($family));
                     
-            if (!isset($nbValues) || $nbValues > $family->getAttributes()->count()) {
-                $nbValues = $family->getAttributes()->count();
+            if (!isset($nbValues) || $nbValues > $familyAttributesCount) {
+                $nbValues = $familyAttributesCount;
             }
 
             $attributes = $this->getRandomAttributesFromFamily($family, $nbValues);
@@ -379,15 +380,11 @@ class ProductCsvGenerator implements GeneratorInterface
     }
 
     /**
-     * Get a random attribute from the family
+     * Get non-identifier attribute from family
      *
-     * @param Faker  $faker
      * @param Family $family
-     *,@param int    $count
-     *
-     * @return array
      */
-    protected function getRandomAttributesFromFamily(Family $family, $count)
+    protected function getAttributesFromFamily(Family $family)
     {
         $familyCode = $family->getCode();
 
@@ -402,7 +399,21 @@ class ProductCsvGenerator implements GeneratorInterface
             }
         }
 
-        return $this->faker->randomElements($this->attributesByFamily[$familyCode], $count);
+        return $this->attributesByFamily[$familyCode];
+    }
+
+    /**
+     * Get a random attribute from the family
+     *
+     * @param Faker  $faker
+     * @param Family $family
+     *,@param int    $count
+     *
+     * @return array
+     */
+    protected function getRandomAttributesFromFamily(Family $family, $count)
+    {
+        return $this->faker->randomElements($this->getAttributesFromFamily($family), $count);
     }
 
 
