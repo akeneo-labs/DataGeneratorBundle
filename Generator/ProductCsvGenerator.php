@@ -233,16 +233,7 @@ class ProductCsvGenerator implements GeneratorInterface
     {
         $keys = array();
 
-        switch ($attribute->getBackendType()) {
-            case 'prices':
-                foreach ($this->getCurrencies() as $currency) {
-                    $keys[] = $attribute->getCode().'-'.$currency->getCode();
-                }
-                break;
-            default:
-                $keys[] = $attribute->getCode();
-                break;
-        }
+        $keys[] = $attribute->getCode();
 
         $updatedKeys = array();
         if ($attribute->isScopable() && $attribute->isLocalizable()) {
@@ -276,15 +267,27 @@ class ProductCsvGenerator implements GeneratorInterface
             $keys = $updatedKeys;
         }
 
-        if ('metric' === $attribute->getBackendType()) {
-            $updatedKeys = array();
+        switch ($attribute->getBackendType()) {
+            case 'prices':
+                $updatedKeys = array();
 
-            foreach ($keys as $key) {
-                $updatedKeys[] = $key;
-                $updatedKeys[] = $key.'-'.self::METRIC_UNIT;
+                foreach ($keys as $key) {
+                    foreach ($this->getCurrencies() as $currency) {
+                        $updatedKeys[] = $key.'-'.$currency->getCode();
+                    }
+                }
+                $keys = $updatedKeys;
+                break;
+            case 'metric':
+                $updatedKeys = array();
 
-            }
-            $keys = $updatedKeys;
+                foreach ($keys as $key) {
+                    $updatedKeys[] = $key;
+                    $updatedKeys[] = $key.'-'.self::METRIC_UNIT;
+
+                }
+                $keys = $updatedKeys;
+                break;
         }
 
         return $keys;
