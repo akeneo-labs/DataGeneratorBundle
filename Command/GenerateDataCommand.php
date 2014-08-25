@@ -65,6 +65,12 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'f',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'Force the value of an attribute to the provided value. Syntax: attribute_code:value'
+            )
+            ->addOption(
+                'start-index',
+                'i',
+                InputOption::VALUE_REQUIRED,
+                'Define the start index value for the products sku definition.'
             );
     }
 
@@ -84,7 +90,8 @@ class GenerateDataCommand extends ContainerAwareCommand
                         'values-number-standard-deviation',
                         'mandatory-attributes',
                         'delimiter',
-                        'force-value'
+                        'force-value',
+                        'start-index'
                     ]
                 ]
         ];

@@ -108,11 +108,11 @@ class ProductCsvGenerator implements GeneratorInterface
     protected $faker;
 
     /**
-     * @param FamilyRepository
-     * @param AttributeRepository
-     * @param ChannelRepository
-     * @param LocaleRepository
-     * @param CurrencyRepository
+     * @param FamilyRepository    $familyRepository
+     * @param AttributeRepository $attributeRepository
+     * @param ChannelRepository   $channelRepository
+     * @param LocaleRepository    $localeRepository
+     * @param CurrencyRepository  $currencyRepository
      */
     public function __construct(
         FamilyRepository $familyRepository,
@@ -138,10 +138,11 @@ class ProductCsvGenerator implements GeneratorInterface
     {
         $this->outputDir = $outputDir;
 
-        $nbValuesBase = (int) $options['values-number'];
-        $nbValueDeviation = (int) $options['values-number-standard-deviation'];
+        $nbValuesBase        = (int) $options['values-number'];
+        $nbValueDeviation    = (int) $options['values-number-standard-deviation'];
         $mandatoryAttributes = $options['mandatory-attributes'];
-        $delimiter = $options['delimiter'];
+        $delimiter           = $options['delimiter'];
+        $startIndex          = (int) $options['start-index'];
 
         $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
 
@@ -155,7 +156,7 @@ class ProductCsvGenerator implements GeneratorInterface
 
         $products = [];
 
-        for ($i = 0; $i < $amount; $i++) {
+        for ($i = $startIndex; $i < ($startIndex + $amount); $i++) {
             $product = array();
             $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
             $family = $this->getRandomFamily($this->faker);
@@ -172,7 +173,7 @@ class ProductCsvGenerator implements GeneratorInterface
                 }
             }
             $familyAttributesCount = count($this->getAttributesFromFamily($family));
-                    
+
             if (!isset($nbValues) || $nbValues > $familyAttributesCount) {
                 $nbValues = $familyAttributesCount;
             }
@@ -225,7 +226,7 @@ class ProductCsvGenerator implements GeneratorInterface
     /**
      * Provides the potential column keys for this attribute
      *
-     * @param AbstractAttribute $attribtue
+     * @param AbstractAttribute $attribute
      *
      * @return array
      */
@@ -365,10 +366,11 @@ class ProductCsvGenerator implements GeneratorInterface
 
         return (string) $data;
     }
-    
 
     /**
-     * Get a random family 
+     * Get a random family
+     *
+     * @param mixed $faker
      *
      * @return Family
      */
@@ -380,7 +382,7 @@ class ProductCsvGenerator implements GeneratorInterface
     /**
      * Get a random attribute
      *
-     * @param $faker
+     * @param mixed $faker
      *
      * @return Family
      */
@@ -393,6 +395,8 @@ class ProductCsvGenerator implements GeneratorInterface
      * Get non-identifier attribute from family
      *
      * @param Family $family
+     *
+     * @return array
      */
     protected function getAttributesFromFamily(Family $family)
     {
@@ -415,7 +419,6 @@ class ProductCsvGenerator implements GeneratorInterface
     /**
      * Get a random attribute from the family
      *
-     * @param Faker  $faker
      * @param Family $family
      *,@param int    $count
      *
@@ -460,7 +463,7 @@ class ProductCsvGenerator implements GeneratorInterface
                 $this->currencies[$currency->getCode()] = $currency;
             }
         }
-        
+
         return $this->currencies;
     }
 
@@ -478,16 +481,16 @@ class ProductCsvGenerator implements GeneratorInterface
                 $this->locales[$locale->getCode()] = $locale;
             }
         }
-        
+
         return $this->locales;
     }
 
     /**
      * Get a random item from a repo
      *
-     * @parma $faker
+     * @param mixed            $faker
      * @param EntityRepository $repo
-     * @param array
+     * @param array            &$items
      *
      * @return element
      */
@@ -500,6 +503,7 @@ class ProductCsvGenerator implements GeneratorInterface
                 $items[$item->getCode()] = $item;
             }
         }
+
         return $faker->randomElement($items);
     }
 
@@ -507,11 +511,13 @@ class ProductCsvGenerator implements GeneratorInterface
      * Get a set of all keys inside arrays
      *
      * @param array $products
+     *
+     * @return array
      */
     protected function getAllKeys(array $products)
     {
         $keys = [];
-        
+
         foreach ($products as $product) {
             $keys = array_merge($keys, array_keys($product));
             $keys = array_unique($keys);
