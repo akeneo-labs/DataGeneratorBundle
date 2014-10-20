@@ -9,29 +9,21 @@ use Pim\Bundle\CatalogBundle\Entity\Repository\AttributeRepository;
 use Pim\Bundle\CatalogBundle\Entity\Repository\LocaleRepository;
 use Pim\Bundle\CatalogBundle\Entity\Repository\ChannelRepository;
 use Pim\Bundle\CatalogBundle\Entity\Repository\CurrencyRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\CategoryRepository;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Faker;
 
 /**
- * Generate native CSV file for products
+ * Generate native CSV file for association
  *
  * @author    Benoit Jacquemont <benoit@akeneo.com>
  * @copyright 2014 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class ProductCsvGenerator implements GeneratorInterface
+class AssociationCsvGenerator implements GeneratorInterface
 {
-    const IDENTIFIER_PREFIX='id-';
-    const METRIC_UNIT = 'unit';
-
-    const CATEGORY_FIELD = 'categories';
-
-    const DEFAULT_NUMBER_MIN = '0';
-    const DEFAULT_NUMBER_MAX = '1000';
-    const DEFAULT_NB_DECIMALS = '4';
+    /** @staticvar string */
     const DEFAULT_DELIMITER = ',';
 
     /** @var string */
@@ -40,145 +32,51 @@ class ProductCsvGenerator implements GeneratorInterface
     /** @var string */
     protected $delimiter;
 
-    /** @var array */
-    protected $forcedValues;
-
-    /** @var array */
-    protected $families;
-
-    /** @var array */
-    protected $attributes;
-
-    /** @var array */
-    protected $attributesByFamily;
-
-    /** @var array */
-    protected $currencies;
-
-    /** @var array */
-    protected $channels;
-
-    /** @var array */
-    protected $locales;
-
-    /** @var FamilyRepository */
-    protected $familyRepository;
+    /** @var ProductRepository */
+    protected $productRepository;
 
     /** @var string */
     protected $identifierCode;
 
-    /** @var LocaleRepository */
-    protected $localeRepository;
-
-    /** @var ChannelRepository */
-    protected $channelRepository;
-
-    /** @var CurrencyRepository */
-    protected $currencyRepository;
-
-    /** @var CategoryRepository */
-    protected $categoryRepository;
-
     /** @var Faker */
     protected $faker;
 
-    /** @var array */
-    protected $categoryCodes;
-
     /**
-     * @param FamilyRepository    $familyRepository
+     * @param ProductRepository   $productRepository
      * @param AttributeRepository $attributeRepository
-     * @param ChannelRepository   $channelRepository
-     * @param LocaleRepository    $localeRepository
-     * @param CurrencyRepository  $currencyRepository
-     * @param CategoryRepository  $categoryRepository
      */
     public function __construct(
-        FamilyRepository $familyRepository,
-        AttributeRepository $attributeRepository,
-        ChannelRepository $channelRepository,
-        LocaleRepository $localeRepository,
-        CurrencyRepository $currencyRepository,
-        CategoryRepository $categoryRepository
+        ProductRepository $productRepository,
+        AttributeRepository $attributeRepository
     ) {
-        $this->familyRepository   = $familyRepository;
-        $this->channelRepository  = $channelRepository;
-        $this->localeRepository   = $localeRepository;
-        $this->currencyRepository = $currencyRepository;
-        $this->categoryRepository = $categoryRepository;
+        $this->attributeRepository = $attributeRepository;
 
         $this->identifierCode = $attributeRepository->getIdentifierCode();
-
-        $this->attributeByFamily = array();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate($amount, $outputFile, ProgressHelper $progress, array $options = null)
+    public function generate($amount, $outputDir, ProgressHelper $progress, array $options = null)
     {
         $this->outputFile = $outputFile;
 
-        $nbValuesBase        = (int) $options['values-number'];
-        $nbValueDeviation    = (int) $options['values-number-standard-deviation'];
-        $startIndex          = (int) $options['start-index'];
-        $categoriesCount     = (int) $options['categories-count'];
-        $mandatoryAttributes = $options['mandatory-attributes'];
-        $delimiter           = $options['delimiter'];
-
-        $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
+        $this->delimiter = ($options['delimiter'] != null) ? $options['delimiter'] : self::DEFAULT_DELIMITER;
 
         $this->forcedValues = array();
-        foreach ($options['force-value'] as $forcedValue) {
-            list($attributeCode, $value) = explode(':', $forcedValue);
-            $this->forcedValues[$attributeCode] = $value;
-        }
 
         $this->faker = Faker\Factory::create();
 
-        $products = [];
+        $associations = [];
 
-        for ($i = $startIndex; $i < ($startIndex + $amount); $i++) {
-            $product = array();
-            $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
-            $family = $this->getRandomFamily($this->faker);
-            $product['family'] = $family->getCode();
+        for ($i = 0; $i < $amount; $i++) {
 
-            if ($nbValuesBase > 0) {
-                if ($nbValueDeviation > 0) {
-                    $nbValues = $this->faker->numberBetween(
-                        $nbValuesBase - round($nbValueDeviation/2),
-                        $nbValuesBase + round($nbValueDeviation/2)
-                    );
-                } else {
-                    $nbValues = $nbValuesBase;
-                }
-            }
-            $familyAttrCount = count($this->getAttributesFromFamily($family));
+            $association = array();
+            $association['code'] = $this->getRandomProduct($this->faker);
+            $association['products'] = $this->getRandomProducts();
+            $association['association_type'] = $this->getRandomAssociationType();
 
-            if (!isset($nbValues) || $nbValues > $familyAttrCount) {
-                $nbValues = $familyAttrCount;
-            }
-
-            $attributes = $this->getRandomAttributesFromFamily($family, $nbValues);
-            foreach ($attributes as $attribute) {
-                $valueData = $this->generateValue($attribute);
-                $product = array_merge($product, $valueData);
-            }
-
-            foreach ($mandatoryAttributes as $mandatoryAttribute) {
-                if (isset($this->attributesByFamily[$family->getCode()][$mandatoryAttribute])) {
-                    $attribute = $this->attributesByFamily[$family->getCode()][$mandatoryAttribute];
-                    $valueData = $this->generateValue($attribute);
-                    $product = array_merge($product, $valueData);
-                }
-            }
-
-            $categories = $this->getRandomCategoryCodes($categoriesCount);
-
-            $product[self::CATEGORY_FIELD] = implode(',', $categories);
-
-            $products[] = $product;
+            $associations[] = $association;
             $progress->advance();
         }
 
@@ -403,10 +301,10 @@ class ProductCsvGenerator implements GeneratorInterface
     }
 
     /**
-     * Get random attributes from the family
+     * Get a random attribute from the family
      *
      * @param Family $family
-     * @param int    $count
+     *,@param int    $count
      *
      * @return array
      */
@@ -415,37 +313,7 @@ class ProductCsvGenerator implements GeneratorInterface
         return $this->faker->randomElements($this->getAttributesFromFamily($family), $count);
     }
 
-    /**
-     * Get random categories
-     *
-     * @param int    $count
-     *
-     * @return array
-     */
-    protected function getRandomCategoryCodes($count)
-    {
-        return $this->faker->randomElements($this->getCategoryCodes(), $count);
-    }
 
-    /**
-     * Get all categories that are not root
-     *
-     * @return array
-     */
-    protected function getCategoryCodes()
-    {
-        if (null === $this->categoryCodes) {
-            $this->categories = array();
-            $categories = $this->categoryRepository->findAll();
-            foreach ($categories as $category) {
-                if (null !== $category->getParent()) {
-                    $this->categoryCodes[] = $category->getCode();
-                }
-            }
-        }
-
-        return $this->categoryCodes;
-    }
 
     /**
      * Get all channels

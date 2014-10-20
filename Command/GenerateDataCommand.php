@@ -26,15 +26,19 @@ class GenerateDataCommand extends ContainerAwareCommand
             ->setName('pim:generate-data')
             ->setDescription('Generate test data for PIM entities')
             ->addArgument(
-                'output_dir',
+                'entity-type',
                 InputArgument::REQUIRED,
-                'Target directory where to generate the data'
+                'Type of entity to generate (product, association)'
             )
-            ->addOption(
-                'product',
-                'p',
-                InputOption::VALUE_REQUIRED,
-                'Number of products to generate'
+            ->addArgument(
+                'amount',
+                InputArgument::REQUIRED,
+                'Number of entities to generate'
+            )
+            ->addArgument(
+                'output-file',
+                InputArgument::REQUIRED,
+                'Target file where to generate the data'
             )
             ->addOption(
                 'values-number',
@@ -52,7 +56,7 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'mandatory-attributes',
                 'm',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'List of mandatory attributes (the identifier is always included)'
+                'List of mandatory attributes for products (the identifier is always included)'
             )
             ->addOption(
                 'delimiter',
@@ -71,6 +75,12 @@ class GenerateDataCommand extends ContainerAwareCommand
                 'i',
                 InputOption::VALUE_REQUIRED,
                 'Define the start index value for the products sku definition.'
+            )
+            ->addOption(
+                'categories-count',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Average number of categories in which the product must be present. Set to 0 to have no category presence for products.'
             );
     }
 
@@ -79,11 +89,8 @@ class GenerateDataCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $outputDir = $input->getArgument('output_dir');
-
         $entities = [
-            [
-                'option'  => 'product',
+            'product' => [
                 'service' => 'pim_datagenerator.generator.product_csv',
                 'options' => [
                         'values-number',
@@ -91,32 +98,56 @@ class GenerateDataCommand extends ContainerAwareCommand
                         'mandatory-attributes',
                         'delimiter',
                         'force-value',
-                        'start-index'
-                    ]
+                        'start-index',
+                        'categories-count'
                 ]
+            ],
+            'association' => [
+                'service' => 'pim_datagenerator.generator.association_csv',
+                'options' => [
+                        'delimiter'
+                ]
+            ]
         ];
+
+        $entityType = $input->getArgument('entity-type');
+        $amount     = $input->getArgument('amount');
+        $outputFile = $input->getArgument('output-file');
+
+        if (!isset($entities[$entityType])) {
+            $output->writeln(
+                sprintf(
+                    '<error>The entity type %s is not allowed. Only %s can be used.</error>',
+                    $entityType,
+                    implode(',', arrau_keys($entities))
+                )
+            );
+
+            return 1;
+        }
+
+        $entityConfig = $entities[$entityType];
+
         $progress = $this->getHelperSet()->get('progress');
 
-        foreach ($entities as $entity) {
-            $amount = (int) $input->getOption($entity['option']);
+        if ($amount> 0) {
+            $output->writeln(
+                sprintf(
+                    '<info>Generating %d instances of entity type %s to %s<info>',
+                    $amount,
+                    $entityType,
+                    $outputFile
+                )
+            );
 
-            if ($amount > 0) {
-                $output->writeln(
-                    sprintf(
-                        '<info>Generating %d instances of entity type %s to %s directory<info>',
-                        $amount,
-                        $entity['option'],
-                        $outputDir
-                    )
-                );
-                $generator = $this->getContainer()->get($entity['service']);
-                $options = [];
-                foreach ($entity['options'] as $option) {
-                    $options[$option] = $input->getOption($option);
-                }
-                $progress->start($output, $amount);
-                $generator->generate($amount, $outputDir, $progress, $options);
+            $generator = $this->getContainer()->get($entityConfig['service']);
+
+            $options = [];
+            foreach ($entityConfig['options'] as $option) {
+                $options[$option] = $input->getOption($option);
             }
+            $progress->start($output, $amount);
+            $generator->generate($amount, $outputFile, $progress, $options);
         }
     }
 }

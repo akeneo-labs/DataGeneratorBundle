@@ -10,4 +10,5 @@ services:
             - '@pim_catalog.repository.channel'
             - '@pim_catalog.repository.locale'
             - '@pim_catalog.repository.currency'
+            - '@pim_catalog.repository.category'
 
