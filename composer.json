@@ -23,8 +23,15 @@
         }
     ],
     "require": {
-        "akeneo/pim-community-dev": ">=1.1",
-        "fzaninotto/faker": "v1.4.0"
+        "akeneo/pim-community-dev": "1.2.*",
+        "akeneo/pim-community-dev": "dev-master@dev",
+        "monolog/monolog": "1.10.*",
+        "symfony/icu": "1.1.0",
+        "oro/platform": "1.0.0-beta13",
+        "knplabs/knp-menu-bundle":"v2.0.0-alpha2",
+        "knplabs/knp-menu":"v2.0.0-alpha2",
+        "gedmo/doctrine-extensions":"2.3.x-dev@dev",
+        "fzaninotto/faker": "1.4.*"
     },
     "require-dev": {
         "phpspec/phpspec": "2.0.*@dev"
@@ -35,6 +42,6 @@
     "config": {
         "bin-dir": "bin"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "target-dir": "Pim/Bundle/DataGeneratorBundle"
 }
