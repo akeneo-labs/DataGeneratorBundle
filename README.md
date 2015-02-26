@@ -21,24 +21,27 @@ Usage
 -----
 ```
 Usage:
- pim:generate-data [-p|--product="..."] [-a|--values-number="..."] [-d|--values-number-standard-deviation="..."] [-m|--mandatory-attributes="..."] [-c|--delimiter="..."] [-f|--force-attribute="..."] output_dir
+ pim:generate-data [-a|--values-number="..."] [-d|--values-number-standard-deviation="..."] [-m|--mandatory-attributes="..."] [-c|--delimiter="..."] [-f|--force-value="..."] [-i|--start-index="..."] [--categories-count="..."] entity-type amount output-file
 
 Arguments:
- output_dir                              Target directory where to generate the data
+ entity-type                             Type of entity to generate (product, association)
+ amount                                  Number of entities to generate
+ output-file                             Target file where to generate the data
 
 Options:
- --product (-p)                          Number of products to generate
  --values-number (-a)                    Mean number of values to generate per products
  --values-number-standard-deviation (-d) Standard deviation for the number of values per product
- --mandatory-attributes (-m)             List of mandatory attributes (the identifier is always included) (multiple values allowed)
+ --mandatory-attributes (-m)             List of mandatory attributes for products (the identifier is always included) (multiple values allowed)
  --delimiter (-c)                        Character delimiter used for the CSV file
- --force-attribute (-f)                  Force the value of an attribute to the provided value. Syntax: attribute_code:value (multiple values allowed)
+ --force-value (-f)                      Force the value of an attribute to the provided value. Syntax: attribute_code:value (multiple values allowed)
+ --start-index (-i)                      Define the start index value for the products sku definition.
+ --categories-count                      Average number of categories in which the product must be present. Set to 0 to have no category presence for products.
 ```
 
 Example
 -------
 ```
-php app/console pim:generate -p 10000 /tmp/
+php app/console pim:generate-data product 1000 /tmp/products.csv
 ```
 Will generates 10000 products in `/tmp/products.csv` file
 
