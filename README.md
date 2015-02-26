@@ -43,7 +43,7 @@ Example
 ```
 php app/console pim:generate-data product 1000 /tmp/products.csv
 ```
-Will generates 10000 products in `/tmp/products.csv` file
+Will generates 1000 products in `/tmp/products.csv` file
 
 Compatibility
 -------------
