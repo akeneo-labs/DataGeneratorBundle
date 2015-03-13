@@ -1,14 +1,20 @@
 parameters:
-    pim_datagenerator.generator.product_csv.class : Pim\Bundle\DataGeneratorBundle\Generator\ProductCsvGenerator
+    pim_data_generator.generator.class : Pim\Bundle\DataGeneratorBundle\Generator\Generator
+    pim_data_generator.generator.product.class : Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
 
 services:
-    pim_datagenerator.generator.product_csv:
-        class: %pim_datagenerator.generator.product_csv.class%
+    pim_data_generator.generator:
+        class: %pim_data_generator.generator.class%
         arguments:
-            - '@pim_catalog.repository.family'
-            - '@pim_catalog.repository.attribute'
-            - '@pim_catalog.repository.channel'
-            - '@pim_catalog.repository.locale'
-            - '@pim_catalog.repository.currency'
-            - '@pim_catalog.repository.category'
+            - @pim_data_generator.generator.product
+
+    pim_data_generator.generator.product:
+        class: %pim_data_generator.generator.product.class%
+        arguments:
+            - @pim_catalog.repository.family
+            - @pim_catalog.repository.attribute
+            - @pim_catalog.repository.channel
+            - @pim_catalog.repository.locale
+            - @pim_catalog.repository.currency
+            - @pim_catalog.repository.category
 

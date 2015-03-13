@@ -1,0 +1,21 @@
+data_generator:
+    output_dir: /tmp/generated_data
+    entities:
+        attribute:
+            count: 200
+            options_count: 100
+        family:
+            count: 30
+            attributes_count: 60
+        product:
+            count: 1000
+            values_count: 50
+            values_count_standard_deviation: 10
+            mandatory_attributes: [sku, name]
+            delimiter: ,
+            force_value:
+                - manufacturer = FactoryInc
+                - brand = SuperProd
+            start_index: 0
+            categories_count: 10
+

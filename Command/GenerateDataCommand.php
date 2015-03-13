@@ -2,11 +2,14 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
+use Pim\Bundle\DataGeneratorBundle\Configuration\GeneratorConfiguration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * Generates CSV files for selected entities
@@ -26,61 +29,9 @@ class GenerateDataCommand extends ContainerAwareCommand
             ->setName('pim:generate-data')
             ->setDescription('Generate test data for PIM entities')
             ->addArgument(
-                'entity-type',
+                'configuration-file',
                 InputArgument::REQUIRED,
-                'Type of entity to generate (product, association)'
-            )
-            ->addArgument(
-                'amount',
-                InputArgument::REQUIRED,
-                'Number of entities to generate'
-            )
-            ->addArgument(
-                'output-file',
-                InputArgument::REQUIRED,
-                'Target file where to generate the data'
-            )
-            ->addOption(
-                'values-number',
-                'a',
-                InputOption::VALUE_REQUIRED,
-                'Mean number of values to generate per products'
-            )
-            ->addOption(
-                'values-number-standard-deviation',
-                'd',
-                InputOption::VALUE_REQUIRED,
-                'Standard deviation for the number of values per product'
-            )
-            ->addOption(
-                'mandatory-attributes',
-                'm',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'List of mandatory attributes for products (the identifier is always included)'
-            )
-            ->addOption(
-                'delimiter',
-                'c',
-                InputOption::VALUE_REQUIRED,
-                'Character delimiter used for the CSV file'
-            )
-            ->addOption(
-                'force-value',
-                'f',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Force the value of an attribute to the provided value. Syntax: attribute_code:value'
-            )
-            ->addOption(
-                'start-index',
-                'i',
-                InputOption::VALUE_REQUIRED,
-                'Define the start index value for the products sku definition.'
-            )
-            ->addOption(
-                'categories-count',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Average number of categories in which the product must be present. Set to 0 to have no category presence for products.'
+                'YAML configuration file'
             );
     }
 
@@ -89,65 +40,68 @@ class GenerateDataCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $entities = [
-            'product' => [
-                'service' => 'pim_datagenerator.generator.product_csv',
-                'options' => [
-                        'values-number',
-                        'values-number-standard-deviation',
-                        'mandatory-attributes',
-                        'delimiter',
-                        'force-value',
-                        'start-index',
-                        'categories-count'
-                ]
-            ],
-            'association' => [
-                'service' => 'pim_datagenerator.generator.association_csv',
-                'options' => [
-                        'delimiter'
-                ]
-            ]
-        ];
+        $configFile = $input->getArgument('configuration-file');
 
-        $entityType = $input->getArgument('entity-type');
-        $amount     = $input->getArgument('amount');
-        $outputFile = $input->getArgument('output-file');
+        $config = $this->getConfiguration($configFile);
 
-        if (!isset($entities[$entityType])) {
-            $output->writeln(
-                sprintf(
-                    '<error>The entity type %s is not allowed. Only %s can be used.</error>',
-                    $entityType,
-                    implode(',', arrau_keys($entities))
-                )
-            );
+        $generator = $this->getContainer()->get('pim_data_generator.generator');
 
-            return 1;
-        }
+        $totalCount = $this->getTotalCount($config);
 
-        $entityConfig = $entities[$entityType];
+        $outputDir = $config['output_dir'];
+
+        $output->writeln(
+            sprintf(
+                '<info>Generating <comment>%d</comment> entities in the <comment>%s</comment> directory</info>',
+                $totalCount,
+                $outputDir
+            )
+        );
 
         $progress = $this->getHelperSet()->get('progress');
+        $progress->start($output, $totalCount);
 
-        if ($amount> 0) {
-            $output->writeln(
-                sprintf(
-                    '<info>Generating %d instances of entity type %s to %s<info>',
-                    $amount,
-                    $entityType,
-                    $outputFile
-                )
-            );
 
-            $generator = $this->getContainer()->get($entityConfig['service']);
+        $generator->generate($config, $outputDir, $progress);
+    }
 
-            $options = [];
-            foreach ($entityConfig['options'] as $option) {
-                $options[$option] = $input->getOption($option);
-            }
-            $progress->start($output, $amount);
-            $generator->generate($amount, $outputFile, $progress, $options);
+    /**
+     * Return a processed configuration from the configuration filename provided
+     *
+     * @param string $filename
+     *
+     * @return array
+     */
+    protected function getConfiguration($filename)
+    {
+        $rawConfig = Yaml::parse(file_get_contents($filename));
+
+        $processor = new Processor();
+        $config = new GeneratorConfiguration();
+
+        $processedConfig = $processor->processConfiguration(
+            $config,
+            $rawConfig
+        );
+
+        return $processedConfig;
+    }
+
+    /**
+     * Get total count from the configuration
+     *
+     * @param array $config
+     *
+     * @return int
+     */
+    protected function getTotalCount(array $config)
+    {
+        $totalCount = 0;
+
+        foreach ($config['entities'] as $entity) {
+            $totalCount += $entity['count'];
         }
+
+        return $totalCount;
     }
 }
