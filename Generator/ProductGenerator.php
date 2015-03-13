@@ -65,6 +65,9 @@ class ProductGenerator implements GeneratorInterface
     /** @var FamilyRepository */
     protected $familyRepository;
 
+    /** @var AttributeRepository */
+    protected $attributeRepository;
+
     /** @var string */
     protected $identifierCode;
 
@@ -107,8 +110,7 @@ class ProductGenerator implements GeneratorInterface
         $this->localeRepository   = $localeRepository;
         $this->currencyRepository = $currencyRepository;
         $this->categoryRepository = $categoryRepository;
-
-        $this->identifierCode = $attributeRepository->getIdentifierCode();
+        $this->attributeRepository = $attributeRepository;
 
         $this->attributeByFamily = array();
     }
@@ -133,7 +135,13 @@ class ProductGenerator implements GeneratorInterface
 
         $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
 
-        $this->forcedValues = $config['force_value'];
+        if (isset($config['force_values'])) {
+            $this->forcedValues = $config['force_values'];
+        } else {
+            $this->forcedValues = [];
+        }
+
+        $this->identifierCode = $this->attributeRepository->getIdentifierCode();
 
         $this->faker = Faker\Factory::create();
 

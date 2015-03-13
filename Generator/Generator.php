@@ -16,17 +16,24 @@ class Generator implements GeneratorInterface
     /** @var AttributeGenerator */
     protected $attributeGenerator;
 
+    /** @var FamilyGenerator */
+    protected $familyGenerator;
+
     /** @var ProductGenerator */
     protected $productGenerator;
 
     /**
      * @param AttributeGenerator $attributeGenerator
+     * @param FamilyGenerator    $familyGenerator
      * @param ProductGenerator   $productGenerator
      */
-    //public function __construct(AttributeGenerator $attributeGenerator, ProductGenerator $productGenerator)
-    public function __construct(ProductGenerator $productGenerator)
-    {
-//        $this->attributeGenerator = $attributeGenerator;
+    public function __construct(
+        AttributeGenerator $attributeGenerator,
+        FamilyGenerator $familyGenerator,
+        ProductGenerator $productGenerator
+    ) {
+        $this->attributeGenerator = $attributeGenerator;
+        $this->familyGenerator    = $familyGenerator;
         $this->productGenerator   = $productGenerator;
     }
 
@@ -37,10 +44,23 @@ class Generator implements GeneratorInterface
     {
         $generatedAttributes = null;
 
+        if (isset($config['entities']['product']) && count($config['entities']) > 1) {
+            throw new \LogicException(
+                'Products can be generated at the same time of other entities.'.
+                'Please generate attributes and families, import them, then generate products'
+            );
+        }
+
         if (isset($config['entities']['attribute'])) {
             $attributeConfig = $config['entities']['attribute'];
-//            $this->attributeGenerator->generate($attributeConfig, $outputDir, $progress);
-//            $generatedAttributes = $this->attributeGenerator->getGeneratedAttributes();
+            $this->attributeGenerator->generate($attributeConfig, $outputDir, $progress);
+            $generatedAttributes = $this->attributeGenerator->getAttributeObjects();
+        }
+
+        if (isset($config['entities']['family'])) {
+            $familyConfig = $config['entities']['family'];
+            $this->familyGenerator->setAttributes($generatedAttributes);
+            $this->familyGenerator->generate($familyConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['product'])) {
@@ -51,5 +71,6 @@ class Generator implements GeneratorInterface
             $this->productGenerator->generate($productConfig, $outputDir, $progress);
         }
 
+        $progress->finish();
     }
 }

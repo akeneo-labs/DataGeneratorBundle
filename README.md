@@ -30,8 +30,10 @@ Arguments:
  configuration-file                      Type of entity to generate (product, association)
 ```
 
-Configuration file example
---------------------------
+Configuration file examples
+---------------------------
+Generating attributes and families:
+
 ```yaml
 data_generator:
     output_dir: /tmp/generated_data
@@ -42,13 +44,20 @@ data_generator:
         family:
             count: 30
             attributes_count: 60
+```
+
+Generating products:
+```yaml
+data_generator:
+    output_dir: /tmp/generated_data
+    entities:
         product:
             count: 1000
             values_count: 50
             values_count_standard_deviation: 10
             mandatory_attributes: [sku, name]
             delimiter: ,
-            force_value:
+            force_values:
                 - manufacturer = FactoryInc
                 - brand = SuperProd
             start_index: 0
@@ -56,6 +65,8 @@ data_generator:
 ```
 
 More configuration examples are available in the ``Resources\examples`` directory.
+
+If not attribute and family are defined, the product generation will use the available attributes in the PIM DB.
 
 Compatibility
 -------------
