@@ -194,7 +194,6 @@ class ProductGenerator implements GeneratorInterface
         $headers = $this->getAllKeys($products);
 
         $this->writeCsvFile($products, $headers);
-        $progress->finish();
 
         return $this;
     }
