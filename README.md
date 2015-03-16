@@ -33,7 +33,7 @@ Usage:
  pim:generate-data <configuration_file_path>
 
 Arguments:
- configuration-file                      Type of entity to generate (product, association)
+ configuration-file    YAML configuration file
 ```
 
 Configuration file examples
