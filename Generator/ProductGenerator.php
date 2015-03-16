@@ -444,7 +444,7 @@ class ProductGenerator implements GeneratorInterface
     protected function getCategoryCodes()
     {
         if (null === $this->categoryCodes) {
-            $this->categories = array();
+            $this->categoryCodes = array();
             $categories = $this->categoryRepository->findAll();
             foreach ($categories as $category) {
                 if (null !== $category->getParent()) {
