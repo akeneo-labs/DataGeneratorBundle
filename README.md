@@ -20,6 +20,12 @@ and update your ``app/AppKernel.php`` as follow:
     $bundles[] = new Pim\Bundle\DataGeneratorBundle\PimDataGeneratorBundle();
 ```
 
+Legacy version
+--------------
+If you want to use the previous version (with the command lines and options), please use the 0.1 tag.
+Note that the current version covers the same feature than the previous one while adding generation
+on attributes and families.
+
 Usage
 -----
 ```bash
@@ -67,6 +73,11 @@ data_generator:
 More configuration examples are available in the ``Resources\examples`` directory.
 
 If not attribute and family are defined, the product generation will use the available attributes in the PIM DB.
+
+How to use the generated attributes and families data
+-----------------------------------------------------
+The generated files are meant to be used in the fixtures. Only the generated products CSV file
+must be imported by the import profiles.
 
 Compatibility
 -------------
