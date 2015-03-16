@@ -2,14 +2,14 @@ data_generator:
     output_dir: /tmp/generated_data
     entities:
         attribute:
-            count: 200
+            count: 100
             identifier_attribute: sku
             force_attributes:
                 - name = pim_catalog_text
         family:
             count: 40
-            attributes_count: 100
+            attributes_count: 50
             identifier_attribute: sku
             label_attribute: name
-            requirements_count: 40
+            requirements_count: 5
 
