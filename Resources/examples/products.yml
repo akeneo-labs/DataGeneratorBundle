@@ -1,0 +1,17 @@
+# With this configuration, product data are generated from existing attributes
+# in Akeneo PIM
+data_generator:
+    output_dir: /tmp/generated_data
+    entities:
+        product:
+            count: 1000
+            values_count: 50
+            values_count_standard_deviation: 10
+            mandatory_attributes: [sku, name]
+            delimiter: ,
+            force_values:
+                - manufacturer = FactoryInc
+                - brand = SuperProd
+            start_index: 0
+            categories_count: 10
+

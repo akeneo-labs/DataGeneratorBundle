@@ -3,51 +3,85 @@ DataGeneratorBundle
 
 This bundle generates file data in the native Akeneo CSV format.
 
-For now, it only able to generate products information.
+It's able to generate products and attributes information (including families and attributes options).
 
-So you need a PIM system with all attributes, famillies, channels, locales and currency already setup.
+So you need a PIM system with channels, locales and currency already setup.
 
-From there, this bundle will generate valid product data
+From that, this bundle will generate valid product and attribute data.
 
 Installation
 ------------
+```bash
+ $ composer.phar require akeneo/data-generator-bundle dev-master
 ```
-composer.phar require akeneo/data-generator-bundle dev-master
-```
-and update your app/AppKernel.php to add a new Pim\\Bundle\\DataGeneratorBundle\\PimDataGeneratorBundle to the bundle list.
+and update your ``app/AppKernel.php`` as follow:
 
+```php
+    $bundles[] = new Pim\Bundle\DataGeneratorBundle\PimDataGeneratorBundle();
+```
+
+Legacy version
+--------------
+If you want to use the previous version (with the command lines and options), please use the 0.1 tag.
+Note that the current version covers the same feature than the previous one while adding generation
+on attributes and families.
 
 Usage
 -----
-```
+```bash
 Usage:
- pim:generate-data [-a|--values-number="..."] [-d|--values-number-standard-deviation="..."] [-m|--mandatory-attributes="..."] [-c|--delimiter="..."] [-f|--force-value="..."] [-i|--start-index="..."] [--categories-count="..."] entity-type amount output-file
+ pim:generate-data <configuration_file_path>
 
 Arguments:
- entity-type                             Type of entity to generate (product, association)
- amount                                  Number of entities to generate
- output-file                             Target file where to generate the data
-
-Options:
- --values-number (-a)                    Mean number of values to generate per products
- --values-number-standard-deviation (-d) Standard deviation for the number of values per product
- --mandatory-attributes (-m)             List of mandatory attributes for products (the identifier is always included) (multiple values allowed)
- --delimiter (-c)                        Character delimiter used for the CSV file
- --force-value (-f)                      Force the value of an attribute to the provided value. Syntax: attribute_code:value (multiple values allowed)
- --start-index (-i)                      Define the start index value for the products sku definition.
- --categories-count                      Average number of categories in which the product must be present. Set to 0 to have no category presence for products.
+ configuration-file                      Type of entity to generate (product, association)
 ```
 
-Example
--------
+Configuration file examples
+---------------------------
+Generating attributes and families:
+
+```yaml
+data_generator:
+    output_dir: /tmp/generated_data
+    entities:
+        attribute:
+            count: 200
+            options_count: 100
+        family:
+            count: 30
+            attributes_count: 60
 ```
-php app/console pim:generate-data product 1000 /tmp/products.csv
+
+Generating products:
+```yaml
+data_generator:
+    output_dir: /tmp/generated_data
+    entities:
+        product:
+            count: 1000
+            values_count: 50
+            values_count_standard_deviation: 10
+            mandatory_attributes: [sku, name]
+            delimiter: ,
+            force_values:
+                - manufacturer = FactoryInc
+                - brand = SuperProd
+            start_index: 0
+            categories_count: 10
 ```
-Will generates 1000 products in `/tmp/products.csv` file
+
+More configuration examples are available in the ``Resources\examples`` directory.
+
+If not attribute and family are defined, the product generation will use the available attributes in the PIM DB.
+
+How to use the generated attributes and families data
+-----------------------------------------------------
+The generated files are meant to be used in the fixtures. Only the generated products CSV file
+must be imported by the import profiles.
 
 Compatibility
 -------------
-Tested on PIM CE 1.1.
+Tested on PIM CE 1.1, CE 1.2, CE 1.3, EE 1.0 and EE 1.3.
 
 Credits
 -------

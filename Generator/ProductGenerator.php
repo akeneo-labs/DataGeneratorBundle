@@ -22,8 +22,9 @@ use Faker;
  * @copyright 2014 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class ProductCsvGenerator implements GeneratorInterface
+class ProductGenerator implements GeneratorInterface
 {
+    const PRODUCT_FILENAME='products.csv';
     const IDENTIFIER_PREFIX='id-';
     const METRIC_UNIT = 'unit';
 
@@ -63,6 +64,9 @@ class ProductCsvGenerator implements GeneratorInterface
 
     /** @var FamilyRepository */
     protected $familyRepository;
+
+    /** @var AttributeRepository */
+    protected $attributeRepository;
 
     /** @var string */
     protected $identifierCode;
@@ -106,8 +110,7 @@ class ProductCsvGenerator implements GeneratorInterface
         $this->localeRepository   = $localeRepository;
         $this->currencyRepository = $currencyRepository;
         $this->categoryRepository = $categoryRepository;
-
-        $this->identifierCode = $attributeRepository->getIdentifierCode();
+        $this->attributeRepository = $attributeRepository;
 
         $this->attributeByFamily = array();
     }
@@ -115,30 +118,36 @@ class ProductCsvGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($amount, $outputFile, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress)
     {
-        $this->outputFile = $outputFile;
+        $this->outputFile = $outputDir.'/'.self::PRODUCT_FILENAME;
 
-        $nbValuesBase        = (int) $options['values-number'];
-        $nbValueDeviation    = (int) $options['values-number-standard-deviation'];
-        $startIndex          = (int) $options['start-index'];
-        $categoriesCount     = (int) $options['categories-count'];
-        $mandatoryAttributes = $options['mandatory-attributes'];
-        $delimiter           = $options['delimiter'];
+        $count               = (int) $config['count'];
+        $nbValuesBase        = (int) $config['values_count'];
+        $nbValueDeviation    = (int) $config['values_count_standard_deviation'];
+        $startIndex          = (int) $config['start_index'];
+        $categoriesCount     = (int) $config['categories_count'];
+        $mandatoryAttributes = $config['mandatory_attributes'];
+        if (!is_array($mandatoryAttributes)) {
+            $mandatoryAttributes = [];
+        }
+        $delimiter           = $config['delimiter'];
 
         $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
 
-        $this->forcedValues = array();
-        foreach ($options['force-value'] as $forcedValue) {
-            list($attributeCode, $value) = explode(':', $forcedValue);
-            $this->forcedValues[$attributeCode] = $value;
+        if (isset($config['force_values'])) {
+            $this->forcedValues = $config['force_values'];
+        } else {
+            $this->forcedValues = [];
         }
+
+        $this->identifierCode = $this->attributeRepository->getIdentifierCode();
 
         $this->faker = Faker\Factory::create();
 
         $products = [];
 
-        for ($i = $startIndex; $i < ($startIndex + $amount); $i++) {
+        for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
             $product = array();
             $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
             $family = $this->getRandomFamily($this->faker);
@@ -185,7 +194,6 @@ class ProductCsvGenerator implements GeneratorInterface
         $headers = $this->getAllKeys($products);
 
         $this->writeCsvFile($products, $headers);
-        $progress->finish();
 
         return $this;
     }
@@ -435,7 +443,7 @@ class ProductCsvGenerator implements GeneratorInterface
     protected function getCategoryCodes()
     {
         if (null === $this->categoryCodes) {
-            $this->categories = array();
+            $this->categoryCodes = array();
             $categories = $this->categoryRepository->findAll();
             foreach ($categories as $category) {
                 if (null !== $category->getParent()) {
