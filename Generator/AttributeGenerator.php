@@ -114,8 +114,6 @@ class AttributeGenerator implements GeneratorInterface
             $progress->advance();
         }
 
-        print_r($this->attributes);
-
         $this->writeYamlFile(['attributes' => $this->attributes], $this->attributesFile);
 
         return $this;
