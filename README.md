@@ -46,10 +46,12 @@ data_generator:
     entities:
         attribute:
             count: 200
-            options_count: 100
+            identifier_attribute: "sku"
         family:
             count: 30
             attributes_count: 60
+            identifier_attribute: "sku"
+            label_attribute: "label"
 ```
 
 Generating products:

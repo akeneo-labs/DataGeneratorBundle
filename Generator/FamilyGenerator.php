@@ -3,9 +3,9 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
-use Pim\Bundle\CatalogBundle\Entity\Repository\LocaleRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\ChannelRepository;
 use Pim\Bundle\CatalogBundle\Entity\Family;
+use Pim\Bundle\CatalogBundle\Repository\ChannelRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -18,9 +18,9 @@ use Symfony\Component\Yaml;
  */
 class FamilyGenerator implements GeneratorInterface
 {
-    const FAMILIES_FILENAME='families.yml';
+    const FAMILIES_FILENAME = 'families.yml';
 
-    const FAMILY_CODE_PREFIX='fam_';
+    const FAMILY_CODE_PREFIX = 'fam_';
 
     /** @var string */
     protected $familiesFile;
@@ -34,16 +34,16 @@ class FamilyGenerator implements GeneratorInterface
     /** @var array */
     protected $locales;
 
-    /** @var ChannelRepository */
+    /** @var ChannelRepositoryInterface */
     protected $channelRepository;
 
     /** @var array */
     protected $channels;
 
-    /** @var LocaleRepository */
+    /** @var LocaleRepositoryInterface */
     protected $localeRepository;
 
-    /** @var Faker */
+    /** @var Faker\Generator */
     protected $faker;
 
     /** @var array */
@@ -56,12 +56,12 @@ class FamilyGenerator implements GeneratorInterface
     protected $filteredAttrCodes;
 
     /**
-     * @param ChannelRepository $channelRepository
-     * @param LocaleRepository  $localeRepository
+     * @param ChannelRepositoryInterface $channelRepository
+     * @param LocaleRepositoryInterface  $localeRepository
      */
     public function __construct(
-        ChannelRepository $channelRepository,
-        LocaleRepository $localeRepository
+        ChannelRepositoryInterface $channelRepository,
+        LocaleRepositoryInterface $localeRepository
     ) {
         $this->channelRepository = $channelRepository;
         $this->localeRepository = $localeRepository;
@@ -86,7 +86,7 @@ class FamilyGenerator implements GeneratorInterface
 
         for ($i = 0; $i < $count; $i++) {
             $family = [];
-            $family['labels']      = $this->getLocalizedRandomLabels();
+            $family['labels'] = $this->getLocalizedRandomLabels();
 
             $family['attributeAsLabel'] = $this->labelAttribute;
 
@@ -98,7 +98,7 @@ class FamilyGenerator implements GeneratorInterface
             $requirements = [];
 
             foreach ($this->getChannels() as $channel) {
-                $attributeReqs =  $this->faker->randomElements($this->getAttributeCodes(), $requirementsCount);
+                $attributeReqs = $this->faker->randomElements($this->getAttributeCodes(), $requirementsCount);
                 $attributeReqs = array_merge([$this->identifierAttribute], $attributeReqs);
 
                 $requirements[$channel->getCode()] = $attributeReqs;

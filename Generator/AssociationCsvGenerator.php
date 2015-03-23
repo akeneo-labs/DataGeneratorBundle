@@ -4,13 +4,10 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Entity\Family;
-use Pim\Bundle\CatalogBundle\Entity\Repository\FamilyRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\AttributeRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\LocaleRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\ChannelRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\CurrencyRepository;
 
 use Doctrine\Common\Persistence\ObjectRepository;
+use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\ProductRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Faker;
 
@@ -32,22 +29,22 @@ class AssociationCsvGenerator implements GeneratorInterface
     /** @var string */
     protected $delimiter;
 
-    /** @var ProductRepository */
+    /** @var ProductRepositoryInterface */
     protected $productRepository;
 
     /** @var string */
     protected $identifierCode;
 
-    /** @var Faker */
+    /** @var Faker\Generator */
     protected $faker;
 
     /**
-     * @param ProductRepository   $productRepository
-     * @param AttributeRepository $attributeRepository
+     * @param ProductRepositoryInterface   $productRepository
+     * @param AttributeRepositoryInterface $attributeRepository
      */
     public function __construct(
-        ProductRepository $productRepository,
-        AttributeRepository $attributeRepository
+        ProductRepositoryInterface $productRepository,
+        AttributeRepositoryInterface $attributeRepository
     ) {
         $this->attributeRepository = $attributeRepository;
 
@@ -312,8 +309,6 @@ class AssociationCsvGenerator implements GeneratorInterface
         return $this->faker->randomElements($this->getAttributesFromFamily($family), $count);
     }
 
-
-
     /**
      * Get all channels
      *
@@ -372,10 +367,10 @@ class AssociationCsvGenerator implements GeneratorInterface
      * Get a random item from a repo
      *
      * @param mixed            $faker
-     * @param EntityRepository $repo
+     * @param ObjectRepository $repo
      * @param array            &$items
      *
-     * @return element
+     * @return string
      */
     protected function getRandomItem($faker, ObjectRepository $repo, array &$items = null)
     {
