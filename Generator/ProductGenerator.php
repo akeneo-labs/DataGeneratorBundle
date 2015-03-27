@@ -4,14 +4,14 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Entity\Family;
-use Pim\Bundle\CatalogBundle\Entity\Repository\FamilyRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\AttributeRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\LocaleRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\ChannelRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\CurrencyRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\CategoryRepository;
 
 use Doctrine\Common\Persistence\ObjectRepository;
+use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\CategoryRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\ChannelRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\CurrencyRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Faker;
 
@@ -24,8 +24,8 @@ use Faker;
  */
 class ProductGenerator implements GeneratorInterface
 {
-    const PRODUCT_FILENAME='products.csv';
-    const IDENTIFIER_PREFIX='id-';
+    const PRODUCT_FILENAME = 'products.csv';
+    const IDENTIFIER_PREFIX = 'id-';
     const METRIC_UNIT = 'unit';
 
     const CATEGORY_FIELD = 'categories';
@@ -62,48 +62,48 @@ class ProductGenerator implements GeneratorInterface
     /** @var array */
     protected $locales;
 
-    /** @var FamilyRepository */
+    /** @var FamilyRepositoryInterface */
     protected $familyRepository;
 
-    /** @var AttributeRepository */
+    /** @var AttributeRepositoryInterface */
     protected $attributeRepository;
 
     /** @var string */
     protected $identifierCode;
 
-    /** @var LocaleRepository */
+    /** @var LocaleRepositoryInterface */
     protected $localeRepository;
 
-    /** @var ChannelRepository */
+    /** @var ChannelRepositoryInterface */
     protected $channelRepository;
 
-    /** @var CurrencyRepository */
+    /** @var CurrencyRepositoryInterface */
     protected $currencyRepository;
 
-    /** @var CategoryRepository */
+    /** @var CategoryRepositoryInterface */
     protected $categoryRepository;
 
-    /** @var Faker */
+    /** @var Faker\Generator */
     protected $faker;
 
     /** @var array */
     protected $categoryCodes;
 
     /**
-     * @param FamilyRepository    $familyRepository
-     * @param AttributeRepository $attributeRepository
-     * @param ChannelRepository   $channelRepository
-     * @param LocaleRepository    $localeRepository
-     * @param CurrencyRepository  $currencyRepository
-     * @param CategoryRepository  $categoryRepository
+     * @param FamilyRepositoryInterface    $familyRepository
+     * @param AttributeRepositoryInterface $attributeRepository
+     * @param ChannelRepositoryInterface   $channelRepository
+     * @param LocaleRepositoryInterface    $localeRepository
+     * @param CurrencyRepositoryInterface  $currencyRepository
+     * @param CategoryRepositoryInterface  $categoryRepository
      */
     public function __construct(
-        FamilyRepository $familyRepository,
-        AttributeRepository $attributeRepository,
-        ChannelRepository $channelRepository,
-        LocaleRepository $localeRepository,
-        CurrencyRepository $currencyRepository,
-        CategoryRepository $categoryRepository
+        FamilyRepositoryInterface $familyRepository,
+        AttributeRepositoryInterface $attributeRepository,
+        ChannelRepositoryInterface $channelRepository,
+        LocaleRepositoryInterface $localeRepository,
+        CurrencyRepositoryInterface $currencyRepository,
+        CategoryRepositoryInterface $categoryRepository
     ) {
         $this->familyRepository   = $familyRepository;
         $this->channelRepository  = $channelRepository;
@@ -131,7 +131,7 @@ class ProductGenerator implements GeneratorInterface
         if (!is_array($mandatoryAttributes)) {
             $mandatoryAttributes = [];
         }
-        $delimiter           = $config['delimiter'];
+        $delimiter = $config['delimiter'];
 
         $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
 
@@ -234,7 +234,6 @@ class ProductGenerator implements GeneratorInterface
         if ($attribute->isScopable() && $attribute->isLocalizable()) {
             foreach ($this->getLocales() as $locale) {
                 foreach ($this->getChannels() as $channel) {
-
                     foreach ($keys as $baseKey) {
                         $key = $baseKey.'-'.$locale->getCode().'-'.$channel->getCode();
                         $updatedKeys[] = $key;
@@ -426,7 +425,7 @@ class ProductGenerator implements GeneratorInterface
     /**
      * Get random categories
      *
-     * @param int    $count
+     * @param int $count
      *
      * @return array
      */
@@ -512,13 +511,13 @@ class ProductGenerator implements GeneratorInterface
     /**
      * Get a random item from a repo
      *
-     * @param mixed            $faker
-     * @param EntityRepository $repo
+     * @param Faker\Generator  $faker
+     * @param ObjectRepository $repo
      * @param array            &$items
      *
-     * @return element
+     * @return string
      */
-    protected function getRandomItem($faker, ObjectRepository $repo, array &$items = null)
+    protected function getRandomItem(Faker\Generator $faker, ObjectRepository $repo, array &$items = null)
     {
         if (null === $items) {
             $items = array();
@@ -556,7 +555,7 @@ class ProductGenerator implements GeneratorInterface
      * @param array $products
      * @param array $headers
      */
-    protected function writeCsvFIle(array $products, array $headers)
+    protected function writeCsvFile(array $products, array $headers)
     {
         $csvFile = fopen($this->outputFile, 'w');
 

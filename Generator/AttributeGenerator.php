@@ -4,9 +4,9 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
 use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypeRegistry;
-use Pim\Bundle\CatalogBundle\Entity\Repository\AttributeGroupRepository;
-use Pim\Bundle\CatalogBundle\Entity\Repository\LocaleRepository;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
+use Pim\Bundle\CatalogBundle\Repository\AttributeGroupRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -19,9 +19,9 @@ use Symfony\Component\Yaml;
  */
 class AttributeGenerator implements GeneratorInterface
 {
-    const ATTRIBUTES_FILENAME='attributes.yml';
+    const ATTRIBUTES_FILENAME = 'attributes.yml';
 
-    const ATTRIBUTE_CODE_PREFIX='attr_';
+    const ATTRIBUTE_CODE_PREFIX = 'attr_';
 
     /** @var string */
     protected $attributesFile;
@@ -29,10 +29,10 @@ class AttributeGenerator implements GeneratorInterface
     /** @var array */
     protected $locales;
 
-    /** @var AttributeGroupRepository */
+    /** @var AttributeGroupRepositoryInterface */
     protected $groupRepository;
 
-    /** @var LocaleRepository */
+    /** @var LocaleRepositoryInterface */
     protected $localeRepository;
 
     /** @ var AttributeTypeRegistry */
@@ -41,20 +41,20 @@ class AttributeGenerator implements GeneratorInterface
     /** @var array */
     protected $groupCodes;
 
-    /** @var Faker */
+    /** @var Faker\Generator */
     protected $faker;
 
     /** @var array */
     protected $attributes;
 
     /**
-     * @param AttributeGroupRepository $groupRepository
-     * @param LocaleRepository         $localeRepository
-     * @param AttributeTypeRegistry    $typeRegistry
+     * @param AttributeGroupRepositoryInterface $groupRepository
+     * @param LocaleRepositoryInterface         $localeRepository
+     * @param AttributeTypeRegistry             $typeRegistry
      */
     public function __construct(
-        AttributeGroupRepository $groupRepository,
-        LocaleRepository $localeRepository,
+        AttributeGroupRepositoryInterface $groupRepository,
+        LocaleRepositoryInterface $localeRepository,
         AttributeTypeRegistry $typeRegistry
     ) {
         $this->groupRepository  = $groupRepository;
@@ -86,7 +86,7 @@ class AttributeGenerator implements GeneratorInterface
         foreach ($forceAttributes as $forceAttribute) {
             list($code, $type) = explode('=', $forceAttribute);
             $this->attributes[trim($code)] = [
-                'type' => trim($type),
+                'type'  => trim($type),
                 'group' => $this->getRandomAttributeGroupCode()
             ];
         }
@@ -95,12 +95,12 @@ class AttributeGenerator implements GeneratorInterface
             $attribute = [];
 
             $type = $this->getRandomAttributeType();
-            $attribute['type']        = $type;
-            $attribute['group']       = $this->getRandomAttributeGroupCode();
-            $attribute['labels']      = $this->getLocalizedRandomLabels();
-            $attribute['sortOrder']   = $this->faker->numberBetween(1, 10);
+            $attribute['type'] = $type;
+            $attribute['group'] = $this->getRandomAttributeGroupCode();
+            $attribute['labels'] = $this->getLocalizedRandomLabels();
+            $attribute['sortOrder'] = $this->faker->numberBetween(1, 10);
             $attribute['localizable'] = $this->faker->boolean();
-            $attribute['scopable']    = $this->faker->boolean();
+            $attribute['scopable'] = $this->faker->boolean();
 
             if ('pim_catalog_metric' === $type) {
                 $attribute = array_merge($attribute, $this->getMetricProperties());
@@ -229,7 +229,7 @@ class AttributeGenerator implements GeneratorInterface
     protected function getMetricProperties()
     {
         return [
-            "metricFamily" => "Length",
+            "metricFamily"      => "Length",
             "defaultMetricUnit" => "METER"
         ];
     }
