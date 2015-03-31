@@ -1,17 +1,27 @@
 parameters:
     pim_data_generator.generator.class : Pim\Bundle\DataGeneratorBundle\Generator\Generator
-    pim_data_generator.generator.product.class : Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
+    pim_data_generator.generator.currency.class : Pim\Bundle\DataGeneratorBundle\Generator\CurrencyGenerator
+    pim_data_generator.generator.channel.class : Pim\Bundle\DataGeneratorBundle\Generator\ChannelGenerator
     pim_data_generator.generator.attribute.class : Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator
 #    pim_data_generator.generator.attribute_option.class : Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator
     pim_data_generator.generator.family.class : Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator
+    pim_data_generator.generator.product.class : Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
 
 services:
     pim_data_generator.generator:
         class: %pim_data_generator.generator.class%
         arguments:
+            - @pim_data_generator.generator.currency
+            - @pim_data_generator.generator.channel
             - @pim_data_generator.generator.attribute
             - @pim_data_generator.generator.family
             - @pim_data_generator.generator.product
+
+    pim_data_generator.generator.currency:
+        class: %pim_data_generator.generator.currency.class%
+
+    pim_data_generator.generator.channel:
+        class: %pim_data_generator.generator.channel.class%
 
     pim_data_generator.generator.attribute:
         class: %pim_data_generator.generator.attribute.class%

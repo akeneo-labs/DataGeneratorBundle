@@ -13,6 +13,12 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class Generator implements GeneratorInterface
 {
+    /** @var CurrencyGenerator */
+    protected $currencyGenerator;
+
+    /** @var ChannelGenerator */
+    protected $channelGenerator;
+
     /** @var AttributeGenerator */
     protected $attributeGenerator;
 
@@ -23,15 +29,21 @@ class Generator implements GeneratorInterface
     protected $productGenerator;
 
     /**
+     * @param CurrencyGenerator  $currencyGenerator
+     * @param ChannelGenerator   $channelGenerator
      * @param AttributeGenerator $attributeGenerator
      * @param FamilyGenerator    $familyGenerator
      * @param ProductGenerator   $productGenerator
      */
     public function __construct(
+        CurrencyGenerator $currencyGenerator,
+        ChannelGenerator $channelGenerator,
         AttributeGenerator $attributeGenerator,
         FamilyGenerator $familyGenerator,
         ProductGenerator $productGenerator
     ) {
+        $this->currencyGenerator  = $currencyGenerator;
+        $this->channelGenerator   = $channelGenerator;
         $this->attributeGenerator = $attributeGenerator;
         $this->familyGenerator    = $familyGenerator;
         $this->productGenerator   = $productGenerator;
@@ -43,6 +55,16 @@ class Generator implements GeneratorInterface
     public function generate(array $config, $outputDir, ProgressHelper $progress)
     {
         $generatedAttributes = null;
+        $generatedCurrencies = null;
+
+        if (!is_writable($outputDir)) {
+            throw new \LogicException(
+                sprintf(
+                    "The directory %s is not writable.",
+                    $outputDir
+                )
+            );
+        }
 
         if (isset($config['entities']['product']) && count($config['entities']) > 1) {
             throw new \LogicException(
@@ -51,24 +73,38 @@ class Generator implements GeneratorInterface
             );
         }
 
-        if (isset($config['entities']['attribute'])) {
-            $attributeConfig = $config['entities']['attribute'];
-            $this->attributeGenerator->generate($attributeConfig, $outputDir, $progress);
-            $generatedAttributes = $this->attributeGenerator->getAttributeObjects();
+        if (isset($config['entities']['currencies'])) {
+            $currenciesConfig = $config['entities']['currencies'];
+            $generatedCurrencies = $this->currencyGenerator->generate($currenciesConfig, $outputDir, $progress);
         }
 
-        if (isset($config['entities']['family'])) {
-            $familyConfig = $config['entities']['family'];
-            $this->familyGenerator->setAttributes($generatedAttributes);
-            $this->familyGenerator->generate($familyConfig, $outputDir, $progress);
+        if (isset($config['entities']['channels'])) {
+            $channelsConfig = $config['entities']['channels'];
+            if (null !== $generatedCurrencies) {
+                $this->channelGenerator->setCurrencies($generatedCurrencies);
+            }
+            $generatedChannels = $this->channelGenerator->generate($channelsConfig, $outputDir, $progress);
         }
 
-        if (isset($config['entities']['product'])) {
-            $productConfig = $config['entities']['product'];
+        if (isset($config['entities']['attributes'])) {
+            $attributesConfig = $config['entities']['attributes'];
+            $generatedAttributes = $this->attributeGenerator->generate($attributeConfig, $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['families'])) {
+            $familiesConfig = $config['entities']['families'];
+            if (null !== $generatedAttributes) {
+                $this->familyGenerator->setAttributes($generatedAttributes);
+            }
+            $generatedFamilies = $this->familyGenerator->generate($familiesConfig, $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['products'])) {
+            $productsConfig = $config['entities']['products'];
             if (null !== $generatedAttributes) {
                 $this->productGenerator->setExtraAttributes($generatedAttributes);
             }
-            $this->productGenerator->generate($productConfig, $outputDir, $progress);
+            $this->productGenerator->generate($productsConfig, $outputDir, $progress);
         }
 
         $progress->finish();
