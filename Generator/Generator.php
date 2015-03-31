@@ -22,33 +22,44 @@ class Generator implements GeneratorInterface
     /** @var ProductGenerator */
     protected $productGenerator;
 
+    /** @var CategoryGenerator */
+    protected $categoryGenerator;
+
     /**
      * @param AttributeGenerator $attributeGenerator
      * @param FamilyGenerator    $familyGenerator
      * @param ProductGenerator   $productGenerator
+     * @param CategoryGenerator  $categoryGenerator
      */
     public function __construct(
         AttributeGenerator $attributeGenerator,
         FamilyGenerator $familyGenerator,
-        ProductGenerator $productGenerator
+        ProductGenerator $productGenerator,
+        CategoryGenerator $categoryGenerator
     ) {
         $this->attributeGenerator = $attributeGenerator;
         $this->familyGenerator    = $familyGenerator;
         $this->productGenerator   = $productGenerator;
+        $this->categoryGenerator  = $categoryGenerator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
-        $generatedAttributes = null;
+        $generatedAttributes = [];
 
         if (isset($config['entities']['product']) && count($config['entities']) > 1) {
             throw new \LogicException(
                 'Products can be generated at the same time of other entities.'.
                 'Please generate attributes and families, import them, then generate products'
             );
+        }
+
+        if (isset($config['entities']['category'])) {
+            $categoryConfig = $config['entities']['category'];
+            $this->categoryGenerator->generate($categoryConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['attribute'])) {
@@ -65,7 +76,7 @@ class Generator implements GeneratorInterface
 
         if (isset($config['entities']['product'])) {
             $productConfig = $config['entities']['product'];
-            if (null !== $generatedAttributes) {
+            if (!empty($generatedAttributes)) {
                 $this->productGenerator->setExtraAttributes($generatedAttributes);
             }
             $this->productGenerator->generate($productConfig, $outputDir, $progress);

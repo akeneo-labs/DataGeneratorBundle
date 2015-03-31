@@ -6,7 +6,6 @@ use Pim\Bundle\DataGeneratorBundle\Configuration\GeneratorConfiguration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
@@ -60,7 +59,6 @@ class GenerateDataCommand extends ContainerAwareCommand
 
         $progress = $this->getHelperSet()->get('progress');
         $progress->start($output, $totalCount);
-
 
         $generator->generate($config, $outputDir, $progress);
     }

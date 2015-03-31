@@ -19,8 +19,9 @@ interface GeneratorInterface
      * @param array          $config
      * @param string         $outputDir
      * @param ProgressHelper $progress
+     * @param array          $options
      *
      * @return $this
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress);
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null);
 }

@@ -2,10 +2,10 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
+use Doctrine\Common\Persistence\ObjectRepository;
+use Pim\Bundle\CatalogBundle\Entity\Attribute;
 use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Entity\Family;
-
-use Doctrine\Common\Persistence\ObjectRepository;
 use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\CategoryRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\ChannelRepositoryInterface;
@@ -112,13 +112,13 @@ class ProductGenerator implements GeneratorInterface
         $this->categoryRepository = $categoryRepository;
         $this->attributeRepository = $attributeRepository;
 
-        $this->attributeByFamily = array();
+        $this->attributesByFamily = [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
         $this->outputFile = $outputDir.'/'.self::PRODUCT_FILENAME;
 
@@ -148,7 +148,7 @@ class ProductGenerator implements GeneratorInterface
         $products = [];
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
-            $product = array();
+            $product = [];
             $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
             $family = $this->getRandomFamily($this->faker);
             $product['family'] = $family->getCode();
@@ -207,7 +207,7 @@ class ProductGenerator implements GeneratorInterface
      */
     protected function generateValue(AbstractAttribute $attribute)
     {
-        $valueData = array();
+        $valueData = [];
         $keys = $this->getAttributeKeys($attribute);
 
         foreach ($keys as $key) {
@@ -226,11 +226,11 @@ class ProductGenerator implements GeneratorInterface
      */
     protected function getAttributeKeys(AbstractAttribute $attribute)
     {
-        $keys = array();
+        $keys = [];
 
         $keys[] = $attribute->getCode();
 
-        $updatedKeys = array();
+        $updatedKeys = [];
         if ($attribute->isScopable() && $attribute->isLocalizable()) {
             foreach ($this->getLocales() as $locale) {
                 foreach ($this->getChannels() as $channel) {
@@ -263,7 +263,7 @@ class ProductGenerator implements GeneratorInterface
 
         switch ($attribute->getBackendType()) {
             case 'prices':
-                $updatedKeys = array();
+                $updatedKeys = [];
 
                 foreach ($keys as $key) {
                     foreach ($this->getCurrencies() as $currency) {
@@ -273,7 +273,7 @@ class ProductGenerator implements GeneratorInterface
                 $keys = $updatedKeys;
                 break;
             case 'metric':
-                $updatedKeys = array();
+                $updatedKeys = [];
 
                 foreach ($keys as $key) {
                     $updatedKeys[] = $key;
@@ -341,7 +341,7 @@ class ProductGenerator implements GeneratorInterface
                 break;
             case "option":
             case "options":
-                $options = array();
+                $options = [];
                 foreach ($attribute->getOptions() as $option) {
                     $options[] = $option;
                 }
@@ -377,7 +377,7 @@ class ProductGenerator implements GeneratorInterface
      *
      * @param mixed $faker
      *
-     * @return Family
+     * @return Attribute
      */
     protected function getRandomAttribute($faker)
     {
@@ -389,7 +389,7 @@ class ProductGenerator implements GeneratorInterface
      *
      * @param Family $family
      *
-     * @return array
+     * @return Attribute[]
      */
     protected function getAttributesFromFamily(Family $family)
     {
@@ -415,7 +415,7 @@ class ProductGenerator implements GeneratorInterface
      * @param Family $family
      * @param int    $count
      *
-     * @return array
+     * @return Attribute[]
      */
     protected function getRandomAttributesFromFamily(Family $family, $count)
     {
@@ -437,12 +437,12 @@ class ProductGenerator implements GeneratorInterface
     /**
      * Get all categories that are not root
      *
-     * @return array
+     * @return string[]
      */
     protected function getCategoryCodes()
     {
         if (null === $this->categoryCodes) {
-            $this->categoryCodes = array();
+            $this->categoryCodes = [];
             $categories = $this->categoryRepository->findAll();
             foreach ($categories as $category) {
                 if (null !== $category->getParent()) {
@@ -462,7 +462,7 @@ class ProductGenerator implements GeneratorInterface
     protected function getChannels()
     {
         if (null === $this->channels) {
-            $this->channels = array();
+            $this->channels = [];
             $channels = $this->channelRepository->findAll();
             foreach ($channels as $channel) {
                 $this->channels[$channel->getCode()] = $channel;
@@ -480,7 +480,7 @@ class ProductGenerator implements GeneratorInterface
     protected function getCurrencies()
     {
         if (null === $this->currencies) {
-            $this->currencies = array();
+            $this->currencies = [];
             $currencies = $this->currencyRepository->findBy(['activated' => 1]);
             foreach ($currencies as $currency) {
                 $this->currencies[$currency->getCode()] = $currency;
@@ -498,7 +498,7 @@ class ProductGenerator implements GeneratorInterface
     protected function getLocales()
     {
         if (null === $this->locales) {
-            $this->locales = array();
+            $this->locales = [];
             $locales = $this->localeRepository->findBy(['activated' => 1]);
             foreach ($locales as $locale) {
                 $this->locales[$locale->getCode()] = $locale;
@@ -515,12 +515,12 @@ class ProductGenerator implements GeneratorInterface
      * @param ObjectRepository $repo
      * @param array            &$items
      *
-     * @return string
+     * @return mixed
      */
     protected function getRandomItem(Faker\Generator $faker, ObjectRepository $repo, array &$items = null)
     {
         if (null === $items) {
-            $items = array();
+            $items = [];
             $loadedItems = $repo->findAll();
             foreach ($loadedItems as $item) {
                 $items[$item->getCode()] = $item;
@@ -567,5 +567,10 @@ class ProductGenerator implements GeneratorInterface
             fputcsv($csvFile, $productData, $this->delimiter);
         }
         fclose($csvFile);
+    }
+
+    public function setExtraAttributes(array $extraAttributes)
+    {
+        // TODO not implemented
     }
 }
