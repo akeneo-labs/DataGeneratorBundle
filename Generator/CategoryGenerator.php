@@ -5,6 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Faker;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
+use Pim\Bundle\DataGeneratorBundle\Model\CategoryTree;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -30,14 +31,17 @@ class CategoryGenerator implements GeneratorInterface
     /** @var Faker\Generator */
     protected $faker;
 
-    /** @var array */
-    protected $categories;
+    /** @var  CategoryTree */
+    protected $categoryTree;
 
     /** @var string */
     protected $outputFile;
 
     /** @var string */
     protected $delimiter;
+
+    /** @var  int */
+    protected $levelMax;
 
     /**
      * @param LocaleRepositoryInterface $localeRepository
@@ -53,40 +57,47 @@ class CategoryGenerator implements GeneratorInterface
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
         $this->outputFile = $outputDir.'/'.self::CATEGORIES_FILENAME;
+
         $delimiter = $config['delimiter'];
         $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
 
         $count = (int)$config['count'];
+        $this->levelMax = (int)$config['levels'];
 
         $this->faker = Faker\Factory::create();
-
-        $this->categories = [];
-
-        $this->categories[] = [
-            'code'   => 'master',
-            'parent' => '',
-            'label-en_US' => 'Master Catalog',
-        ];
 
         $headers = ['code', 'parent'];
         foreach ($this->getLocales() as $locale) {
             $headers[] = 'label-'.$locale->getCode();
         }
 
-        for ($i = 0; $i < $count; $i++) {
-            $category = [];
-            $category['code'] = self::CATEGORIES_CODE_PREFIX.$i;
-            $category['parent'] = 'master';
-            foreach($this->getLocalizedRandomLabels() as $localeCode => $localeLabel) {
-                $category[$localeCode] = $localeLabel;
-            }
-            $this->categories[] = $category;
-            $progress->advance();
-        }
+        $currentLevel = 0;
 
-        $this->writeCsvFile($this->categories, $headers);
+        $this->categoryTree = new CategoryTree('master', 0);
+        $this->categoryTree->addLabel('en_US', 'Master Catalog');
+
+        $this->feedTree($this->categoryTree, $currentLevel + 1, $count, $progress);
+
+        $this->writeCsvFile($headers);
 
         return $this;
+    }
+
+    protected function feedTree(CategoryTree $categoryTree, $currentLevel, $count, ProgressHelper $progress)
+    {
+        for ($i = 0; $i < $count; $i++) {
+            $categoryCode = self::CATEGORIES_CODE_PREFIX.uniqid();
+            $categoryLeaf = new CategoryTree($categoryCode, $currentLevel);
+            foreach ($this->getLocalizedRandomLabels() as $localeCode => $localeLabel) {
+                $categoryLeaf->addLabel($localeCode, $localeLabel);
+            }
+            if ($currentLevel < $this->levelMax) {
+                $this->feedTree($categoryLeaf, $currentLevel + 1, 2, $progress);
+            }
+            $categoryTree->addChild($categoryLeaf);
+        }
+
+        return $categoryTree;
     }
 
     /**
@@ -126,22 +137,32 @@ class CategoryGenerator implements GeneratorInterface
     }
 
     /**
-     * Write the CSV file from products and headers
+     * Write the CSV file
      *
-     * @param array $categories
      * @param array $headers
-     *
-     * @internal param array $products
      */
-    protected function writeCsvFile(array $categories, array $headers)
+    protected function writeCsvFile(array $headers)
     {
         $csvFile = fopen($this->outputFile, 'w');
-
         fputcsv($csvFile, $headers, $this->delimiter);
-
-        foreach ($categories as $category) {
+        $lines = $this->flattenTree($this->categoryTree);
+        foreach ($lines as $category) {
             fputcsv($csvFile, $category, $this->delimiter);
         }
         fclose($csvFile);
+    }
+
+    protected function flattenTree(CategoryTree $categoryTree, array $lines = [], CategoryTree $parent = null)
+    {
+        $flatCategory = $categoryTree->flatten();
+        if ($parent) {
+            $flatCategory['parent'] = $parent->getCode();
+        }
+        $lines [] = $flatCategory;
+        foreach ($categoryTree->getChildren() as $child) {
+            $lines = $this->flattenTree($child, $lines, $categoryTree);
+        }
+
+        return $lines;
     }
 }

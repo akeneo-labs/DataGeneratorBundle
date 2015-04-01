@@ -3,4 +3,4 @@ data_generator:
     entities:
         category:
             count: 50
-            levels: 2
+            levels: 3
