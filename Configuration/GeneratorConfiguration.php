@@ -56,6 +56,7 @@ class GeneratorConfiguration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('product')
                             ->children()
+                                ->scalarNode('filename')->end()
                                 ->integerNode('count')->min(1)->isRequired()->end()
                                 ->integerNode('values_count')->min(1)->isRequired()->end()
                                 ->integerNode('values_count_standard_deviation')->min(1)->defaultValue(10)->end()

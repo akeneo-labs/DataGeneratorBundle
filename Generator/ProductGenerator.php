@@ -24,7 +24,7 @@ use Faker;
  */
 class ProductGenerator implements GeneratorInterface
 {
-    const PRODUCT_FILENAME = 'products.csv';
+    const DEFAULT_FILENAME = 'products.csv';
     const IDENTIFIER_PREFIX = 'id-';
     const METRIC_UNIT = 'unit';
 
@@ -120,7 +120,11 @@ class ProductGenerator implements GeneratorInterface
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
-        $this->outputFile = $outputDir.'/'.self::PRODUCT_FILENAME;
+        if (!empty($config['filename'])) {
+            $this->outputFile = $outputDir.'/'.trim($config['filename']);
+        } else {
+            $this->outputFile = $outputDir.'/'.self::DEFAULT_FILENAME;
+        }
 
         $count               = (int) $config['count'];
         $nbValuesBase        = (int) $config['values_count'];
