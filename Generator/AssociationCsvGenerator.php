@@ -22,6 +22,9 @@ class AssociationCsvGenerator implements GeneratorInterface
     /** @staticvar string */
     const DEFAULT_DELIMITER = ',';
 
+    /** @staticvar string */
+    const DEFAULT_FILENAME = 'associations.csv';
+
     /** @var string */
     protected $outputFile;
 
@@ -55,7 +58,11 @@ class AssociationCsvGenerator implements GeneratorInterface
      */
     public function generate(array $amount, $outputDir, ProgressHelper $progress, array $options = null)
     {
-        $this->outputFile = $outputFile;
+        if (!empty($config['filename'])) {
+            $this->outputFile = $outputDir.'/'.trim($config['filename']);
+        } else {
+            $this->outputFile = $outputDir.'/'.self::DEFAULT_FILENAME;
+        }
 
         $this->delimiter = ($options['delimiter'] != null) ? $options['delimiter'] : self::DEFAULT_DELIMITER;
 
