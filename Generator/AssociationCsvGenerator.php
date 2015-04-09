@@ -2,14 +2,13 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
-use Pim\Bundle\CatalogBundle\Entity\Family;
-
 use Doctrine\Common\Persistence\ObjectRepository;
+use Faker;
+use Pim\Bundle\CatalogBundle\Entity\Family;
+use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\ProductRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
-use Faker;
 
 /**
  * Generate native CSV file for association
@@ -22,6 +21,9 @@ class AssociationCsvGenerator implements GeneratorInterface
 {
     /** @staticvar string */
     const DEFAULT_DELIMITER = ',';
+
+    /** @staticvar string */
+    const DEFAULT_FILENAME = 'associations.csv';
 
     /** @var string */
     protected $outputFile;
@@ -54,13 +56,17 @@ class AssociationCsvGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($amount, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $amount, $outputDir, ProgressHelper $progress, array $options = null)
     {
-        $this->outputFile = $outputFile;
+        if (!empty($config['filename'])) {
+            $this->outputFile = $outputDir.'/'.trim($config['filename']);
+        } else {
+            $this->outputFile = $outputDir.'/'.self::DEFAULT_FILENAME;
+        }
 
         $this->delimiter = ($options['delimiter'] != null) ? $options['delimiter'] : self::DEFAULT_DELIMITER;
 
-        $this->forcedValues = array();
+        $this->forcedValues = [];
 
         $this->faker = Faker\Factory::create();
 
@@ -68,7 +74,7 @@ class AssociationCsvGenerator implements GeneratorInterface
 
         for ($i = 0; $i < $amount; $i++) {
 
-            $association = array();
+            $association = [];
             $association['code'] = $this->getRandomProduct($this->faker);
             $association['products'] = $this->getRandomProducts();
             $association['association_type'] = $this->getRandomAssociationType();
@@ -93,7 +99,7 @@ class AssociationCsvGenerator implements GeneratorInterface
      */
     protected function generateValue(AbstractAttribute $attribute)
     {
-        $valueData = array();
+        $valueData = [];
         $keys = $this->getAttributeKeys($attribute);
 
         foreach ($keys as $key) {
@@ -112,11 +118,11 @@ class AssociationCsvGenerator implements GeneratorInterface
      */
     protected function getAttributeKeys(AbstractAttribute $attribute)
     {
-        $keys = array();
+        $keys = [];
 
         $keys[] = $attribute->getCode();
 
-        $updatedKeys = array();
+        $updatedKeys = [];
         if ($attribute->isScopable() && $attribute->isLocalizable()) {
             foreach ($this->getLocales() as $locale) {
                 foreach ($this->getChannels() as $channel) {
@@ -150,7 +156,7 @@ class AssociationCsvGenerator implements GeneratorInterface
 
         switch ($attribute->getBackendType()) {
             case 'prices':
-                $updatedKeys = array();
+                $updatedKeys = [];
 
                 foreach ($keys as $key) {
                     foreach ($this->getCurrencies() as $currency) {
@@ -160,7 +166,7 @@ class AssociationCsvGenerator implements GeneratorInterface
                 $keys = $updatedKeys;
                 break;
             case 'metric':
-                $updatedKeys = array();
+                $updatedKeys = [];
 
                 foreach ($keys as $key) {
                     $updatedKeys[] = $key;
@@ -228,7 +234,7 @@ class AssociationCsvGenerator implements GeneratorInterface
                 break;
             case "option":
             case "options":
-                $options = array();
+                $options = [];
                 foreach ($attribute->getOptions() as $option) {
                     $options[] = $option;
                 }
@@ -317,7 +323,7 @@ class AssociationCsvGenerator implements GeneratorInterface
     protected function getChannels()
     {
         if (null === $this->channels) {
-            $this->channels = array();
+            $this->channels = [];
             $channels = $this->channelRepository->findAll();
             foreach ($channels as $channel) {
                 $this->channels[$channel->getCode()] = $channel;
@@ -335,7 +341,7 @@ class AssociationCsvGenerator implements GeneratorInterface
     protected function getCurrencies()
     {
         if (null === $this->currencies) {
-            $this->currencies = array();
+            $this->currencies = [];
             $currencies = $this->currencyRepository->findBy(['activated' => 1]);
             foreach ($currencies as $currency) {
                 $this->currencies[$currency->getCode()] = $currency;
@@ -353,7 +359,7 @@ class AssociationCsvGenerator implements GeneratorInterface
     protected function getLocales()
     {
         if (null === $this->locales) {
-            $this->locales = array();
+            $this->locales = [];
             $locales = $this->localeRepository->findBy(['activated' => 1]);
             foreach ($locales as $locale) {
                 $this->locales[$locale->getCode()] = $locale;
@@ -375,7 +381,7 @@ class AssociationCsvGenerator implements GeneratorInterface
     protected function getRandomItem($faker, ObjectRepository $repo, array &$items = null)
     {
         if (null === $items) {
-            $items = array();
+            $items = [];
             $loadedItems = $repo->findAll();
             foreach ($loadedItems as $item) {
                 $items[$item->getCode()] = $item;

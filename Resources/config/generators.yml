@@ -4,6 +4,7 @@ parameters:
     pim_data_generator.generator.attribute.class : Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator
 #    pim_data_generator.generator.attribute_option.class : Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator
     pim_data_generator.generator.family.class : Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator
+    pim_data_generator.generator.category.class : Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator
 
 services:
     pim_data_generator.generator:
@@ -12,6 +13,12 @@ services:
             - @pim_data_generator.generator.attribute
             - @pim_data_generator.generator.family
             - @pim_data_generator.generator.product
+            - @pim_data_generator.generator.category
+
+    pim_data_generator.generator.category:
+        class: %pim_data_generator.generator.category.class%
+        arguments:
+            - '@pim_catalog.repository.locale'
 
     pim_data_generator.generator.attribute:
         class: %pim_data_generator.generator.attribute.class%

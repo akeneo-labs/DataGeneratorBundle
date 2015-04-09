@@ -70,7 +70,7 @@ class FamilyGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
         $this->familiesFile = $outputDir.'/'.self::FAMILIES_FILENAME;
 
@@ -174,7 +174,7 @@ class FamilyGenerator implements GeneratorInterface
     protected function getLocales()
     {
         if (null === $this->locales) {
-            $this->locales = array();
+            $this->locales = [];
             $locales = $this->localeRepository->findBy(['activated' => 1]);
             foreach ($locales as $locale) {
                 $this->locales[$locale->getCode()] = $locale;
