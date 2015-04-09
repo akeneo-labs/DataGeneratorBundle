@@ -1,10 +1,11 @@
 parameters:
-    pim_data_generator.generator.class : Pim\Bundle\DataGeneratorBundle\Generator\Generator
-    pim_data_generator.generator.product.class : Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
-    pim_data_generator.generator.attribute.class : Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator
-#    pim_data_generator.generator.attribute_option.class : Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator
-    pim_data_generator.generator.family.class : Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator
-    pim_data_generator.generator.category.class : Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator
+    pim_data_generator.generator.class :                  Pim\Bundle\DataGeneratorBundle\Generator\Generator
+    pim_data_generator.generator.product.class :          Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
+    pim_data_generator.generator.attribute.class :        Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator
+#   pim_data_generator.generator.attribute_option.class : Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator
+    pim_data_generator.generator.family.class :           Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator
+    pim_data_generator.generator.attribute_group.class:   Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupGenerator
+    pim_data_generator.generator.category.class :         Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator
 
 services:
     pim_data_generator.generator:
@@ -14,6 +15,7 @@ services:
             - @pim_data_generator.generator.family
             - @pim_data_generator.generator.product
             - @pim_data_generator.generator.category
+            - @pim_data_generator.generator.attribute_group
 
     pim_data_generator.generator.category:
         class: %pim_data_generator.generator.category.class%
@@ -40,7 +42,12 @@ services:
 #            - @pim_catalog.repository.attribute
 #            - @pim_catalog.repository.channel
 #            - @pim_catalog.repository.locale
-#
+
+    pim_data_generator.generator.attribute_group:
+        class: %pim_data_generator.generator.attribute_group.class%
+        arguments:
+            - @pim_catalog.repository.locale
+
     pim_data_generator.generator.product:
         class: %pim_data_generator.generator.product.class%
         arguments:

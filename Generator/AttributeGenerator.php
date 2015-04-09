@@ -27,6 +27,12 @@ class AttributeGenerator implements GeneratorInterface
     protected $attributesFile;
 
     /** @var array */
+    protected $attributeGroups;
+
+    /** @var array */
+    protected $attributeGroupCodes;
+
+    /** @var array */
     protected $locales;
 
     /** @var AttributeGroupRepositoryInterface */
@@ -148,6 +154,16 @@ class AttributeGenerator implements GeneratorInterface
     }
 
     /**
+     * Set attribute groups.
+     *
+     * @param array $attributeGroups
+     */
+    public function setAttributeGroups(array $attributeGroups)
+    {
+        $this->attributeGroups = $attributeGroups;
+    }
+
+    /**
      * Get a random non-identifier attribute type
      *
      * @return string
@@ -186,22 +202,20 @@ class AttributeGenerator implements GeneratorInterface
     }
 
     /**
-     * Get all attribute groups
+     * Get all generated attribute groups.
      *
      * @return array
      */
     protected function getAttributeGroupCodes()
     {
-        if (null === $this->groupCodes) {
-            $this->groupCodes = [];
-
-            $groups = $this->groupRepository->findAll();
-            foreach ($groups as $group) {
-                $this->groupCodes[] = $group->getCode();
+        if (null === $this->attributeGroupCodes) {
+            $this->attributeGroupCodes = [];
+            foreach (array_keys($this->attributeGroups) as $code) {
+                $this->attributeGroupCodes[] = $code;
             }
         }
 
-        return $this->groupCodes;
+        return $this->attributeGroupCodes;
     }
 
     /**
