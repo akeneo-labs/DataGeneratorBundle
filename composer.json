@@ -35,6 +35,9 @@
         "doctrine/mongodb-odm": "1.0.0-beta10@dev",
         "doctrine/mongodb-odm-bundle": "v3.0.0-BETA6@dev"
     },
+    "config": {
+        "bin-dir": "bin"
+    },
     "autoload": {
         "psr-0": {"Pim\\Bundle\\DataGeneratorBundle\\": ""}
     },
