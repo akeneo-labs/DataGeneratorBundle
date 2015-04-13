@@ -1,6 +1,8 @@
 data_generator:
     output_dir: /tmp/generated_data
     entities:
+        attribute_group:
+            count: 10
         attribute:
             count: 100
             identifier_attribute: sku
@@ -12,4 +14,3 @@ data_generator:
             identifier_attribute: sku
             label_attribute: name
             requirements_count: 5
-

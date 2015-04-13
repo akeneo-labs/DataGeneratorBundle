@@ -25,22 +25,28 @@ class Generator implements GeneratorInterface
     /** @var CategoryGenerator */
     protected $categoryGenerator;
 
+    /** @var AttributeGroupGenerator */
+    protected $attrGroupGenerator;
+
     /**
-     * @param AttributeGenerator $attributeGenerator
-     * @param FamilyGenerator    $familyGenerator
-     * @param ProductGenerator   $productGenerator
-     * @param CategoryGenerator  $categoryGenerator
+     * @param AttributeGenerator      $attributeGenerator
+     * @param FamilyGenerator         $familyGenerator
+     * @param ProductGenerator        $productGenerator
+     * @param CategoryGenerator       $categoryGenerator
+     * @param AttributeGroupGenerator $attrGroupGenerator
      */
     public function __construct(
         AttributeGenerator $attributeGenerator,
         FamilyGenerator $familyGenerator,
         ProductGenerator $productGenerator,
-        CategoryGenerator $categoryGenerator
+        CategoryGenerator $categoryGenerator,
+        AttributeGroupGenerator $attrGroupGenerator
     ) {
         $this->attributeGenerator = $attributeGenerator;
         $this->familyGenerator    = $familyGenerator;
         $this->productGenerator   = $productGenerator;
         $this->categoryGenerator  = $categoryGenerator;
+        $this->attrGroupGenerator = $attrGroupGenerator;
     }
 
     /**
@@ -48,6 +54,7 @@ class Generator implements GeneratorInterface
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
+        $generatedAttrGroups = [];
         $generatedAttributes = [];
 
         if (isset($config['entities']['product']) && count($config['entities']) > 1) {
@@ -62,8 +69,15 @@ class Generator implements GeneratorInterface
             $this->categoryGenerator->generate($categoryConfig, $outputDir, $progress);
         }
 
+        if (isset($config['entities']['attribute_group'])) {
+            $attributeGroupConfig = $config['entities']['attribute_group'];
+            $this->attrGroupGenerator->generate($attributeGroupConfig, $outputDir, $progress);
+            $generatedAttrGroups = $this->attrGroupGenerator->getAttributeGroupObjects();
+        }
+
         if (isset($config['entities']['attribute'])) {
             $attributeConfig = $config['entities']['attribute'];
+            $this->attributeGenerator->setAttributeGroups($generatedAttrGroups);
             $this->attributeGenerator->generate($attributeConfig, $outputDir, $progress);
             $generatedAttributes = $this->attributeGenerator->getAttributeObjects();
         }
