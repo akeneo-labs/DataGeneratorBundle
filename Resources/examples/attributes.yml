@@ -1,5 +1,5 @@
 data_generator:
-    output_dir: app/cache
+    output_dir: /tmp
     entities:
         attribute_group:
             count: 10

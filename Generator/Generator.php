@@ -32,27 +32,27 @@ class Generator implements GeneratorInterface
     protected $attributeOptionGenerator;
 
     /**
-     * @param AttributeGenerator      $attributeGenerator
-     * @param FamilyGenerator         $familyGenerator
-     * @param ProductGenerator        $productGenerator
-     * @param CategoryGenerator       $categoryGenerator
-     * @param AttributeGroupGenerator $attrGroupGenerator
-     * @param AttributeOptionGenerator  $attributeOptionGenerator
+     * @param AttributeGenerator       $attributeGenerator
+     * @param FamilyGenerator          $familyGenerator
+     * @param ProductGenerator         $productGenerator
+     * @param CategoryGenerator        $categoryGenerator
+     * @param AttributeGroupGenerator  $attrGroupGenerator
+     * @param AttributeOptionGenerator $attributeOptionGenerator
      */
     public function __construct(
-        AttributeGenerator $attributeGenerator,
-        FamilyGenerator $familyGenerator,
-        ProductGenerator $productGenerator,
-        CategoryGenerator $categoryGenerator,
-        AttributeGroupGenerator $attrGroupGenerator,
-		AttributeOptionGenerator $attributeOptionGenerator
+        AttributeGenerator       $attributeGenerator,
+        FamilyGenerator          $familyGenerator,
+        ProductGenerator         $productGenerator,
+        CategoryGenerator        $categoryGenerator,
+        AttributeGroupGenerator  $attrGroupGenerator,
+        AttributeOptionGenerator $attributeOptionGenerator
     ) {
-        $this->attributeGenerator = $attributeGenerator;
-        $this->familyGenerator    = $familyGenerator;
-        $this->productGenerator   = $productGenerator;
-        $this->categoryGenerator  = $categoryGenerator;
-        $this->attrGroupGenerator = $attrGroupGenerator;
-		$this->attributeOptionGenerator  = $attributeOptionGenerator;
+        $this->attributeGenerator       = $attributeGenerator;
+        $this->familyGenerator          = $familyGenerator;
+        $this->productGenerator         = $productGenerator;
+        $this->categoryGenerator        = $categoryGenerator;
+        $this->attrGroupGenerator       = $attrGroupGenerator;
+        $this->attributeOptionGenerator = $attributeOptionGenerator;
     }
 
     /**

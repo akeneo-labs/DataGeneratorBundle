@@ -4,7 +4,6 @@ namespace spec\Pim\Bundle\DataGeneratorBundle\Generator;
 
 use PhpSpec\ObjectBehavior;
 use Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator;
-use Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator;

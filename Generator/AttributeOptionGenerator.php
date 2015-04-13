@@ -46,12 +46,12 @@ class AttributeOptionGenerator implements GeneratorInterface
     protected $faker;
 
     /**
-     * @param LocaleRepositoryInterface    $localeRepository
+     * @param LocaleRepositoryInterface $localeRepository
      */
     public function __construct(
         LocaleRepositoryInterface $localeRepository
     ) {
-        $this->localeRepository   = $localeRepository;
+        $this->localeRepository = $localeRepository;
         $this->faker = Faker\Factory::create();
     }
 
@@ -62,10 +62,11 @@ class AttributeOptionGenerator implements GeneratorInterface
     {
         $count = (int) $config['count'];
 
-        $this->outputFile = (!empty($config['filename'])) ?
-            $outputDir.'/'.trim($config['filename'])
-            :
-            $outputDir.'/'.self::DEFAULT_FILENAME;
+        if (!empty($config['filename'])) {
+            $this->outputFile = $outputDir.'/'.trim($config['filename']);
+        } else {
+            $this->outputFile =  $outputDir.'/'.static::DEFAULT_FILENAME;
+        }
 
         foreach ($this->getFilteredAttributes() as $attribute) {
             for ($i = 0; $i < $count; $i++) {
@@ -73,8 +74,8 @@ class AttributeOptionGenerator implements GeneratorInterface
                 $attributeOptions['attribute'] = $attribute->getCode();
                 $attributeOptions['labels'][] = $this->getLocalizedRandomLabels();
                 $attributeOptions['sortOrder'] = $this->faker->numberBetween(1, 10);
-                $attributeLabel = self::ATTRIBUTE_OPTION_CODE_PREFIX . $attribute->getCode() . $i;
-                $this->attributeOptions[$attributeLabel] = $attributeOptions;
+                $attributeIndex = static::ATTRIBUTE_OPTION_CODE_PREFIX . $attribute->getCode() . $i;
+                $this->attributeOptions[$attributeIndex] = $attributeOptions;
             };
             $progress->advance();
         }
@@ -85,7 +86,7 @@ class AttributeOptionGenerator implements GeneratorInterface
     }
 
     /**
-     * Set attributes
+     * Set attributes from Generator
      *
      * @param array $attributes
      */
@@ -95,19 +96,9 @@ class AttributeOptionGenerator implements GeneratorInterface
     }
 
     /**
-     * Get a random attribute group code
-     *
-     * @return string
-     */
-    protected function getRandomAttributeOptionCode()
-    {
-        return $this->faker->randomElement($this->getAttributesSelectOptions());
-    }
-
-    /**
      * Get localized random labels
      *
-     * @return array
+     * @return Locale[]
      */
     protected function getLocalizedRandomLabels()
     {
@@ -124,7 +115,7 @@ class AttributeOptionGenerator implements GeneratorInterface
     /**
      * Get filtered attributes
      *
-     * @return array
+     * @return Attributes[]
      */
     public function getFilteredAttributes()
     {
@@ -132,12 +123,11 @@ class AttributeOptionGenerator implements GeneratorInterface
 
         if (null !== $this->attributes) {
             foreach ($this->attributes as $attribute) {
-                if ($attribute->getAttributeType() === 'pim_catalog_simpleselect' ||
-                    $attribute->getAttributeType() === 'pim_catalog_multiselect'
+                if ('pim_catalog_simpleselect' === $attribute->getAttributeType() ||
+                    'pim_catalog_multiselect' === $attribute->getAttributeType()
                  ) {
                     $filteredAttributes[$attribute->getCode()] = $attribute;
                 }
-
             }
         }
 
@@ -147,7 +137,7 @@ class AttributeOptionGenerator implements GeneratorInterface
     /**
      * Get active locales
      *
-     * @return array
+     * @return Locale[]
      */
     protected function getLocales()
     {
