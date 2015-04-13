@@ -2,5 +2,6 @@ data_generator:
     output_dir: app/cache
     entities:
         category:
+            delimiter: ;
             count: 50
             levels: 3

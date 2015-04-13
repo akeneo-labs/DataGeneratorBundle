@@ -1,5 +1,5 @@
 data_generator:
-    output_dir: /tmp/generated_data
+    output_dir: app/cache
     entities:
         attribute_group:
             count: 10
@@ -8,6 +8,8 @@ data_generator:
             identifier_attribute: sku
             force_attributes:
                 - name = pim_catalog_text
+        attribute_option:
+            count: 10
         family:
             count: 40
             attributes_count: 50

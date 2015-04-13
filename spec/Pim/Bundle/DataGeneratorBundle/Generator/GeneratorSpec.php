@@ -4,6 +4,7 @@ namespace spec\Pim\Bundle\DataGeneratorBundle\Generator;
 
 use PhpSpec\ObjectBehavior;
 use Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator;
+use Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator;
@@ -15,9 +16,16 @@ class GeneratorSpec extends ObjectBehavior
         AttributeGenerator $attributeGenerator,
         FamilyGenerator $familyGenerator,
         ProductGenerator $productGenerator,
-        CategoryGenerator $categoryGenerator
+        CategoryGenerator $categoryGenerator,
+        AttributeOptionGenerator $attributeOptionGenerator
     ) {
-        $this->beConstructedWith($attributeGenerator, $familyGenerator, $productGenerator, $categoryGenerator);
+        $this->beConstructedWith(
+            $attributeGenerator,
+            $familyGenerator,
+            $productGenerator,
+            $categoryGenerator,
+            $attributeOptionGenerator
+        );
     }
 
     function it_is_initializable()

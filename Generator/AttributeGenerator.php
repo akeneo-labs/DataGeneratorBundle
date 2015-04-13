@@ -35,6 +35,9 @@ class AttributeGenerator implements GeneratorInterface
     /** @var array */
     protected $locales;
 
+    /** @var array */
+    protected $attributeOptions;
+
     /** @var AttributeGroupRepositoryInterface */
     protected $groupRepository;
 
