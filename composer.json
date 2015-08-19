@@ -1,5 +1,5 @@
 {
-    "name": "akeneo/data-generator-bundle",
+    "name": "akeneo-labs/data-generator-bundle",
     "type": "symfony-bundle",
     "description": "Akeneo PIM Bundle to generate data in order to test high volume operations",
     "keywords": ["pim", "akeneo", "ecommerce", "e-commerce", "data", "performances", "csv"],
