@@ -1,0 +1,26 @@
+data_generator:
+    output_dir: /tmp/generated_data
+    entities:
+#        currencies:
+#            count: 5
+#            force_currencies:
+#                - USD
+#                - EUR
+        channels:
+            count: 5
+            locales_count: 33
+            currencies_count: 5
+            force_channels:
+                - ecommerce
+#        attributes:
+#            count: 100
+#            identifier_attribute: sku
+#            force_attributes:
+#                - name = pim_catalog_text
+#        families:
+#            count: 40
+#            attributes_count: 50
+#            identifier_attribute: sku
+#            label_attribute: name
+#            requirements_count: 5
+
