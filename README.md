@@ -74,7 +74,7 @@ data_generator:
 
 More configuration examples are available in the ``Resources\examples`` directory.
 
-If not attribute and family are defined, the product generation will use the available attributes in the PIM DB.
+If no attribute and family are defined, the product generation will use the available attributes in the PIM DB.
 
 How to use the generated attributes and families data
 -----------------------------------------------------
