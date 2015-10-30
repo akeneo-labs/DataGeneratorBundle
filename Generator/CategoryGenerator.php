@@ -74,7 +74,10 @@ class CategoryGenerator implements GeneratorInterface
         $currentLevel = 0;
 
         $this->categoryTree = new CategoryTree('master', 0);
-        $this->categoryTree->addLabel('en_US', 'Master Catalog');
+
+        foreach ($this->getLocales() as $locale) {
+            $this->categoryTree->addLabel($locale->getCode(), 'Master Catalog');
+        }
 
         $this->feedTree($this->categoryTree, $currentLevel + 1, $count, $progress);
 
@@ -155,6 +158,7 @@ class CategoryGenerator implements GeneratorInterface
     protected function flattenTree(CategoryTree $categoryTree, array $lines = [], CategoryTree $parent = null)
     {
         $flatCategory = $categoryTree->flatten();
+
         if ($parent) {
             $flatCategory['parent'] = $parent->getCode();
         }
