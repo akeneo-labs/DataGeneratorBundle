@@ -86,7 +86,7 @@ class AttributeGenerator implements GeneratorInterface
 
         $this->attributes = [];
 
-        $this->attributes[] = [
+        $this->attributes[$identifier] = [
             'code'  => $identifier,
             'type'  => 'pim_catalog_identifier',
             'group' => $this->getRandomAttributeGroupCode()
@@ -125,7 +125,7 @@ class AttributeGenerator implements GeneratorInterface
                 $attribute = array_merge($attribute, $this->getMediaProperties());
             }
 
-            $this->attributes[] = $attribute;
+            $this->attributes[$attribute['code']] = $attribute;
             $progress->advance();
         }
         $headers = $this->getAllKeys($this->attributes);

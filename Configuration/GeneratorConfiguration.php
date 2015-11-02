@@ -58,6 +58,7 @@ class GeneratorConfiguration implements ConfigurationInterface
                                 ->scalarNode('identifier_attribute')->isRequired()->end()
                                 ->scalarNode('label_attribute')->isRequired()->end()
                                 ->integerNode('requirements_count')->min(1)->defaultValue(5)->end()
+                                ->scalarNode('delimiter')->defaultValue(';')->end()
                             ->end()
                         ->end()
                         ->arrayNode('product')
