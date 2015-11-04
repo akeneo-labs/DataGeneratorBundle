@@ -12,7 +12,7 @@ From that, this bundle will generate valid product and attribute data.
 Installation
 ------------
 ```bash
- $ composer.phar require akeneo/data-generator-bundle dev-master
+ $ composer.phar require akeneo-labs/data-generator-bundle dev-master
 ```
 and update your ``app/AppKernel.php`` as follow:
 
