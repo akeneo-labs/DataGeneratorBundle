@@ -80,6 +80,11 @@ class AttributeGenerator implements GeneratorInterface
         $this->delimiter = $config['delimiter'];
 
         $count = (int) $config['count'];
+
+        $localizableProbability = (int) $config['localizable_probability'];
+        $scopableProbability = (int) $config['scopable_probability'];
+        $locScopableProbability = (int) $config['localizable_and_scopable_probability'];
+
         $identifier = $config['identifier_attribute'];
 
         $this->faker = Faker\Factory::create();
@@ -114,8 +119,13 @@ class AttributeGenerator implements GeneratorInterface
                 $attribute['label-'.$localeCode] = $label;
             }
 
-            $attribute['localizable'] = (int) $this->faker->boolean();
-            $attribute['scopable'] = (int) $this->faker->boolean();
+            if ($this->faker->boolean($locScopableProbability)) {
+                $attribute['localizable'] = 1;
+                $attribute['scopable'] = 1;
+            } else {
+                $attribute['localizable'] = (int) $this->faker->boolean($localizableProbability);
+                $attribute['scopable'] = (int) $this->faker->boolean($scopableProbability);
+            }
 
             if ('pim_catalog_metric' === $type) {
                 $attribute = array_merge($attribute, $this->getMetricProperties());

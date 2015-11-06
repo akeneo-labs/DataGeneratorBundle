@@ -166,7 +166,7 @@ class ProductGenerator implements GeneratorInterface
             $product['family'] = $family->getCode();
 
             if ($nbAttrBase > 0) {
-                if ($nbValueDeviation > 0) {
+                if ($nbAttrDeviation > 0) {
                     $nbAttr = $this->faker->numberBetween(
                         $nbAttrBase - round($nbAttrDeviation/2),
                         $nbAttrBase + round($nbAttrDeviation/2)
