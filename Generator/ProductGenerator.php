@@ -136,11 +136,12 @@ class ProductGenerator implements GeneratorInterface
         }
 
         $count               = (int) $config['count'];
-        $nbValuesBase        = (int) $config['values_count'];
-        $nbValueDeviation    = (int) $config['values_count_standard_deviation'];
+        $nbAttrBase          = (int) $config['filled_attributes_count'];
+        $nbAttrDeviation     = (int) $config['filled_attributes_standard_deviation'];
         $startIndex          = (int) $config['start_index'];
         $categoriesCount     = (int) $config['categories_count'];
         $mandatoryAttributes = $config['mandatory_attributes'];
+
         if (!is_array($mandatoryAttributes)) {
             $mandatoryAttributes = [];
         }
@@ -164,23 +165,23 @@ class ProductGenerator implements GeneratorInterface
             $family = $this->getRandomFamily($this->faker);
             $product['family'] = $family->getCode();
 
-            if ($nbValuesBase > 0) {
+            if ($nbAttrBase > 0) {
                 if ($nbValueDeviation > 0) {
-                    $nbValues = $this->faker->numberBetween(
-                        $nbValuesBase - round($nbValueDeviation/2),
-                        $nbValuesBase + round($nbValueDeviation/2)
+                    $nbAttr = $this->faker->numberBetween(
+                        $nbAttrBase - round($nbAttrDeviation/2),
+                        $nbAttrBase + round($nbAttrDeviation/2)
                     );
                 } else {
-                    $nbValues = $nbValuesBase;
+                    $nbAttr = $nbAttrBase;
                 }
             }
             $familyAttrCount = count($this->getAttributesFromFamily($family));
 
-            if (!isset($nbValues) || $nbValues > $familyAttrCount) {
-                $nbValues = $familyAttrCount;
+            if (!isset($nbAttr) || $nbAttr > $familyAttrCount) {
+                $nbAttr = $familyAttrCount;
             }
 
-            $attributes = $this->getRandomAttributesFromFamily($family, $nbValues);
+            $attributes = $this->getRandomAttributesFromFamily($family, $nbAttr);
             foreach ($attributes as $attribute) {
                 $valueData = $this->generateValue($attribute);
                 $product = array_merge($product, $valueData);

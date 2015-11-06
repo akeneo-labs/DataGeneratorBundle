@@ -64,6 +64,8 @@ class CategoryGenerator implements GeneratorInterface
         $count = (int)$config['count'];
         $this->levelMax = (int)$config['levels'];
 
+        $countByLevel = $this->calculateNodeCountPerLevel($this->levelMax, $count);
+
         $this->faker = Faker\Factory::create();
 
         $headers = ['code', 'parent'];
@@ -71,15 +73,14 @@ class CategoryGenerator implements GeneratorInterface
             $headers[] = 'label-'.$locale->getCode();
         }
 
-        $currentLevel = 0;
-
         $this->categoryTree = new CategoryTree('master', 0);
 
         foreach ($this->getLocales() as $locale) {
             $this->categoryTree->addLabel($locale->getCode(), 'Master Catalog');
         }
 
-        $this->feedTree($this->categoryTree, $currentLevel + 1, $count, $progress);
+        $currentLevel = 1;
+        $this->feedTree($this->categoryTree, $currentLevel, $countByLevel, $progress);
 
         $this->writeCsvFile($headers);
 
@@ -89,15 +90,17 @@ class CategoryGenerator implements GeneratorInterface
     protected function feedTree(CategoryTree $categoryTree, $currentLevel, $count, ProgressHelper $progress)
     {
         for ($i = 0; $i < $count; $i++) {
-            $categoryCode = self::CATEGORIES_CODE_PREFIX.uniqid();
+            $categoryCode = $categoryTree->getCode().'_'.$i;
             $categoryLeaf = new CategoryTree($categoryCode, $currentLevel);
             foreach ($this->getLocalizedRandomLabels() as $localeCode => $localeLabel) {
                 $categoryLeaf->addLabel($localeCode, $localeLabel);
             }
             if ($currentLevel < $this->levelMax) {
-                $this->feedTree($categoryLeaf, $currentLevel + 1, 2, $progress);
+                $this->feedTree($categoryLeaf, $currentLevel + 1, $count, $progress);
             }
             $categoryTree->addChild($categoryLeaf);
+
+            $progress->advance();
         }
 
         return $categoryTree;
@@ -129,7 +132,7 @@ class CategoryGenerator implements GeneratorInterface
     {
         if (null === $this->locales) {
             $this->locales = [];
-            /** @var Locale[] $locales */
+
             $locales = $this->localeRepository->findBy(['activated' => 1]);
             foreach ($locales as $locale) {
                 $this->locales[$locale->getCode()] = $locale;
@@ -168,5 +171,63 @@ class CategoryGenerator implements GeneratorInterface
         }
 
         return $lines;
+    }
+
+    /**
+     * Calculate on approximation for the average number of nodes per level needed from the
+     * provided argument
+     *
+     * @param int $levelCount
+     * @param int $nodeCount
+     *
+     * @return int
+     */
+    protected function calculateNodeCountPerLevel($levelCount, $nodeCount)
+    {
+        $lowerLimit = 1;
+
+        $upperLimit = round(pow($nodeCount, 1/$levelCount));
+
+        $approximationFound = false;
+        $avgNodeCount = $lowerLimit;
+
+        $prevDistance = PHP_INT_MAX;
+        $prevAvgNodeCount = null;
+
+        while (!$approximationFound && $avgNodeCount < $upperLimit) {
+
+            $distance = abs($nodeCount - $this->calculateTotalNodesNumber($levelCount, $avgNodeCount));
+
+            if ($distance > $prevDistance) {
+                $approximationFound = true;
+
+            } else {
+                $previousDistance = $distance;
+                $prevAvgNodeCount = $avgNodeCount;
+                $avgNodeCount++;
+            }
+        }
+
+        return $prevAvgNodeCount;
+    }
+
+    /**
+     * Get the total number of nodes based on levels count and average node count
+     * per level
+     *
+     * @param int $levelCount
+     * @param int $avgNodeCount
+     *
+     * @return int
+     */
+    protected function calculateTotalNodesNumber($levelCount, $avgNodeCount)
+    {
+        $totalNodeCount = 0;
+
+        for ($level = 1; $level <= $levelCount; $level++) {
+            $totalNodeCount += pow($avgNodeCount, $level);
+        }
+
+        return $totalNodeCount;
     }
 }
