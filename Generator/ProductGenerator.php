@@ -89,6 +89,12 @@ class ProductGenerator implements GeneratorInterface
     /** @var array */
     protected $categoryCodes;
 
+    /** @var string */
+    protected $tmpFile;
+
+    /** @var array */
+    protected $headers;
+
     /**
      * @param FamilyRepositoryInterface    $familyRepository
      * @param AttributeRepositoryInterface $attributeRepository
@@ -105,12 +111,15 @@ class ProductGenerator implements GeneratorInterface
         CurrencyRepositoryInterface $currencyRepository,
         CategoryRepositoryInterface $categoryRepository
     ) {
-        $this->familyRepository   = $familyRepository;
-        $this->channelRepository  = $channelRepository;
-        $this->localeRepository   = $localeRepository;
-        $this->currencyRepository = $currencyRepository;
-        $this->categoryRepository = $categoryRepository;
+        $this->familyRepository    = $familyRepository;
+        $this->channelRepository   = $channelRepository;
+        $this->localeRepository    = $localeRepository;
+        $this->currencyRepository  = $currencyRepository;
+        $this->categoryRepository  = $categoryRepository;
         $this->attributeRepository = $attributeRepository;
+
+        $this->tmpFile = tempnam('/tmp', 'data-gene');
+        $this->headers = [];
 
         $this->attributesByFamily = [];
     }
@@ -148,8 +157,6 @@ class ProductGenerator implements GeneratorInterface
         $this->identifierCode = $this->attributeRepository->getIdentifierCode();
 
         $this->faker = Faker\Factory::create();
-
-        $products = [];
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
             $product = [];
@@ -191,13 +198,12 @@ class ProductGenerator implements GeneratorInterface
 
             $product[self::CATEGORY_FIELD] = implode(',', $categories);
 
-            $products[] = $product;
+            $this->bufferizeProduct($product);
+
             $progress->advance();
         }
 
-        $headers = $this->getAllKeys($products);
-
-        $this->writeCsvFile($products, $headers);
+        $this->writeCsvFile();
 
         return $this;
     }
@@ -535,46 +541,41 @@ class ProductGenerator implements GeneratorInterface
     }
 
     /**
-     * Get a set of all keys inside arrays
-     *
-     * @param array $products
-     *
-     * @return array
+     * Write the CSV file from data coming from the buffer
      */
-    protected function getAllKeys(array $products)
+    protected function writeCsvFile()
     {
-        $keys = [];
+        $buffer = fopen($this->tmpFile, 'r');
 
-        foreach ($products as $product) {
-            $keys = array_merge($keys, array_keys($product));
-            $keys = array_unique($keys);
-        }
-
-        return $keys;
-    }
-
-    /**
-     * Write the CSV file from products and headers
-     *
-     * @param array $products
-     * @param array $headers
-     */
-    protected function writeCsvFile(array $products, array $headers)
-    {
         $csvFile = fopen($this->outputFile, 'w');
 
-        fputcsv($csvFile, $headers, $this->delimiter);
-        $headersAsKeys = array_fill_keys($headers, "");
+        fputcsv($csvFile, $this->headers, $this->delimiter);
+        $headersAsKeys = array_fill_keys($this->headers, "");
 
-        foreach ($products as $product) {
+        while ($bufferedProduct = fgets($buffer)) {
+            $product = unserialize($bufferedProduct);
             $productData = array_merge($headersAsKeys, $product);
             fputcsv($csvFile, $productData, $this->delimiter);
         }
         fclose($csvFile);
+        fclose($buffer);
     }
 
     public function setExtraAttributes(array $extraAttributes)
     {
         // TODO not implemented
+    }
+
+    /**
+     * Bufferize the product for latter use and
+     * set the headers
+     *
+     * @param array $product
+     */
+    protected function bufferizeProduct(array $product)
+    {
+        $this->headers = array_unique(array_merge($this->headers, array_keys($product)));
+
+        file_put_contents($this->tmpFile, serialize($product)."\n", FILE_APPEND);
     }
 }
