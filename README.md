@@ -12,7 +12,7 @@ From that, this bundle will generate valid product and attribute data.
 Installation
 ------------
 ```bash
- $ composer.phar require akeneo/data-generator-bundle dev-master
+ $ composer.phar require akeneo-labs/data-generator-bundle dev-master
 ```
 and update your ``app/AppKernel.php`` as follow:
 
@@ -38,7 +38,7 @@ Arguments:
 
 Configuration file examples
 ---------------------------
-Generating attributes and families:
+Generating base fixtures:
 
 ```yaml
 data_generator:
@@ -61,8 +61,8 @@ data_generator:
     entities:
         product:
             count: 1000
-            values_count: 50
-            values_count_standard_deviation: 10
+            filled_attributes_count: 50
+            filled_attributes_standard_deviation: 10
             mandatory_attributes: [sku, name]
             delimiter: ,
             force_values:
@@ -74,7 +74,16 @@ data_generator:
 
 More configuration examples are available in the ``Resources\examples`` directory.
 
-If not attribute and family are defined, the product generation will use the available attributes in the PIM DB.
+## Warning
+Products data cannot be generated at the same time as the base fixtures (families, categories, attributes, etc...).
+Indeed, to generate products data, we use the objects available in the PIM (families, attributes, etc).
+
+So if you need to generate a full catalog, you need to:
+ 1. generate the fixtures
+ 2. copy the minimal data set fixtures into a new fixtures set
+ 3. copy the generated fixtures into this new set
+ 4. install the new fixtures set by changing the `installer_data` configuration
+ 5. generate the products data
 
 How to use the generated attributes and families data
 -----------------------------------------------------

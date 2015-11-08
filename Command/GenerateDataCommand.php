@@ -61,6 +61,8 @@ class GenerateDataCommand extends ContainerAwareCommand
         $progress->start($output, $totalCount);
 
         $generator->generate($config, $outputDir, $progress);
+
+        $progress->finish();
     }
 
     /**

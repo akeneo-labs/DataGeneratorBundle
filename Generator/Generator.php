@@ -107,7 +107,5 @@ class Generator implements GeneratorInterface
             }
             $this->productGenerator->generate($productConfig, $outputDir, $progress);
         }
-
-        $progress->finish();
     }
 }

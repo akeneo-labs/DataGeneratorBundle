@@ -19,7 +19,7 @@ use Symfony\Component\Yaml;
  */
 class AttributeGenerator implements GeneratorInterface
 {
-    const ATTRIBUTES_FILENAME = 'attributes.yml';
+    const ATTRIBUTES_FILENAME = 'attributes.csv';
 
     const ATTRIBUTE_CODE_PREFIX = 'attr_';
 
@@ -53,6 +53,9 @@ class AttributeGenerator implements GeneratorInterface
     /** @var array */
     protected $attributes;
 
+    /** @var string */
+    protected $delimiter;
+
     /**
      * @param AttributeGroupRepositoryInterface $groupRepository
      * @param LocaleRepositoryInterface         $localeRepository
@@ -74,8 +77,14 @@ class AttributeGenerator implements GeneratorInterface
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
         $this->attributesFile = $outputDir.'/'.self::ATTRIBUTES_FILENAME;
+        $this->delimiter = $config['delimiter'];
 
         $count = (int) $config['count'];
+
+        $localizableProbability = (int) $config['localizable_probability'];
+        $scopableProbability = (int) $config['scopable_probability'];
+        $locScopableProbability = (int) $config['localizable_and_scopable_probability'];
+
         $identifier = $config['identifier_attribute'];
 
         $this->faker = Faker\Factory::create();
@@ -83,6 +92,7 @@ class AttributeGenerator implements GeneratorInterface
         $this->attributes = [];
 
         $this->attributes[$identifier] = [
+            'code'  => $identifier,
             'type'  => 'pim_catalog_identifier',
             'group' => $this->getRandomAttributeGroupCode()
         ];
@@ -99,14 +109,23 @@ class AttributeGenerator implements GeneratorInterface
 
         for ($i = 0; $i < $count; $i++) {
             $attribute = [];
+            $attribute['code'] = self::ATTRIBUTE_CODE_PREFIX.$i;
 
             $type = $this->getRandomAttributeType();
             $attribute['type'] = $type;
             $attribute['group'] = $this->getRandomAttributeGroupCode();
-            $attribute['labels'] = $this->getLocalizedRandomLabels();
-            $attribute['sortOrder'] = $this->faker->numberBetween(1, 10);
-            $attribute['localizable'] = $this->faker->boolean();
-            $attribute['scopable'] = $this->faker->boolean();
+
+            foreach($this->getLocalizedRandomLabels() as $localeCode => $label) {
+                $attribute['label-'.$localeCode] = $label;
+            }
+
+            if ($this->faker->boolean($locScopableProbability)) {
+                $attribute['localizable'] = 1;
+                $attribute['scopable'] = 1;
+            } else {
+                $attribute['localizable'] = (int) $this->faker->boolean($localizableProbability);
+                $attribute['scopable'] = (int) $this->faker->boolean($scopableProbability);
+            }
 
             if ('pim_catalog_metric' === $type) {
                 $attribute = array_merge($attribute, $this->getMetricProperties());
@@ -116,11 +135,12 @@ class AttributeGenerator implements GeneratorInterface
                 $attribute = array_merge($attribute, $this->getMediaProperties());
             }
 
-            $this->attributes[self::ATTRIBUTE_CODE_PREFIX.$i] = $attribute;
+            $this->attributes[$attribute['code']] = $attribute;
             $progress->advance();
         }
+        $headers = $this->getAllKeys($this->attributes);
 
-        $this->writeYamlFile(['attributes' => $this->attributes], $this->attributesFile);
+        $this->writeCsvFile($this->attributes, $headers);
 
         return $this;
     }
@@ -172,7 +192,12 @@ class AttributeGenerator implements GeneratorInterface
     {
         $attributeType = null;
 
-        while ((null === $attributeType) || ('pim_catalog_identifier' === $attributeType)) {
+        while (
+            (null === $attributeType) ||
+            ('pim_catalog_identifier' === $attributeType) ||
+            ('pim_reference_data_multiselect' === $attributeType) ||
+            ('pim_reference_data_simpleselect' === $attributeType)
+        ) {
             $attributeType = $this->faker->randomElement($this->getAttributeTypeCodes());
         }
 
@@ -243,8 +268,8 @@ class AttributeGenerator implements GeneratorInterface
     protected function getMetricProperties()
     {
         return [
-            "metricFamily"      => "Length",
-            "defaultMetricUnit" => "METER"
+            "metric_family"      => "Length",
+            "default_metric_unit" => "METER"
         ];
     }
 
@@ -256,7 +281,7 @@ class AttributeGenerator implements GeneratorInterface
     protected function getMediaProperties()
     {
         return [
-            'allowedExtensions' => implode(
+            'allowed_extensions' => implode(
                 ',',
                 $this->faker->randomElements(['png', 'jpg', 'pdf'], 2)
             )
@@ -282,16 +307,41 @@ class AttributeGenerator implements GeneratorInterface
     }
 
     /**
-     * Write a YAML file
+     * Write the CSV file from attributes
      *
-     * @param array  $data
-     * @param string $filename
+     * @param array $attributes
+     * @param array $headers
      */
-    protected function writeYamlFile(array $data, $filename)
+    protected function writeCsvFile(array $attributes, array $headers)
     {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
+        $csvFile = fopen($this->attributesFile, 'w');
 
-        file_put_contents($filename, $yamlData);
+        fputcsv($csvFile, $headers, $this->delimiter);
+        $headersAsKeys = array_fill_keys($headers, "");
+
+        foreach ($attributes as $attribute) {
+            $attributeData = array_merge($headersAsKeys, $attribute);
+            fputcsv($csvFile, $attributeData, $this->delimiter);
+        }
+        fclose($csvFile);
+    }
+
+    /**
+     * Get a set of all keys inside arrays
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    protected function getAllKeys(array $items)
+    {
+        $keys = [];
+
+        foreach ($items as $item) {
+            $keys = array_merge($keys, array_keys($item));
+            $keys = array_unique($keys);
+        }
+
+        return $keys;
     }
 }

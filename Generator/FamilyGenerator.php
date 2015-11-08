@@ -18,12 +18,17 @@ use Symfony\Component\Yaml;
  */
 class FamilyGenerator implements GeneratorInterface
 {
-    const FAMILIES_FILENAME = 'families.yml';
+    const FAMILIES_FILENAME = 'families.csv';
 
     const FAMILY_CODE_PREFIX = 'fam_';
 
+    const ATTRIBUTE_DELIMITER = ',';
+
     /** @var string */
     protected $familiesFile;
+
+    /** @var string */
+    protected $delimiter;
 
     /** @var string */
     protected $identifierAttribute;
@@ -74,6 +79,8 @@ class FamilyGenerator implements GeneratorInterface
     {
         $this->familiesFile = $outputDir.'/'.self::FAMILIES_FILENAME;
 
+        $this->delimiter = $config['delimiter'];
+
         $count = (int) $config['count'];
         $attributesCount = (int) $config['attributes_count'] - 1;
         $requirementsCount = (int) $config['requirements_count'] - 1;
@@ -86,14 +93,20 @@ class FamilyGenerator implements GeneratorInterface
 
         for ($i = 0; $i < $count; $i++) {
             $family = [];
-            $family['labels'] = $this->getLocalizedRandomLabels();
 
-            $family['attributeAsLabel'] = $this->labelAttribute;
+            $family['code'] =self::FAMILY_CODE_PREFIX.$i;
+
+            foreach($this->getLocalizedRandomLabels() as $localeCode => $label) {
+                $family['label-'.$localeCode] = $label;
+            }
+
+            $family['attribute_as_label'] = $this->labelAttribute;
 
             $attributes = $this->faker->randomElements($this->getAttributeCodes(), $attributesCount);
 
-            $attributes = array_merge([$this->identifierAttribute, $this->labelAttribute], $attributes);
-            $family['attributes'] = $attributes;
+            $attributes = array_unique(array_merge([$this->identifierAttribute, $this->labelAttribute], $attributes));
+
+            $family['attributes'] = implode(static::ATTRIBUTE_DELIMITER, $attributes);
 
             $requirements = [];
 
@@ -101,20 +114,18 @@ class FamilyGenerator implements GeneratorInterface
                 $attributeReqs = $this->faker->randomElements($this->getAttributeCodes(), $requirementsCount);
                 $attributeReqs = array_merge([$this->identifierAttribute], $attributeReqs);
 
-                $requirements[$channel->getCode()] = $attributeReqs;
+                $family['requirements-'.$channel->getCode()] = implode(static::ATTRIBUTE_DELIMITER, $attributeReqs);
             }
-            $family['requirements'] = $requirements;
 
-            $families[self::FAMILY_CODE_PREFIX.$i] = $family;
+            $families[$family['code']] = $family;
             $progress->advance();
         }
 
+        $this->families = $families;
 
-        $this->families = [
-            "families" => $families
-        ];
+        $headers = $this->getAllKeys($this->families);
 
-        $this->writeYamlFile($this->families, $this->familiesFile);
+        $this->writeCsvFile($this->families, $headers);
 
         return $this;
     }
@@ -218,16 +229,41 @@ class FamilyGenerator implements GeneratorInterface
     }
 
     /**
-     * Write a YAML file
+     * Write the CSV file from families
      *
-     * @param array  $data
-     * @param string $filename
+     * @param array $families
+     * @param array $headers
      */
-    protected function writeYamlFile(array $data, $filename)
+    protected function writeCsvFile(array $families, array $headers)
     {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
+        $csvFile = fopen($this->familiesFile, 'w');
 
-        file_put_contents($filename, $yamlData);
+        fputcsv($csvFile, $headers, $this->delimiter);
+        $headersAsKeys = array_fill_keys($headers, "");
+
+        foreach ($families as $family) {
+            $familyData = array_merge($headersAsKeys, $family);
+            fputcsv($csvFile, $familyData, $this->delimiter);
+        }
+        fclose($csvFile);
+    }
+
+    /**
+     * Get a set of all keys inside arrays
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    protected function getAllKeys(array $items)
+    {
+        $keys = [];
+
+        foreach ($items as $item) {
+            $keys = array_merge($keys, array_keys($item));
+            $keys = array_unique($keys);
+        }
+
+        return $keys;
     }
 }

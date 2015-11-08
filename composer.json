@@ -1,5 +1,5 @@
 {
-    "name": "akeneo/data-generator-bundle",
+    "name": "akeneo-labs/data-generator-bundle",
     "type": "symfony-bundle",
     "description": "Akeneo PIM Bundle to generate data in order to test high volume operations",
     "keywords": ["pim", "akeneo", "ecommerce", "e-commerce", "data", "performances", "csv"],
@@ -24,7 +24,7 @@
     ],
     "require": {
         "php": ">=5.4.4",
-        "akeneo/pim-community-dev": "~1.3",
+        "akeneo/pim-community-dev": "~1.4.0",
         "doctrine/migrations": "1.0.*@dev",
         "fzaninotto/faker": "1.4.0"
     },
