@@ -1,5 +1,5 @@
 data_generator:
-    output_dir: /tmp
+    output_dir: /tmp/fixtures
     entities:
         attribute_group:
             count: 10
@@ -11,10 +11,14 @@ data_generator:
             force_attributes:
                 - name = pim_catalog_text
         attribute_option:
-            count: 10
+            count_per_attribute: 10
         family:
             count: 40
             attributes_count: 50
             identifier_attribute: sku
             label_attribute: name
             requirements_count: 5
+        category:
+            delimiter: ;
+            count: 50
+            levels: 3

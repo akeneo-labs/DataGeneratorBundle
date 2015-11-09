@@ -19,7 +19,7 @@ class AttributeOptionGenerator implements GeneratorInterface
 {
     const ATTRIBUTE_OPTION_CODE_PREFIX = 'attr_opt_';
 
-    const DEFAULT_FILENAME = 'attribute_options.yml';
+    const ATTRIBUTE_OPTIONS_FILENAME = 'attribute_options.csv';
 
     /** @var string */
     protected $outputFile;
@@ -42,6 +42,9 @@ class AttributeOptionGenerator implements GeneratorInterface
     /** @var array */
     protected $attributes;
 
+    /** @var array */
+    protected $selectAttributes;
+
     /** @var Faker\Generator */
     protected $faker;
 
@@ -60,27 +63,29 @@ class AttributeOptionGenerator implements GeneratorInterface
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
-        $count = (int) $config['count'];
+        $countPerAttribute = (int) $config['count_per_attribute'];
+        $this->delimiter   = $config['delimiter'];
 
-        if (!empty($config['filename'])) {
-            $this->outputFile = $outputDir.'/'.trim($config['filename']);
-        } else {
-            $this->outputFile =  $outputDir.'/'.static::DEFAULT_FILENAME;
-        }
+        $this->attributeOptionsFile =  $outputDir.'/'.static::ATTRIBUTE_OPTIONS_FILENAME;
 
-        foreach ($this->getFilteredAttributes() as $attribute) {
-            for ($i = 0; $i < $count; $i++) {
-                $attributeOptions = [];
-                $attributeOptions['attribute'] = $attribute->getCode();
-                $attributeOptions['labels'][] = $this->getLocalizedRandomLabels();
-                $attributeOptions['sortOrder'] = $this->faker->numberBetween(1, 10);
-                $attributeIndex = static::ATTRIBUTE_OPTION_CODE_PREFIX . $attribute->getCode() . $i;
-                $this->attributeOptions[$attributeIndex] = $attributeOptions;
+        foreach ($this->getSelectAttributes() as $attribute) {
+            for ($i = 0; $i < $countPerAttribute; $i++) {
+                $attributeOption = [];
+                $attributeOption['attribute'] = $attribute->getCode();
+                $attributeOption['code'] = static::ATTRIBUTE_OPTION_CODE_PREFIX . $attribute->getCode() . $i;
+                $attributeOption['sort_order'] = $this->faker->numberBetween(1, $countPerAttribute);
+
+                foreach ($this->getLocalizedRandomLabels() as $localeCode => $label) {
+                    $attributeOption['label-'.$localeCode] = $label;
+                }
+
+                $this->attributeOptions[$attributeOption['code']] = $attributeOption;
             };
-            $progress->advance();
         }
-        
-        $this->writeYamlFile(['options' => $this->attributeOptions], $this->outputFile);
+
+        $headers = $this->getAllKeys($this->attributeOptions);
+
+        $this->writeCsvFile($this->attributeOptions, $headers);
 
         return $this;
     }
@@ -113,25 +118,31 @@ class AttributeOptionGenerator implements GeneratorInterface
     }
 
     /**
-     * Get filtered attributes
+     * Get attributes that can have options
      *
      * @return Attributes[]
+     *
+     * @throw \LogicException
      */
-    public function getFilteredAttributes()
+    public function getSelectAttributes()
     {
-        $filteredAttributes = [];
+        if (null === $this->selectAttributes) {
+            $this->selectAttributes = [];
 
-        if (null !== $this->attributes) {
+            if (null === $this->attributes) {
+                throw new \LogicException("No attributes have been provided to the attributeOptionGenerator !");
+            }
+
             foreach ($this->attributes as $attribute) {
                 if ('pim_catalog_simpleselect' === $attribute->getAttributeType() ||
                     'pim_catalog_multiselect' === $attribute->getAttributeType()
                  ) {
-                    $filteredAttributes[$attribute->getCode()] = $attribute;
+                    $this->selectAttributes[$attribute->getCode()] = $attribute;
                 }
             }
         }
 
-        return $filteredAttributes;
+        return $this->selectAttributes;
     }
 
     /**
@@ -153,16 +164,42 @@ class AttributeOptionGenerator implements GeneratorInterface
     }
 
     /**
-     * Write a YAML file
+     * Write the CSV file from attributeOptions
      *
-     * @param array  $data
-     * @param string $filename
+     * @param array $attributeOptions
+     * @param array $headers
      */
-    protected function writeYamlFile(array $data, $filename)
+    protected function writeCsvFile(array $attributeOptions, array $headers)
     {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
+        $csvFile = fopen($this->attributeOptionsFile, 'w');
 
-        file_put_contents($filename, $yamlData);
+        fputcsv($csvFile, $headers, $this->delimiter);
+        $headersAsKeys = array_fill_keys($headers, "");
+
+        foreach ($attributeOptions as $attributeOption) {
+            $attributeOptionData = array_merge($headersAsKeys, $attributeOption);
+            fputcsv($csvFile, $attributeOptionData, $this->delimiter);
+        }
+        fclose($csvFile);
     }
+
+    /**
+     * Get a set of all keys inside arrays
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    protected function getAllKeys(array $items)
+    {
+        $keys = [];
+
+        foreach ($items as $item) {
+            $keys = array_merge($keys, array_keys($item));
+            $keys = array_unique($keys);
+        }
+
+        return $keys;
+    }
+
 }

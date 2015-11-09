@@ -99,7 +99,9 @@ class GenerateDataCommand extends ContainerAwareCommand
         $totalCount = 0;
 
         foreach ($config['entities'] as $entity) {
-            $totalCount += $entity['count'];
+            if (isset($entity['count'])) {
+                $totalCount += $entity['count'];
+            }
         }
 
         return $totalCount;
