@@ -15,9 +15,16 @@ class GeneratorSpec extends ObjectBehavior
         AttributeGenerator $attributeGenerator,
         FamilyGenerator $familyGenerator,
         ProductGenerator $productGenerator,
-        CategoryGenerator $categoryGenerator
+        CategoryGenerator $categoryGenerator,
+        AttributeOptionGenerator $attributeOptionGenerator
     ) {
-        $this->beConstructedWith($attributeGenerator, $familyGenerator, $productGenerator, $categoryGenerator);
+        $this->beConstructedWith(
+            $attributeGenerator,
+            $familyGenerator,
+            $productGenerator,
+            $categoryGenerator,
+            $attributeOptionGenerator
+        );
     }
 
     function it_is_initializable()

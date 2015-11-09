@@ -28,25 +28,31 @@ class Generator implements GeneratorInterface
     /** @var AttributeGroupGenerator */
     protected $attrGroupGenerator;
 
+	/** @var AttributeOptionGenerator */
+    protected $attributeOptionGenerator;
+
     /**
-     * @param AttributeGenerator      $attributeGenerator
-     * @param FamilyGenerator         $familyGenerator
-     * @param ProductGenerator        $productGenerator
-     * @param CategoryGenerator       $categoryGenerator
-     * @param AttributeGroupGenerator $attrGroupGenerator
+     * @param AttributeGenerator       $attributeGenerator
+     * @param FamilyGenerator          $familyGenerator
+     * @param ProductGenerator         $productGenerator
+     * @param CategoryGenerator        $categoryGenerator
+     * @param AttributeGroupGenerator  $attrGroupGenerator
+     * @param AttributeOptionGenerator $attributeOptionGenerator
      */
     public function __construct(
-        AttributeGenerator $attributeGenerator,
-        FamilyGenerator $familyGenerator,
-        ProductGenerator $productGenerator,
-        CategoryGenerator $categoryGenerator,
-        AttributeGroupGenerator $attrGroupGenerator
+        AttributeGenerator       $attributeGenerator,
+        FamilyGenerator          $familyGenerator,
+        ProductGenerator         $productGenerator,
+        CategoryGenerator        $categoryGenerator,
+        AttributeGroupGenerator  $attrGroupGenerator,
+        AttributeOptionGenerator $attributeOptionGenerator
     ) {
-        $this->attributeGenerator = $attributeGenerator;
-        $this->familyGenerator    = $familyGenerator;
-        $this->productGenerator   = $productGenerator;
-        $this->categoryGenerator  = $categoryGenerator;
-        $this->attrGroupGenerator = $attrGroupGenerator;
+        $this->attributeGenerator       = $attributeGenerator;
+        $this->familyGenerator          = $familyGenerator;
+        $this->productGenerator         = $productGenerator;
+        $this->categoryGenerator        = $categoryGenerator;
+        $this->attrGroupGenerator       = $attrGroupGenerator;
+        $this->attributeOptionGenerator = $attributeOptionGenerator;
     }
 
     /**
@@ -86,6 +92,12 @@ class Generator implements GeneratorInterface
             $familyConfig = $config['entities']['family'];
             $this->familyGenerator->setAttributes($generatedAttributes);
             $this->familyGenerator->generate($familyConfig, $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['attribute_option'])) {
+            $attributeOptionConfig = $config['entities']['attribute_option'];
+            $this->attributeOptionGenerator->setAttributes($generatedAttributes);
+            $this->attributeOptionGenerator->generate($attributeOptionConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['product'])) {
