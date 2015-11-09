@@ -118,7 +118,6 @@ class ProductGenerator implements GeneratorInterface
         $this->categoryRepository  = $categoryRepository;
         $this->attributeRepository = $attributeRepository;
 
-        $this->tmpFile = tempnam('/tmp', 'data-gene');
         $this->headers = [];
 
         $this->attributesByFamily = [];
@@ -129,6 +128,8 @@ class ProductGenerator implements GeneratorInterface
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
+        $this->tmpFile = tempnam(sys_get_temp_dir(), 'data-gene');
+
         if (!empty($config['filename'])) {
             $this->outputFile = $outputDir.'/'.trim($config['filename']);
         } else {
