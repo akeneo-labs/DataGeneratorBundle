@@ -207,6 +207,8 @@ class ProductGenerator implements GeneratorInterface
 
         $this->writeCsvFile();
 
+        unlink($this->tmpFile);
+
         return $this;
     }
 
@@ -315,54 +317,31 @@ class ProductGenerator implements GeneratorInterface
             return $this->forcedValues[$attribute->getCode()];
         }
 
+        if (preg_match('/-'.self::METRIC_UNIT.'$/', $key)) {
+            return $attribute->getDefaultMetricUnit();
+        }
+
         switch ($attribute->getBackendType()) {
             case "varchar":
-                $validationRule = $attribute->getValidationRule();
-                switch ($validationRule) {
-                    case 'url':
-                        $data = $this->faker->url();
-                        break;
-                    default:
-                        $data = $this->faker->sentence();
-                        break;
-                }
+                $data = $this->generateVarcharData($attribute);
                 break;
             case "text":
-                $data = $this->faker->sentence();
+                $data = $this->generateTextData();
                 break;
             case "date":
-                $data = $this->faker->dateTimeBetween($attribute->getDateMin(), $attribute->getDateMax());
-                $data = $data->format('Y-m-d');
+                $data = $this->generateDateData($attribute);
                 break;
             case "metric":
             case "decimal":
             case "prices":
-                if ($attribute->getBackendType() && preg_match('/-'.self::METRIC_UNIT.'$/', $key)) {
-                    $data = $attribute->getDefaultMetricUnit();
-                } else {
-                    $min = ($attribute->getNumberMin() != null) ? $attribute->getNumberMin() : self::DEFAULT_NUMBER_MIN;
-                    $max = ($attribute->getNumberMax() != null) ? $attribute->getNumberMax() : self::DEFAULT_NUMBER_MAX;
-
-                    $decimals = $attribute->isDecimalsAllowed() ? self::DEFAULT_NB_DECIMALS : 0;
-
-                    $data = $this->faker->randomFloat($decimals, $min, $max);
-                }
+                $data = $this->generateNumberData($attribute);
                 break;
             case "boolean":
-                $data = $this->faker->boolean() ? "1" : "0";
+                $data = $this->generateBooleanData();
                 break;
             case "option":
             case "options":
-                $options = [];
-                foreach ($attribute->getOptions() as $option) {
-                    $options[] = $option;
-                }
-                $option = $this->faker->randomElement($options);
-
-                if (is_object($option)) {
-                    $data = $option->getCode();
-                }
-
+                $data = $this->generateOptionData($attribute);
                 break;
             default:
                 $data = '';
@@ -371,6 +350,121 @@ class ProductGenerator implements GeneratorInterface
 
         return (string) $data;
     }
+
+    /**
+     * Generate a varchar product value data
+     *
+     * @param AbstractAttribute attribute
+     *
+     * @return string
+     */
+    protected function generateVarcharData(AbstractAttribute $attribute)
+    {
+        $validationRule = $attribute->getValidationRule();
+        switch ($validationRule) {
+            case 'url':
+                $varchar = $this->faker->url();
+                break;
+            default:
+                $varchar = $this->faker->sentence();
+                break;
+        }
+
+        return $varchar;
+    }
+
+    /**
+     * Generate a text product value data
+     *
+     * @return string
+     */
+    protected function generateTextData()
+    {
+        return $this->faker->sentence();
+    }
+
+    /**
+     * Generate a date product value data
+     *
+     * @param AbstractAttribute attribute
+     *
+     * @return string
+     */
+    protected function generateDateData(AbstractAttribute $attribute)
+    {
+        $date = $this->faker->dateTimeBetween($attribute->getDateMin(), $attribute->getDateMax());
+        return $date->format('Y-m-d');
+    }
+
+    /**
+     * Generate number data
+     *
+     * @param AbstractAttribute attribute
+     *
+     * @return string
+     */
+    protected function generateNumberData(AbstractAttribute $attribute)
+    {
+        $min = ($attribute->getNumberMin() != null) ? $attribute->getNumberMin() : self::DEFAULT_NUMBER_MIN;
+        $max = ($attribute->getNumberMax() != null) ? $attribute->getNumberMax() : self::DEFAULT_NUMBER_MAX;
+
+        $decimals = $attribute->isDecimalsAllowed() ? self::DEFAULT_NB_DECIMALS : 0;
+
+        $number = $this->faker->randomFloat($decimals, $min, $max);
+
+        return (string) $number;
+    }
+
+    /**
+     * Generate a boolean product value data
+     *
+     * @return string
+     */
+    protected function generateBooleanData()
+    {
+        return $this->faker->boolean() ? "1" : "0";
+    }
+
+    /**
+     * Generate option data
+     *
+     * @param AbstractAttribute attribute
+     *
+     * @return string
+     */
+    protected function generateOptionData(AbstractAttribute $attribute)
+    {
+        $optionCode = "";
+
+        $option = $this->getRandomOptionFromAttribute($attribute);
+
+        if (is_object($option)) {
+            $optionCode = $option->getCode();
+        }
+
+        return $optionCode;
+    }
+
+    /**
+     * Get a random option from an attribute
+     *
+     * @param AbstractAttribute $attribute
+     *
+     * @return AttributeOption
+     */
+    protected function getRandomOptionFromAttribute(AbstractAttribute $attribute)
+    {
+        if (!isset($this->attributeOptions[$attribute->getCode()])) {
+            $this->attributeOptions[$attribute->getCode()] = [];
+
+            foreach ($attribute->getOptions() as $option) {
+            $this->attributeOptions[$attribute->getCode()][] = $option;
+            }
+        }
+
+        return $this->faker->randomElement($this->attributeOptions[$attribute->getCode()]);
+    }
+
 
     /**
      * Get a random family
