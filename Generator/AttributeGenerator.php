@@ -102,6 +102,7 @@ class AttributeGenerator implements GeneratorInterface
         foreach ($forceAttributes as $forceAttribute) {
             list($code, $type) = explode('=', $forceAttribute);
             $this->attributes[trim($code)] = [
+                'code'  => trim($code),
                 'type'  => trim($type),
                 'group' => $this->getRandomAttributeGroupCode()
             ];
