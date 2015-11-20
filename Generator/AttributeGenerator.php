@@ -192,13 +192,14 @@ class AttributeGenerator implements GeneratorInterface
     protected function getRandomAttributeType()
     {
         $attributeType = null;
+        $typesToAvoid = [
+            'pim_catalog_identifier',
+            'pim_reference_data_multiselect',
+            'pim_reference_data_simpleselect',
+            'pim_assets_collection',
+        ];
 
-        while (
-            (null === $attributeType) ||
-            ('pim_catalog_identifier' === $attributeType) ||
-            ('pim_reference_data_multiselect' === $attributeType) ||
-            ('pim_reference_data_simpleselect' === $attributeType)
-        ) {
+        while ((null === $attributeType) || in_array($attributeType, $typesToAvoid)) {
             $attributeType = $this->faker->randomElement($this->getAttributeTypeCodes());
         }
 
