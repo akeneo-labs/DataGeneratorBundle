@@ -4,6 +4,8 @@ namespace spec\Pim\Bundle\DataGeneratorBundle\Generator;
 
 use PhpSpec\ObjectBehavior;
 use Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator;
+use Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupGenerator;
+use Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator;
@@ -16,6 +18,7 @@ class GeneratorSpec extends ObjectBehavior
         FamilyGenerator $familyGenerator,
         ProductGenerator $productGenerator,
         CategoryGenerator $categoryGenerator,
+        AttributeGroupGenerator $attrGroupGenerator,
         AttributeOptionGenerator $attributeOptionGenerator
     ) {
         $this->beConstructedWith(
@@ -23,6 +26,7 @@ class GeneratorSpec extends ObjectBehavior
             $familyGenerator,
             $productGenerator,
             $categoryGenerator,
+            $attrGroupGenerator,
             $attributeOptionGenerator
         );
     }
@@ -30,7 +34,6 @@ class GeneratorSpec extends ObjectBehavior
     function it_is_initializable()
     {
         $this->shouldHaveType('Pim\Bundle\DataGeneratorBundle\Generator\Generator');
-        $this->shouldImplement('Pim\Bundle\DataGeneratorBundle\Generator\GeneratorInterface');
     }
 
     function it_is_a_generator()
