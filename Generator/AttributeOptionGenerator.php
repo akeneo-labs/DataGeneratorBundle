@@ -3,8 +3,6 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
-use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -33,12 +31,6 @@ class AttributeOptionGenerator implements GeneratorInterface
     /** @var array */
     protected $attributeOptions = [];
 
-    /** @var LocaleRepositoryInterface */
-    protected $localeRepository;
-
-    /** @ var AttributeRepositoryInterface */
-    protected $attributeRepository;
-
     /** @var array */
     protected $attributes;
 
@@ -49,20 +41,11 @@ class AttributeOptionGenerator implements GeneratorInterface
     protected $faker;
 
     /**
-     * @param LocaleRepositoryInterface $localeRepository
-     */
-    public function __construct(
-        LocaleRepositoryInterface $localeRepository
-    ) {
-        $this->localeRepository = $localeRepository;
-        $this->faker = Faker\Factory::create();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
+        $this->faker = Faker\Factory::create();
         $countPerAttribute = (int) $config['count_per_attribute'];
         $this->delimiter   = $config['delimiter'];
 
@@ -107,10 +90,9 @@ class AttributeOptionGenerator implements GeneratorInterface
      */
     protected function getLocalizedRandomLabels()
     {
-        $locales = $this->getLocales();
         $labels = [];
 
-        foreach ($locales as $locale) {
+        foreach ($this->locales as $locale) {
             $labels[$locale->getCode()] = $this->faker->sentence(2);
         }
 
@@ -146,21 +128,13 @@ class AttributeOptionGenerator implements GeneratorInterface
     }
 
     /**
-     * Get active locales
+     * Set active locales
      *
-     * @return Locale[]
+     * @param Locale[]
      */
-    protected function getLocales()
+    public function setLocales(array $locales)
     {
-        if (null === $this->locales) {
-            $this->locales = [];
-            $locales = $this->localeRepository->findBy(['activated' => 1]);
-            foreach ($locales as $locale) {
-                $this->locales[$locale->getCode()] = $locale;
-            }
-        }
-
-        return $this->locales;
+        $this->locales = $locales;
     }
 
     /**

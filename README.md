@@ -44,10 +44,10 @@ Generating base fixtures:
 data_generator:
     output_dir: /tmp/generated_data
     entities:
-        attribute:
+        attributes:
             count: 200
             identifier_attribute: "sku"
-        family:
+        families:
             count: 30
             attributes_count: 60
             identifier_attribute: "sku"
@@ -59,7 +59,7 @@ Generating products:
 data_generator:
     output_dir: /tmp/generated_data
     entities:
-        product:
+        products:
             count: 1000
             filled_attributes_count: 50
             filled_attributes_standard_deviation: 10
@@ -92,7 +92,7 @@ must be imported by the import profiles.
 
 Compatibility
 -------------
-Tested on PIM CE 1.1, CE 1.2, CE 1.3, EE 1.0 and EE 1.3.
+This version is only compatible with Akeneo PIM CE >= 1.4.
 
 Credits
 -------

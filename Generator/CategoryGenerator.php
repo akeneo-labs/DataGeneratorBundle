@@ -4,8 +4,9 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\CatalogBundle\Entity\Category;
+use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation;
 use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
-use Pim\Bundle\DataGeneratorBundle\Model\CategoryTree;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -16,166 +17,195 @@ use Symfony\Component\Yaml;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class CategoryGenerator implements GeneratorInterface
+class CategoryGenerator
 {
     const CATEGORIES_FILENAME = 'categories.csv';
     const CATEGORIES_CODE_PREFIX = 'cat_';
-    const DEFAULT_DELIMITER = ';';
+    const LABEL_LENGTH = 2;
 
     /** @var Locale[] */
     protected $locales;
 
-    /** @var LocaleRepositoryInterface */
-    protected $localeRepository;
-
     /** @var Faker\Generator */
     protected $faker;
-
-    /** @var  CategoryTree */
-    protected $categoryTree;
-
-    /** @var string */
-    protected $outputFile;
-
-    /** @var string */
-    protected $delimiter;
-
-    /** @var  int */
-    protected $levelMax;
-
-    /**
-     * @param LocaleRepositoryInterface $localeRepository
-     */
-    public function __construct(LocaleRepositoryInterface $localeRepository)
-    {
-        $this->localeRepository = $localeRepository;
-    }
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir)
     {
-        $this->outputFile = $outputDir.'/'.self::CATEGORIES_FILENAME;
-
-        $delimiter = $config['delimiter'];
-        $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
-
-        $count = (int)$config['count'];
-        $this->levelMax = (int)$config['levels'];
-
-        $countByLevel = $this->calculateNodeCountPerLevel($this->levelMax, $count);
-
         $this->faker = Faker\Factory::create();
 
+        $delimiter = $config['delimiter'];
+        $count     = (int)$config['count'];
+        $levelMax  = (int)$config['levels'];
+
+        $countByLevel = $this->calculateNodeCountPerLevel($levelMax, $count);
+
         $headers = ['code', 'parent'];
-        foreach ($this->getLocales() as $locale) {
+        foreach ($this->locales as $locale) {
             $headers[] = 'label-'.$locale->getCode();
         }
 
-        $this->categoryTree = new CategoryTree('master', 0);
+        $rootCategory = $this->generateCategory('master', 'Master Catalog');
+        $categories = $this->generateCategories($rootCategory, 1, $countByLevel, $levelMax);
 
-        foreach ($this->getLocales() as $locale) {
-            $this->categoryTree->addLabel($locale->getCode(), 'Master Catalog');
-        }
+        $normalizedCategories = $this->normalizeCategories($categories);
 
-        $currentLevel = 1;
-        $this->feedTree($this->categoryTree, $currentLevel, $countByLevel, $progress);
+        $outputFile = $outputDir.'/'.self::CATEGORIES_FILENAME;
+        $this->writeCsvFile($headers, $normalizedCategories, $outputFile, $delimiter);
 
-        $this->writeCsvFile($headers);
-
-        return $this;
-    }
-
-    protected function feedTree(CategoryTree $categoryTree, $currentLevel, $count, ProgressHelper $progress)
-    {
-        for ($i = 0; $i < $count; $i++) {
-            $categoryCode = $categoryTree->getCode().'_'.$i;
-            $categoryLeaf = new CategoryTree($categoryCode, $currentLevel);
-            foreach ($this->getLocalizedRandomLabels() as $localeCode => $localeLabel) {
-                $categoryLeaf->addLabel($localeCode, $localeLabel);
-            }
-            if ($currentLevel < $this->levelMax) {
-                $this->feedTree($categoryLeaf, $currentLevel + 1, $count, $progress);
-            }
-            $categoryTree->addChild($categoryLeaf);
-
-            $progress->advance();
-        }
-
-        return $categoryTree;
+        return $this->flattenCategories($categories);
     }
 
     /**
-     * Get localized random labels
+     * Generate categories in a tree structure
+     *
+     * @param Category $parent
+     * @param int $level
+     * @param int $count
+     * @param int $levelMax
+     */
+    protected function generateCategories(Category $parent, $level, $count, $levelMax)
+    {
+        for ($i = 0; $i < $count; $i++) {
+            $categoryCode = $parent->getCode().'_'.$i;
+
+            $category = $this->generateCategory($categoryCode);
+
+            if ($level < $levelMax) {
+                $this->generateCategories($category, $level + 1, $count, $levelMax);
+            }
+
+            $parent->addChild($category);
+        }
+
+        return $parent;
+    }
+
+    /**
+     * Generate a category object
+     *
+     * @param string $categoryCode
+     * @param string $forcedLabel
+     *
+     * @return Category $category
+     */
+    protected function generateCategory($code, $forcedLabel = null)
+    {
+        $category = new Category();
+        $category->setCode($code);
+
+        foreach ($this->locales as $locale) {
+            $translation = new CategoryTranslation();
+            $translation->setLocale($locale);
+
+            if (null === $forcedLabel) {
+                $translation->setLabel($this->faker->sentence(static::LABEL_LENGTH));
+            } else {
+                $translation->setLabel($forcedLabel);
+            }
+            $category->addTranslation($translation);
+        }
+
+        return $category;
+    }
+
+    /**
+     * Normalize Categories objects into a flat array
+     *
+     * @param Category $category
+     * @param array    $normalizedCategories
+     */
+    protected function normalizeCategories(Category $category, array $normalizedCategories = [])
+    {
+        $normalizedCategory = $this->normalizeCategory($category);
+
+        $normalizedCategories[] = $normalizedCategory;
+
+        foreach ($category->getChildren() as $child) {
+            $normalizedCategories = $this->normalizeCategories($child, $normalizedCategories);
+        }
+
+        return $normalizedCategories;
+    }
+
+    /**
+     * Normalize a category object into a flat array
+     *
+     * @param Category $category
      *
      * @return array
      */
-    protected function getLocalizedRandomLabels()
+    protected function normalizeCategory(Category $category)
     {
-        $locales = $this->getLocales();
-        $labels = [];
+        $normalizedCategory = [
+            'code'   => $category->getCode()
+        ];
 
-        foreach ($locales as $locale) {
-            $labels[$locale->getCode()] = $this->faker->sentence(2);
+        if (null !== $category->getParent()) {
+            $normalizedCategory['parent'] = $category->getParent()->getCode();
+        } else {
+            $normalizedCategory['parent'] = "";
         }
 
-        return $labels;
+        foreach ($category->getTranslations() as $translation) {
+            $labelCode = 'label-'.$translation->getLocale()->getCode();
+
+            $normalizedCategory[$labelCode] = $translation->getLabel();
+        }
+
+        return $normalizedCategory;
     }
 
     /**
-     * Get active locales
+     * Flatten the category tree into an array
      *
-     * @return Locale[]
+     * @param Category $category
+     * @param array    $flatCategories
+     *
+     * @return array
      */
-    protected function getLocales()
+    protected function flattenCategories(Category $category, array $flatCategories = [])
     {
-        if (null === $this->locales) {
-            $this->locales = [];
+        $flatCategories[$category->getCode()] = $category;
 
-            $locales = $this->localeRepository->findBy(['activated' => 1]);
-            foreach ($locales as $locale) {
-                $this->locales[$locale->getCode()] = $locale;
-            }
+        foreach ($category->getChildren() as $child) {
+            $flatCategories = $this->flattenCategories($child, $flatCategories);
         }
 
-        return $this->locales;
+        return $flatCategories;
+    }
+
+    /**
+     * Set active locales
+     *
+     * @param Locale[]
+     */
+    public function setLocales(array $locales)
+    {
+        $this->locales = $locales;
     }
 
     /**
      * Write the CSV file
-     *
-     * @param array $headers
      */
-    protected function writeCsvFile(array $headers)
+    protected function writeCsvFile(array $headers, array $normalizedCategories, $outputFile, $delimiter)
     {
-        $csvFile = fopen($this->outputFile, 'w');
-        fputcsv($csvFile, $headers, $this->delimiter);
-        $lines = $this->flattenTree($this->categoryTree);
-        foreach ($lines as $category) {
-            fputcsv($csvFile, $category, $this->delimiter);
+        $csvFile = fopen($outputFile, 'w');
+
+        fputcsv($csvFile, $headers, $delimiter);
+
+        foreach ($normalizedCategories as $category) {
+            fputcsv($csvFile, $category, $delimiter);
         }
         fclose($csvFile);
     }
 
-    protected function flattenTree(CategoryTree $categoryTree, array $lines = [], CategoryTree $parent = null)
-    {
-        $flatCategory = $categoryTree->flatten();
-
-        if ($parent) {
-            $flatCategory['parent'] = $parent->getCode();
-        }
-        $lines [] = $flatCategory;
-        foreach ($categoryTree->getChildren() as $child) {
-            $lines = $this->flattenTree($child, $lines, $categoryTree);
-        }
-
-        return $lines;
-    }
 
     /**
      * Calculate on approximation for the average number of nodes per level needed from the
-     * provided argument
+     * provided node count and level count
      *
      * @param int $levelCount
      * @param int $nodeCount

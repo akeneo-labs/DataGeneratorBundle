@@ -33,19 +33,8 @@ class AttributeGroupGenerator implements GeneratorInterface
     /** @var Faker\Generator */
     protected $faker;
 
-    /** @var LocaleRepositoryInterface */
-    protected $localeRepository;
-
     /** @var Locale[] */
     protected $locales;
-
-    /**
-     * @param LocaleRepositoryInterface  $localeRepository
-     */
-    public function __construct(LocaleRepositoryInterface $localeRepository)
-    {
-        $this->localeRepository  = $localeRepository;
-    }
 
     /**
      * {@inheritdoc}
@@ -80,7 +69,7 @@ class AttributeGroupGenerator implements GeneratorInterface
      *
      * @return array
      */
-    public function getAttributeGroupObjects()
+    public function getAttributeGroups()
     {
         $attrGroupObjects = [];
 
@@ -102,10 +91,9 @@ class AttributeGroupGenerator implements GeneratorInterface
      */
     protected function getLocalizedRandomLabels()
     {
-        $locales = $this->getLocales();
         $labels = [];
 
-        foreach ($locales as $locale) {
+        foreach ($this->locales as $locale) {
             $labels[$locale->getCode()] = $this->faker->sentence(2);
         }
 
@@ -113,21 +101,13 @@ class AttributeGroupGenerator implements GeneratorInterface
     }
 
     /**
-     * Get active locales
+     * Set active locales
      *
-     * @return Locale[]
+     * @param Locale[]
      */
-    protected function getLocales()
+    public function setLocales(array $locales)
     {
-        if (null === $this->locales) {
-            $this->locales = [];
-            $locales = $this->localeRepository->findBy(['activated' => 1]);
-            foreach ($locales as $locale) {
-                $this->locales[$locale->getCode()] = $locale;
-            }
-        }
-
-        return $this->locales;
+        $this->locales = $locales;
     }
 
     /**

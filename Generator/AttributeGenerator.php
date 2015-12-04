@@ -5,8 +5,6 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Faker;
 use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypeRegistry;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
-use Pim\Bundle\CatalogBundle\Repository\AttributeGroupRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -35,13 +33,7 @@ class AttributeGenerator implements GeneratorInterface
     /** @var array */
     protected $locales;
 
-    /** @var AttributeGroupRepositoryInterface */
-    protected $groupRepository;
-
-    /** @var LocaleRepositoryInterface */
-    protected $localeRepository;
-
-    /** @ var AttributeTypeRegistry */
+    /** @var AttributeTypeRegistry */
     protected $typeRegistry;
 
     /** @var array */
@@ -57,18 +49,12 @@ class AttributeGenerator implements GeneratorInterface
     protected $delimiter;
 
     /**
-     * @param AttributeGroupRepositoryInterface $groupRepository
-     * @param LocaleRepositoryInterface         $localeRepository
-     * @param AttributeTypeRegistry             $typeRegistry
+     * @param AttributeTypeRegistry $typeRegistry
      */
     public function __construct(
-        AttributeGroupRepositoryInterface $groupRepository,
-        LocaleRepositoryInterface $localeRepository,
         AttributeTypeRegistry $typeRegistry
     ) {
-        $this->groupRepository  = $groupRepository;
-        $this->localeRepository = $localeRepository;
-        $this->typeRegistry     = $typeRegistry;
+        $this->typeRegistry = $typeRegistry;
     }
 
     /**
@@ -151,7 +137,7 @@ class AttributeGenerator implements GeneratorInterface
      *
      * @return array
      */
-    public function getAttributeObjects()
+    public function getAttributes()
     {
         $attributeObjects = [];
 
@@ -252,10 +238,9 @@ class AttributeGenerator implements GeneratorInterface
      */
     protected function getLocalizedRandomLabels()
     {
-        $locales = $this->getLocales();
         $labels = [];
 
-        foreach ($locales as $locale) {
+        foreach ($this->locales as $locale) {
             $labels[$locale->getCode()] = $this->faker->sentence(2);
         }
 
@@ -291,21 +276,13 @@ class AttributeGenerator implements GeneratorInterface
     }
 
     /**
-     * Get active locales
+     * Set active locales
      *
-     * @return array
+     * @param Locale[]
      */
-    protected function getLocales()
+    public function setLocales(array $locales)
     {
-        if (null === $this->locales) {
-            $this->locales = [];
-            $locales = $this->localeRepository->findBy(['activated' => 1]);
-            foreach ($locales as $locale) {
-                $this->locales[$locale->getCode()] = $locale;
-            }
-        }
-
-        return $this->locales;
+        $this->locales = $locales;
     }
 
     /**

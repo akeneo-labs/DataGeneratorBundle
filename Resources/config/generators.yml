@@ -1,51 +1,64 @@
 parameters:
     pim_data_generator.generator.class :                  Pim\Bundle\DataGeneratorBundle\Generator\Generator
+    pim_data_generator.generator.channel.class :          Pim\Bundle\DataGeneratorBundle\Generator\ChannelGenerator
     pim_data_generator.generator.product.class :          Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
     pim_data_generator.generator.attribute.class :        Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator
     pim_data_generator.generator.attribute_option.class : Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator
     pim_data_generator.generator.family.class :           Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator
     pim_data_generator.generator.attribute_group.class:   Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupGenerator
     pim_data_generator.generator.category.class :         Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator
+    pim_data_generator.generator.user_group.class :       Pim\Bundle\DataGeneratorBundle\Generator\UserGroupGenerator
+    pim_data_generator.generator.user_role.class :        Pim\Bundle\DataGeneratorBundle\Generator\UserRoleGenerator
+    pim_data_generator.generator.user.class :             Pim\Bundle\DataGeneratorBundle\Generator\UserGenerator
+    pim_data_generator.generator.job.class :              Pim\Bundle\DataGeneratorBundle\Generator\JobGenerator
 
 services:
     pim_data_generator.generator:
         class: %pim_data_generator.generator.class%
         arguments:
+            - @pim_data_generator.generator.channel
+            - @pim_data_generator.generator.user_role
+            - @pim_data_generator.generator.user_group
+            - @pim_data_generator.generator.user
             - @pim_data_generator.generator.attribute
             - @pim_data_generator.generator.family
             - @pim_data_generator.generator.product
             - @pim_data_generator.generator.category
             - @pim_data_generator.generator.attribute_group
             - @pim_data_generator.generator.attribute_option
+            - @pim_data_generator.generator.job
+
+    pim_data_generator.generator.channel:
+        class: %pim_data_generator.generator.channel.class%
 
     pim_data_generator.generator.category:
         class: %pim_data_generator.generator.category.class%
-        arguments:
-            - '@pim_catalog.repository.locale'
+
+    pim_data_generator.generator.user_role:
+        class: %pim_data_generator.generator.user_role.class%
+
+    pim_data_generator.generator.user_group:
+        class: %pim_data_generator.generator.user_group.class%
+
+    pim_data_generator.generator.user:
+        class: %pim_data_generator.generator.user.class%
 
     pim_data_generator.generator.attribute:
         class: %pim_data_generator.generator.attribute.class%
         arguments:
-            - '@pim_catalog.repository.attribute_group'
-            - '@pim_catalog.repository.locale'
             - '@pim_catalog.registry.attribute_type'
-            - '@pim_catalog.repository.attribute_option'
 
     pim_data_generator.generator.family:
         class: %pim_data_generator.generator.family.class%
-        arguments:
-            - @pim_catalog.repository.channel
-            - @pim_catalog.repository.locale
 
     pim_data_generator.generator.attribute_option:
         class: %pim_data_generator.generator.attribute_option.class%
-        arguments:
-            - '@pim_catalog.repository.locale'
 
     pim_data_generator.generator.attribute_group:
         class: %pim_data_generator.generator.attribute_group.class%
-        arguments:
-            - @pim_catalog.repository.locale
+
+    pim_data_generator.generator.job:
+        class: %pim_data_generator.generator.job.class%
 
     pim_data_generator.generator.product:
         class: %pim_data_generator.generator.product.class%
