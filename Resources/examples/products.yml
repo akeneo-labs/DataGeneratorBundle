@@ -5,7 +5,7 @@ data_generator:
     entities:
         product:
             count: 1000
-            filled_attributes: 50
+            filled_attributes_count: 50
             filled_attributes_standard_deviation: 10
             mandatory_attributes: [sku, name]
             delimiter: ;
