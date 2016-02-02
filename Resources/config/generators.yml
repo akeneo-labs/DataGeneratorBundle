@@ -14,7 +14,7 @@ parameters:
     pim_data_generator.generator.asset_category.class:          Pim\Bundle\DataGeneratorBundle\Generator\AssetCategoryGenerator
     pim_data_generator.generator.asset_category_access.class:   Pim\Bundle\DataGeneratorBundle\Generator\AssetCategoryAccessGenerator
     pim_data_generator.generator.attribute_groups_access.class: Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupsAccessGenerator
-
+    pim_data_generator.generator.job_profiles_access.class:     Pim\Bundle\DataGeneratorBundle\Generator\JobProfilesAccessGenerator
 
 services:
     pim_data_generator.generator:
@@ -34,6 +34,7 @@ services:
             - @pim_data_generator.generator.asset_category
             - @pim_data_generator.generator.asset_category_access
             - @pim_data_generator.generator.attribute_groups_access
+            - @pim_data_generator.generator.job_profiles_access
 
     pim_data_generator.generator.channel:
         class: %pim_data_generator.generator.channel.class%
@@ -85,3 +86,6 @@ services:
 
     pim_data_generator.generator.attribute_groups_access:
         class: %pim_data_generator.generator.attribute_groups_access.class%
+
+    pim_data_generator.generator.job_profiles_access:
+        class: %pim_data_generator.generator.job_profiles_access.class%

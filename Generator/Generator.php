@@ -55,6 +55,9 @@ class Generator implements GeneratorInterface
     /** @var AttributeGroupsAccessGenerator */
     protected $attributeGroupsAccessGenerator;
 
+    /** @var JobProfilesAccessGenerator */
+    protected $jobProfilesAccessGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -70,6 +73,7 @@ class Generator implements GeneratorInterface
      * @param AssetCategoryGenerator         $assetCategoryGenerator
      * @param AssetCategoryAccessGenerator   $assetCategoryAccessGenerator
      * @param AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator
+     * @param JobProfilesAccessGenerator     $jobProfilesAccessGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -85,7 +89,8 @@ class Generator implements GeneratorInterface
         JobGenerator                   $jobGenerator,
         AssetCategoryGenerator         $assetCategoryGenerator,
         AssetCategoryAccessGenerator   $assetCategoryAccessGenerator,
-        AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator
+        AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator,
+        JobProfilesAccessGenerator     $jobProfilesAccessGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -101,6 +106,7 @@ class Generator implements GeneratorInterface
         $this->assetCategoryGenerator         = $assetCategoryGenerator;
         $this->assetCategoryAccessGenerator   = $assetCategoryAccessGenerator;
         $this->attributeGroupsAccessGenerator = $attributeGroupsAccessGenerator;
+        $this->jobProfilesAccessGenerator     = $jobProfilesAccessGenerator;
     }
 
     /**
@@ -108,19 +114,15 @@ class Generator implements GeneratorInterface
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
-        $locales    = [];
-        $currencies = [];
-        $channels   = [];
-
-        $userRoles  = [];
-        $userGroups = [];
-        $users      = [];
-        $categories = [];
-
-        $attributeGroups = [];
-        $attributes      = [];
-
+        $locales            = [];
+        $channels           = [];
+        $userRoles          = [];
+        $userGroups         = [];
+        $categories         = [];
+        $attributeGroups    = [];
+        $attributes         = [];
         $assetCategoryCodes = [];
+        $jobs               = [];
 
         if (isset($config['entities']['product']) && count($config['entities']) > 1) {
             throw new \LogicException(
@@ -133,7 +135,6 @@ class Generator implements GeneratorInterface
             $channelConfig = $config['entities']['channels'];
             $this->channelGenerator->generate($channelConfig, $outputDir, $progress);
             $locales    = $this->channelGenerator->getLocales();
-            $currencies = $this->channelGenerator->getCurrencies();
             $channels   = $this->channelGenerator->getChannels();
         }
 
@@ -166,7 +167,7 @@ class Generator implements GeneratorInterface
             $this->userGenerator->setUserRoles($userRoles);
             $this->userGenerator->setUserGroups($userGroups);
             $this->userGenerator->setAssetCategories($assetCategoryCodes);
-            $users = $this->userGenerator->generate($userConfig, $outputDir);
+            $this->userGenerator->generate($userConfig, $outputDir);
         }
 
         if (isset($config['entities']['attribute_groups'])) {
@@ -194,7 +195,7 @@ class Generator implements GeneratorInterface
 
         if (isset($config['entities']['jobs'])) {
             $jobConfig = $config['entities']['jobs'];
-            $this->jobGenerator->generate($jobConfig, $outputDir);
+            $jobs = $this->jobGenerator->generate($jobConfig, $outputDir);
         }
 
         if (isset($config['entities']['attribute_options'])) {
@@ -219,6 +220,12 @@ class Generator implements GeneratorInterface
             $this->attributeGroupsAccessGenerator->setGroups($userGroups);
             $this->attributeGroupsAccessGenerator->setAttributeGroups($attributeGroups);
             $this->attributeGroupsAccessGenerator->generate([], $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['job_profiles_accesses'])) {
+            $this->jobProfilesAccessGenerator->setGroups($userGroups);
+            $this->jobProfilesAccessGenerator->setJobs($jobs);
+            $this->jobProfilesAccessGenerator->generate([], $outputDir, $progress);
         }
     }
 }

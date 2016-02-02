@@ -58,3 +58,4 @@ data_generator:
         asset_categories: ~
         asset_category_accesses: ~
         attribute_groups_accesses: ~
+        job_profiles_accesses: ~

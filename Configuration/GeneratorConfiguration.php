@@ -185,6 +185,7 @@ class GeneratorConfiguration implements ConfigurationInterface
                         ->arrayNode('asset_categories')->end()
                         ->arrayNode('asset_category_accesses')->end()
                         ->arrayNode('attribute_groups_accesses')->end()
+                        ->arrayNode('job_profiles_accesses')->end()
                     ->end()
                 ->end()
             ->end()
