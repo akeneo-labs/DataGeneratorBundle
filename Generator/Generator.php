@@ -52,49 +52,55 @@ class Generator implements GeneratorInterface
     /** @var AssetCategoryAccessGenerator */
     protected $assetCategoryAccessGenerator;
 
+    /** @var AttributeGroupsAccessGenerator */
+    protected $attributeGroupsAccessGenerator;
+
     /**
-     * @param ChannelGenerator             $channelGenerator
-     * @param UserRoleGenerator            $userRoleGenerator
-     * @param UserGroupGenerator           $userGroupGenerator
-     * @param UserGenerator                $userGenerator
-     * @param AttributeGenerator           $attributeGenerator
-     * @param FamilyGenerator              $familyGenerator
-     * @param ProductGenerator             $productGenerator
-     * @param CategoryGenerator            $categoryGenerator
-     * @param AttributeGroupGenerator      $attrGroupGenerator
-     * @param AttributeOptionGenerator     $attributeOptionGenerator
-     * @param JobGenerator                 $jobGenerator
-     * @param AssetCategoryGenerator       $assetCategoryGenerator
-     * @param AssetCategoryAccessGenerator $assetCategoryAccessGenerator
+     * @param ChannelGenerator               $channelGenerator
+     * @param UserRoleGenerator              $userRoleGenerator
+     * @param UserGroupGenerator             $userGroupGenerator
+     * @param UserGenerator                  $userGenerator
+     * @param AttributeGenerator             $attributeGenerator
+     * @param FamilyGenerator                $familyGenerator
+     * @param ProductGenerator               $productGenerator
+     * @param CategoryGenerator              $categoryGenerator
+     * @param AttributeGroupGenerator        $attrGroupGenerator
+     * @param AttributeOptionGenerator       $attributeOptionGenerator
+     * @param JobGenerator                   $jobGenerator
+     * @param AssetCategoryGenerator         $assetCategoryGenerator
+     * @param AssetCategoryAccessGenerator   $assetCategoryAccessGenerator
+     * @param AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator
      */
     public function __construct(
-        ChannelGenerator             $channelGenerator,
-        UserRoleGenerator            $userRoleGenerator,
-        UserGroupGenerator           $userGroupGenerator,
-        UserGenerator                $userGenerator,
-        AttributeGenerator           $attributeGenerator,
-        FamilyGenerator              $familyGenerator,
-        ProductGenerator             $productGenerator,
-        CategoryGenerator            $categoryGenerator,
-        AttributeGroupGenerator      $attrGroupGenerator,
-        AttributeOptionGenerator     $attributeOptionGenerator,
-        JobGenerator                 $jobGenerator,
-        AssetCategoryGenerator       $assetCategoryGenerator,
-        AssetCategoryAccessGenerator $assetCategoryAccessGenerator
+        ChannelGenerator               $channelGenerator,
+        UserRoleGenerator              $userRoleGenerator,
+        UserGroupGenerator             $userGroupGenerator,
+        UserGenerator                  $userGenerator,
+        AttributeGenerator             $attributeGenerator,
+        FamilyGenerator                $familyGenerator,
+        ProductGenerator               $productGenerator,
+        CategoryGenerator              $categoryGenerator,
+        AttributeGroupGenerator        $attrGroupGenerator,
+        AttributeOptionGenerator       $attributeOptionGenerator,
+        JobGenerator                   $jobGenerator,
+        AssetCategoryGenerator         $assetCategoryGenerator,
+        AssetCategoryAccessGenerator   $assetCategoryAccessGenerator,
+        AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator
     ) {
-        $this->channelGenerator             = $channelGenerator;
-        $this->userRoleGenerator            = $userRoleGenerator;
-        $this->userGroupGenerator           = $userGroupGenerator;
-        $this->userGenerator                = $userGenerator;
-        $this->attributeGenerator           = $attributeGenerator;
-        $this->familyGenerator              = $familyGenerator;
-        $this->productGenerator             = $productGenerator;
-        $this->categoryGenerator            = $categoryGenerator;
-        $this->attrGroupGenerator           = $attrGroupGenerator;
-        $this->attributeOptionGenerator     = $attributeOptionGenerator;
-        $this->jobGenerator                 = $jobGenerator;
-        $this->assetCategoryGenerator       = $assetCategoryGenerator;
-        $this->assetCategoryAccessGenerator = $assetCategoryAccessGenerator;
+        $this->channelGenerator               = $channelGenerator;
+        $this->userRoleGenerator              = $userRoleGenerator;
+        $this->userGroupGenerator             = $userGroupGenerator;
+        $this->userGenerator                  = $userGenerator;
+        $this->attributeGenerator             = $attributeGenerator;
+        $this->familyGenerator                = $familyGenerator;
+        $this->productGenerator               = $productGenerator;
+        $this->categoryGenerator              = $categoryGenerator;
+        $this->attrGroupGenerator             = $attrGroupGenerator;
+        $this->attributeOptionGenerator       = $attributeOptionGenerator;
+        $this->jobGenerator                   = $jobGenerator;
+        $this->assetCategoryGenerator         = $assetCategoryGenerator;
+        $this->assetCategoryAccessGenerator   = $assetCategoryAccessGenerator;
+        $this->attributeGroupsAccessGenerator = $attributeGroupsAccessGenerator;
     }
 
     /**
@@ -207,6 +213,12 @@ class Generator implements GeneratorInterface
             $this->assetCategoryAccessGenerator->setGroups($userGroups);
             $this->assetCategoryAccessGenerator->setAssetCategories($assetCategoryCodes);
             $this->assetCategoryAccessGenerator->generate([], $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['attribute_groups_accesses'])) {
+            $this->attributeGroupsAccessGenerator->setGroups($userGroups);
+            $this->attributeGroupsAccessGenerator->setAttributeGroups($attributeGroups);
+            $this->attributeGroupsAccessGenerator->generate([], $outputDir, $progress);
         }
     }
 }

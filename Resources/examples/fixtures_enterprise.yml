@@ -57,3 +57,4 @@ data_generator:
                     enabled: true
         asset_categories: ~
         asset_category_accesses: ~
+        attribute_groups_accesses: ~
