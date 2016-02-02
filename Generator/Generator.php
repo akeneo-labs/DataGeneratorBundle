@@ -58,6 +58,9 @@ class Generator implements GeneratorInterface
     /** @var JobProfilesAccessGenerator */
     protected $jobProfilesAccessGenerator;
 
+    /** @var LocalesAccessGenerator */
+    protected $localesAccessGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -74,6 +77,7 @@ class Generator implements GeneratorInterface
      * @param AssetCategoryAccessGenerator   $assetCategoryAccessGenerator
      * @param AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator
      * @param JobProfilesAccessGenerator     $jobProfilesAccessGenerator
+     * @param LocalesAccessGenerator         $localesAccessGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -90,7 +94,8 @@ class Generator implements GeneratorInterface
         AssetCategoryGenerator         $assetCategoryGenerator,
         AssetCategoryAccessGenerator   $assetCategoryAccessGenerator,
         AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator,
-        JobProfilesAccessGenerator     $jobProfilesAccessGenerator
+        JobProfilesAccessGenerator     $jobProfilesAccessGenerator,
+        LocalesAccessGenerator         $localesAccessGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -107,6 +112,7 @@ class Generator implements GeneratorInterface
         $this->assetCategoryAccessGenerator   = $assetCategoryAccessGenerator;
         $this->attributeGroupsAccessGenerator = $attributeGroupsAccessGenerator;
         $this->jobProfilesAccessGenerator     = $jobProfilesAccessGenerator;
+        $this->localesAccessGenerator         = $localesAccessGenerator;
     }
 
     /**
@@ -226,6 +232,12 @@ class Generator implements GeneratorInterface
             $this->jobProfilesAccessGenerator->setGroups($userGroups);
             $this->jobProfilesAccessGenerator->setJobs($jobs);
             $this->jobProfilesAccessGenerator->generate([], $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['locales_accesses'])) {
+            $this->localesAccessGenerator->setGroups($userGroups);
+            $this->localesAccessGenerator->setLocales($locales);
+            $this->localesAccessGenerator->generate([], $outputDir, $progress);
         }
     }
 }
