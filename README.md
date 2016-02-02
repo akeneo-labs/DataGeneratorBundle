@@ -12,7 +12,7 @@ From that, this bundle will generate valid product and attribute data.
 Installation
 ------------
 ```bash
- $ composer.phar require akeneo-labs/data-generator-bundle dev-master
+ $ composer.phar require akeneo-labs/data-generator-bundle ~0.3
 ```
 and update your ``app/AppKernel.php`` as follow:
 
@@ -20,14 +20,12 @@ and update your ``app/AppKernel.php`` as follow:
     $bundles[] = new Pim\Bundle\DataGeneratorBundle\PimDataGeneratorBundle();
 ```
 
-Legacy version
---------------
-If you want to use the previous version (with the command lines and options), please use the 0.1 tag.
-Note that the current version covers the same feature than the previous one while adding generation
-on attributes and families.
+How to use it
+-------------
+The catalog generation is done in two phases:
+ 1. generating the catalog fixtures
+ 2. generating the product CSV import files
 
-Usage
------
 ```bash
 Usage:
  pim:generate-data <configuration_file_path>
@@ -36,13 +34,15 @@ Arguments:
  configuration-file    YAML configuration file
 ```
 
+
+
 Configuration file examples
 ---------------------------
 Generating base fixtures:
 
 ```yaml
 data_generator:
-    output_dir: /tmp/generated_data
+    output_dir: /tmp/fixtures/
     entities:
         attributes:
             count: 200
@@ -57,7 +57,7 @@ data_generator:
 Generating products:
 ```yaml
 data_generator:
-    output_dir: /tmp/generated_data
+    output_dir: /tmp/
     entities:
         products:
             count: 1000
