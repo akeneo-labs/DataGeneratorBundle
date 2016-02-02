@@ -12,7 +12,7 @@ From that, this bundle will generate valid product and attribute data.
 Installation
 ------------
 ```bash
- $ composer.phar require akeneo-labs/data-generator-bundle dev-master
+ $ composer.phar require akeneo-labs/data-generator-bundle ~0.3
 ```
 and update your ``app/AppKernel.php`` as follow:
 
@@ -20,14 +20,12 @@ and update your ``app/AppKernel.php`` as follow:
     $bundles[] = new Pim\Bundle\DataGeneratorBundle\PimDataGeneratorBundle();
 ```
 
-Legacy version
---------------
-If you want to use the previous version (with the command lines and options), please use the 0.1 tag.
-Note that the current version covers the same feature than the previous one while adding generation
-on attributes and families.
+How to use it
+-------------
+The catalog generation is done in two phases:
+ 1. generating the catalog fixtures
+ 2. generating the product CSV import files
 
-Usage
------
 ```bash
 Usage:
  pim:generate-data <configuration_file_path>
@@ -36,18 +34,20 @@ Arguments:
  configuration-file    YAML configuration file
 ```
 
+
+
 Configuration file examples
 ---------------------------
 Generating base fixtures:
 
 ```yaml
 data_generator:
-    output_dir: /tmp/generated_data
+    output_dir: /tmp/fixtures/
     entities:
-        attribute:
+        attributes:
             count: 200
             identifier_attribute: "sku"
-        family:
+        families:
             count: 30
             attributes_count: 60
             identifier_attribute: "sku"
@@ -57,9 +57,9 @@ data_generator:
 Generating products:
 ```yaml
 data_generator:
-    output_dir: /tmp/generated_data
+    output_dir: /tmp/
     entities:
-        product:
+        products:
             count: 1000
             filled_attributes_count: 50
             filled_attributes_standard_deviation: 10
@@ -92,7 +92,7 @@ must be imported by the import profiles.
 
 Compatibility
 -------------
-Tested on PIM CE 1.1, CE 1.2, CE 1.3, EE 1.0 and EE 1.3.
+This version is only compatible with Akeneo PIM CE >= 1.4.
 
 Credits
 -------

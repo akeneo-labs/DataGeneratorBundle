@@ -39,14 +39,8 @@ class FamilyGenerator implements GeneratorInterface
     /** @var array */
     protected $locales;
 
-    /** @var ChannelRepositoryInterface */
-    protected $channelRepository;
-
     /** @var array */
     protected $channels;
-
-    /** @var LocaleRepositoryInterface */
-    protected $localeRepository;
 
     /** @var Faker\Generator */
     protected $faker;
@@ -59,18 +53,6 @@ class FamilyGenerator implements GeneratorInterface
 
     /** @var array */
     protected $filteredAttrCodes;
-
-    /**
-     * @param ChannelRepositoryInterface $channelRepository
-     * @param LocaleRepositoryInterface  $localeRepository
-     */
-    public function __construct(
-        ChannelRepositoryInterface $channelRepository,
-        LocaleRepositoryInterface $localeRepository
-    ) {
-        $this->channelRepository = $channelRepository;
-        $this->localeRepository = $localeRepository;
-    }
 
     /**
      * {@inheritdoc}
@@ -110,7 +92,7 @@ class FamilyGenerator implements GeneratorInterface
 
             $requirements = [];
 
-            foreach ($this->getChannels() as $channel) {
+            foreach ($this->channels as $channel) {
                 $attributeReqs = $this->faker->randomElements($this->getAttributeCodes(), $requirementsCount);
                 $attributeReqs = array_merge([$this->identifierAttribute], $attributeReqs);
 
@@ -167,10 +149,9 @@ class FamilyGenerator implements GeneratorInterface
      */
     protected function getLocalizedRandomLabels()
     {
-        $locales = $this->getLocales();
         $labels = [];
 
-        foreach ($locales as $locale) {
+        foreach ($this->locales as $locale) {
             $labels[$locale->getCode()] = $this->faker->sentence(2);
         }
 
@@ -178,21 +159,13 @@ class FamilyGenerator implements GeneratorInterface
     }
 
     /**
-     * Get active locales
+     * Set active locales
      *
-     * @return array
+     * @param Locale[]
      */
-    protected function getLocales()
+    public function setLocales(array $locales)
     {
-        if (null === $this->locales) {
-            $this->locales = [];
-            $locales = $this->localeRepository->findBy(['activated' => 1]);
-            foreach ($locales as $locale) {
-                $this->locales[$locale->getCode()] = $locale;
-            }
-        }
-
-        return $this->locales;
+        $this->locales = $locales;
     }
 
     /**
@@ -215,17 +188,13 @@ class FamilyGenerator implements GeneratorInterface
     }
 
     /**
-     * Get channels
+     * Set channels
      *
-     * @return array
+     * @param Channel[]
      */
-    protected function getChannels()
+    public function setChannels(array $channels)
     {
-        if (null === $this->channels) {
-            $this->channels = $this->channelRepository->findAll();
-        }
-
-        return $this->channels;
+        $this->channels = $channels;
     }
 
     /**

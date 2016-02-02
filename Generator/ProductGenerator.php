@@ -657,11 +657,6 @@ class ProductGenerator implements GeneratorInterface
         fclose($buffer);
     }
 
-    public function setExtraAttributes(array $extraAttributes)
-    {
-        // TODO not implemented
-    }
-
     /**
      * Bufferize the product for latter use and
      * set the headers
