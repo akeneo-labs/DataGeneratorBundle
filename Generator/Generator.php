@@ -108,6 +108,8 @@ class Generator implements GeneratorInterface
         $attributeGroups = [];
         $attributes      = [];
 
+        $assetCategoryCodes = [];
+
         if (isset($config['entities']['product']) && count($config['entities']) > 1) {
             throw new \LogicException(
                 'Products can be generated at the same time of other entities.'.
@@ -139,6 +141,11 @@ class Generator implements GeneratorInterface
             $userGroups = $this->userGroupGenerator->generate($userGroupConfig, $outputDir);
         }
 
+        if (isset($config['entities']['asset_categories'])) {
+            $this->assetCategoryGenerator->setLocales($locales);
+            $assetCategoryCodes = $this->assetCategoryGenerator->generate([], $outputDir, $progress);
+        }
+
         if (isset($config['entities']['users'])) {
             $userConfig = $config['entities']['users'];
             $this->userGenerator->setLocales($locales);
@@ -146,6 +153,7 @@ class Generator implements GeneratorInterface
             $this->userGenerator->setCategories($categories);
             $this->userGenerator->setUserRoles($userRoles);
             $this->userGenerator->setUserGroups($userGroups);
+            $this->userGenerator->setAssetCategories($assetCategoryCodes);
             $users = $this->userGenerator->generate($userConfig, $outputDir);
         }
 
@@ -188,11 +196,6 @@ class Generator implements GeneratorInterface
             $productConfig = $config['entities']['products'];
 
             $this->productGenerator->generate($productConfig, $outputDir, $progress);
-        }
-
-        if (isset($config['entities']['asset_categories'])) {
-            $this->assetCategoryGenerator->setLocales($locales);
-            $this->assetCategoryGenerator->generate([], $outputDir, $progress);
         }
     }
 }
