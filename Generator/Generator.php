@@ -49,46 +49,52 @@ class Generator implements GeneratorInterface
     /** @var AssetCategoryGenerator */
     protected $assetCategoryGenerator;
 
+    /** @var AssetCategoryAccessGenerator */
+    protected $assetCategoryAccessGenerator;
+
     /**
-     * @param ChannelGenerator         $channelGenerator
-     * @param UserRoleGenerator        $userRoleGenerator
-     * @param UserGroupGenerator       $userGroupGenerator
-     * @param UserGenerator            $userGenerator
-     * @param AttributeGenerator       $attributeGenerator
-     * @param FamilyGenerator          $familyGenerator
-     * @param ProductGenerator         $productGenerator
-     * @param CategoryGenerator        $categoryGenerator
-     * @param AttributeGroupGenerator  $attrGroupGenerator
-     * @param AttributeOptionGenerator $attributeOptionGenerator
-     * @param JobGenerator             $jobGenerator
-     * @param AssetCategoryGenerator   $assetCategoryGenerator
+     * @param ChannelGenerator             $channelGenerator
+     * @param UserRoleGenerator            $userRoleGenerator
+     * @param UserGroupGenerator           $userGroupGenerator
+     * @param UserGenerator                $userGenerator
+     * @param AttributeGenerator           $attributeGenerator
+     * @param FamilyGenerator              $familyGenerator
+     * @param ProductGenerator             $productGenerator
+     * @param CategoryGenerator            $categoryGenerator
+     * @param AttributeGroupGenerator      $attrGroupGenerator
+     * @param AttributeOptionGenerator     $attributeOptionGenerator
+     * @param JobGenerator                 $jobGenerator
+     * @param AssetCategoryGenerator       $assetCategoryGenerator
+     * @param AssetCategoryAccessGenerator $assetCategoryAccessGenerator
      */
     public function __construct(
-        ChannelGenerator         $channelGenerator,
-        UserRoleGenerator        $userRoleGenerator,
-        UserGroupGenerator       $userGroupGenerator,
-        UserGenerator            $userGenerator,
-        AttributeGenerator       $attributeGenerator,
-        FamilyGenerator          $familyGenerator,
-        ProductGenerator         $productGenerator,
-        CategoryGenerator        $categoryGenerator,
-        AttributeGroupGenerator  $attrGroupGenerator,
-        AttributeOptionGenerator $attributeOptionGenerator,
-        JobGenerator             $jobGenerator,
-        AssetCategoryGenerator   $assetCategoryGenerator
+        ChannelGenerator             $channelGenerator,
+        UserRoleGenerator            $userRoleGenerator,
+        UserGroupGenerator           $userGroupGenerator,
+        UserGenerator                $userGenerator,
+        AttributeGenerator           $attributeGenerator,
+        FamilyGenerator              $familyGenerator,
+        ProductGenerator             $productGenerator,
+        CategoryGenerator            $categoryGenerator,
+        AttributeGroupGenerator      $attrGroupGenerator,
+        AttributeOptionGenerator     $attributeOptionGenerator,
+        JobGenerator                 $jobGenerator,
+        AssetCategoryGenerator       $assetCategoryGenerator,
+        AssetCategoryAccessGenerator $assetCategoryAccessGenerator
     ) {
-        $this->channelGenerator         = $channelGenerator;
-        $this->userRoleGenerator        = $userRoleGenerator;
-        $this->userGroupGenerator       = $userGroupGenerator;
-        $this->userGenerator            = $userGenerator;
-        $this->attributeGenerator       = $attributeGenerator;
-        $this->familyGenerator          = $familyGenerator;
-        $this->productGenerator         = $productGenerator;
-        $this->categoryGenerator        = $categoryGenerator;
-        $this->attrGroupGenerator       = $attrGroupGenerator;
-        $this->attributeOptionGenerator = $attributeOptionGenerator;
-        $this->jobGenerator             = $jobGenerator;
-        $this->assetCategoryGenerator   = $assetCategoryGenerator;
+        $this->channelGenerator             = $channelGenerator;
+        $this->userRoleGenerator            = $userRoleGenerator;
+        $this->userGroupGenerator           = $userGroupGenerator;
+        $this->userGenerator                = $userGenerator;
+        $this->attributeGenerator           = $attributeGenerator;
+        $this->familyGenerator              = $familyGenerator;
+        $this->productGenerator             = $productGenerator;
+        $this->categoryGenerator            = $categoryGenerator;
+        $this->attrGroupGenerator           = $attrGroupGenerator;
+        $this->attributeOptionGenerator     = $attributeOptionGenerator;
+        $this->jobGenerator                 = $jobGenerator;
+        $this->assetCategoryGenerator       = $assetCategoryGenerator;
+        $this->assetCategoryAccessGenerator = $assetCategoryAccessGenerator;
     }
 
     /**
@@ -194,8 +200,13 @@ class Generator implements GeneratorInterface
 
         if (isset($config['entities']['products'])) {
             $productConfig = $config['entities']['products'];
-
             $this->productGenerator->generate($productConfig, $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['asset_category_accesses'])) {
+            $this->assetCategoryAccessGenerator->setGroups($userGroups);
+            $this->assetCategoryAccessGenerator->setAssetCategories($assetCategoryCodes);
+            $this->assetCategoryAccessGenerator->generate([], $outputDir, $progress);
         }
     }
 }

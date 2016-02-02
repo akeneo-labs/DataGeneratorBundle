@@ -55,13 +55,5 @@ data_generator:
                     enclosure: '"'
                     escape: '\'
                     enabled: true
-        users:
-            -   username: admin
-                password: admin
-                email: admin@example.com
-                firstname: Peter
-                lastname: Doe
-                roles: [ ROLE_ADMINISTRATOR ]
-                groups: [ IT support ]
-                enable: true
         asset_categories: ~
+        asset_category_accesses: ~
