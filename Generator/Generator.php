@@ -46,6 +46,9 @@ class Generator implements GeneratorInterface
 	/** @var JobGenerator */
     protected $jobGenerator;
 
+    /** @var AssetCategoryGenerator */
+    protected $assetCategoryGenerator;
+
     /**
      * @param ChannelGenerator         $channelGenerator
      * @param UserRoleGenerator        $userRoleGenerator
@@ -58,6 +61,7 @@ class Generator implements GeneratorInterface
      * @param AttributeGroupGenerator  $attrGroupGenerator
      * @param AttributeOptionGenerator $attributeOptionGenerator
      * @param JobGenerator             $jobGenerator
+     * @param AssetCategoryGenerator   $assetCategoryGenerator
      */
     public function __construct(
         ChannelGenerator         $channelGenerator,
@@ -70,7 +74,8 @@ class Generator implements GeneratorInterface
         CategoryGenerator        $categoryGenerator,
         AttributeGroupGenerator  $attrGroupGenerator,
         AttributeOptionGenerator $attributeOptionGenerator,
-        JobGenerator             $jobGenerator
+        JobGenerator             $jobGenerator,
+        AssetCategoryGenerator   $assetCategoryGenerator
     ) {
         $this->channelGenerator         = $channelGenerator;
         $this->userRoleGenerator        = $userRoleGenerator;
@@ -83,6 +88,7 @@ class Generator implements GeneratorInterface
         $this->attrGroupGenerator       = $attrGroupGenerator;
         $this->attributeOptionGenerator = $attributeOptionGenerator;
         $this->jobGenerator             = $jobGenerator;
+        $this->assetCategoryGenerator   = $assetCategoryGenerator;
     }
 
     /**
@@ -182,6 +188,11 @@ class Generator implements GeneratorInterface
             $productConfig = $config['entities']['products'];
 
             $this->productGenerator->generate($productConfig, $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['asset_categories'])) {
+            $this->assetCategoryGenerator->setLocales($locales);
+            $this->assetCategoryGenerator->generate([], $outputDir, $progress);
         }
     }
 }

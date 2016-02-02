@@ -1,0 +1,67 @@
+data_generator:
+    output_dir: /tmp/fixtures
+    entities:
+        channels:
+            ecommerce:
+                code: ecommerce
+                label: Ecommerce
+                locales:
+                    - fr_FR
+                    - en_US
+                currencies:
+                    - USD
+                    - EUR
+                color: blue
+            print:
+                code: print
+                label: Print
+                locales:
+                    - fr_FR
+                    - de_DE
+                currencies:
+                    - USD
+                    - GBP
+                color: white
+        attribute_groups:
+            count: 10
+        attributes:
+            count: 100
+            identifier_attribute: sku
+            localizable_probability: 20
+            scopable_probability: 15
+            force_attributes:
+                - name = pim_catalog_text
+        attribute_options:
+            count_per_attribute: 10
+        families:
+            count: 40
+            attributes_count: 50
+            identifier_attribute: sku
+            label_attribute: name
+            requirements_count: 5
+        categories:
+            delimiter: ;
+            count: 50
+            levels: 3
+        jobs:
+            csv_product_import:
+                connector: Akeneo CSV Connector
+                alias: csv_product_import
+                label: Demo product import
+                type: import
+                configuration:
+                    filePath: /tmp/product.csv
+                    delimiter: ;
+                    enclosure: '"'
+                    escape: '\'
+                    enabled: true
+        users:
+            -   username: admin
+                password: admin
+                email: admin@example.com
+                firstname: Peter
+                lastname: Doe
+                roles: [ ROLE_ADMINISTRATOR ]
+                groups: [ IT support ]
+                enable: true
+        asset_categories: ~

@@ -11,6 +11,7 @@ parameters:
     pim_data_generator.generator.user_role.class :        Pim\Bundle\DataGeneratorBundle\Generator\UserRoleGenerator
     pim_data_generator.generator.user.class :             Pim\Bundle\DataGeneratorBundle\Generator\UserGenerator
     pim_data_generator.generator.job.class :              Pim\Bundle\DataGeneratorBundle\Generator\JobGenerator
+    pim_data_generator.generator.asset_category.class :   Pim\Bundle\DataGeneratorBundle\Generator\AssetCategoryGenerator
 
 services:
     pim_data_generator.generator:
@@ -27,6 +28,7 @@ services:
             - @pim_data_generator.generator.attribute_group
             - @pim_data_generator.generator.attribute_option
             - @pim_data_generator.generator.job
+            - @pim_data_generator.generator.asset_category
 
     pim_data_generator.generator.channel:
         class: %pim_data_generator.generator.channel.class%
@@ -70,3 +72,5 @@ services:
             - '@pim_catalog.repository.currency'
             - '@pim_catalog.repository.category'
 
+    pim_data_generator.generator.asset_category:
+        class: %pim_data_generator.generator.asset_category.class%

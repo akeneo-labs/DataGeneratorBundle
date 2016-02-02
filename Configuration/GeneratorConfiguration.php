@@ -47,7 +47,6 @@ class GeneratorConfiguration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('users')
-                            ->useAttributeAsKey('name')
                             ->defaultValue([
                                 "admin" => [
                                     "username"  => "admin",
@@ -78,6 +77,7 @@ class GeneratorConfiguration implements ConfigurationInterface
                                         ->isRequired()
                                         ->prototype('scalar')->end()
                                     ->end()
+                                    ->booleanNode('enable')->defaultFalse()->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -182,6 +182,7 @@ class GeneratorConfiguration implements ConfigurationInterface
                                 ->integerNode('categories_count')->min(0)->defaultValue(0)->end()
                             ->end()
                         ->end()
+                        ->arrayNode('asset_categories')->end()
                     ->end()
                 ->end()
             ->end()
