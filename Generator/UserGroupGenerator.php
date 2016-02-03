@@ -21,7 +21,7 @@ class UserGroupGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir)
+    public function generate(array $config, $outputDir, ProgressHelper $progress)
     {
         $groups = $this->generateGroups($config);
 
@@ -31,6 +31,8 @@ class UserGroupGenerator
             $normalizedGroups,
             $outputDir . "/" . static::GROUPS_FILENAME
         );
+
+        $progress->advance();
 
         return $groups;
     }

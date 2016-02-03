@@ -66,6 +66,8 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
 
         $attributeGroupsAccesses = [self::ATTRIBUTE_GROUPS_ACCESSES => $data];
 
+        $progress->advance();
+
         $this->writeYamlFile($attributeGroupsAccesses, $outputDir);
     }
 

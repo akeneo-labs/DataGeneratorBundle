@@ -2,14 +2,9 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
-use Pim\Bundle\DataGeneratorBundle\Configuration\GeneratorConfiguration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Config\Definition\Processor;
-
 /**
  * Generates CSV files for selected entities
  *
@@ -17,7 +12,7 @@ use Symfony\Component\Config\Definition\Processor;
  * @copyright 2014 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class GenerateDataCommand extends ContainerAwareCommand
+class GenerateFixtureCommand extends AbstractGenerateCommand
 {
     /**
      * {@inheritdoc}
@@ -25,8 +20,8 @@ class GenerateDataCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('pim:generate-data')
-            ->setDescription('Generate test data for PIM entities')
+            ->setName('pim:generate:fixtures')
+            ->setDescription('Generate test fixtures for PIM entities')
             ->addArgument(
                 'configuration-file',
                 InputArgument::REQUIRED,
@@ -43,7 +38,7 @@ class GenerateDataCommand extends ContainerAwareCommand
 
         $config = $this->getConfiguration($configFile);
 
-        $generator = $this->getContainer()->get('pim_data_generator.generator');
+        $generator = $this->getContainer()->get('pim_data_generator.fixture_generator');
 
         $totalCount = $this->getTotalCount($config);
 
@@ -63,47 +58,5 @@ class GenerateDataCommand extends ContainerAwareCommand
         $generator->generate($config, $outputDir, $progress);
 
         $progress->finish();
-    }
-
-    /**
-     * Return a processed configuration from the configuration filename provided
-     *
-     * @param string $filename
-     *
-     * @return array
-     */
-    protected function getConfiguration($filename)
-    {
-        $rawConfig = Yaml::parse(file_get_contents($filename));
-
-        $processor = new Processor();
-        $config = new GeneratorConfiguration();
-
-        $processedConfig = $processor->processConfiguration(
-            $config,
-            $rawConfig
-        );
-
-        return $processedConfig;
-    }
-
-    /**
-     * Get total count from the configuration
-     *
-     * @param array $config
-     *
-     * @return int
-     */
-    protected function getTotalCount(array $config)
-    {
-        $totalCount = 0;
-
-        foreach ($config['entities'] as $entity) {
-            if (isset($entity['count'])) {
-                $totalCount += $entity['count'];
-            }
-        }
-
-        return $totalCount;
     }
 }

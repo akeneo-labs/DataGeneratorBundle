@@ -1,5 +1,5 @@
 parameters:
-    pim_data_generator.generator.class:                         Pim\Bundle\DataGeneratorBundle\Generator\Generator
+    pim_data_generator.generator.fixture.class:                 Pim\Bundle\DataGeneratorBundle\Generator\FixtureGenerator
     pim_data_generator.generator.channel.class:                 Pim\Bundle\DataGeneratorBundle\Generator\ChannelGenerator
     pim_data_generator.generator.product.class:                 Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
     pim_data_generator.generator.attribute.class:               Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator
@@ -18,8 +18,8 @@ parameters:
     pim_data_generator.generator.locales_access.class:          Pim\Bundle\DataGeneratorBundle\Generator\LocalesAccessGenerator
 
 services:
-    pim_data_generator.generator:
-        class: %pim_data_generator.generator.class%
+    pim_data_generator.fixture_generator:
+        class: %pim_data_generator.generator.fixture.class%
         arguments:
             - @pim_data_generator.generator.channel
             - @pim_data_generator.generator.user_role
@@ -27,7 +27,6 @@ services:
             - @pim_data_generator.generator.user
             - @pim_data_generator.generator.attribute
             - @pim_data_generator.generator.family
-            - @pim_data_generator.generator.product
             - @pim_data_generator.generator.category
             - @pim_data_generator.generator.attribute_group
             - @pim_data_generator.generator.attribute_option

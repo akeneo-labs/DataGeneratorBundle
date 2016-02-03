@@ -63,6 +63,8 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
 
         $assetCategoryAccesses = [self::ASSET_CATEGORY_ACCESSES => $data];
 
+        $progress->advance();
+
         $this->writeYamlFile($assetCategoryAccesses, $outputDir);
     }
 

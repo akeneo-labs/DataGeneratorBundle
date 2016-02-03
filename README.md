@@ -28,12 +28,12 @@ The catalog generation is done in two phases:
 
 ```bash
 Usage:
- pim:generate-data <configuration_file_path>
+ pim:generate:fixtures <configuration_file_path>
+ pim:generate:products-file <configuration_file_path>
 
 Arguments:
  configuration-file    YAML configuration file
 ```
-
 
 
 Configuration file examples

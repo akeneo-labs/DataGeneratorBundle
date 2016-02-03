@@ -21,7 +21,7 @@ class UserRoleGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir)
+    public function generate(array $config, $outputDir, ProgressHelper $progress)
     {
         $roles = $this->generateRoles($config);
 
@@ -31,6 +31,8 @@ class UserRoleGenerator
             $normalizedRoles,
             $outputDir . "/" . static::ROLES_FILENAME
         );
+
+        $progress->advance();
 
         return $roles;
     }

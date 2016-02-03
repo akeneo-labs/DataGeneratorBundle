@@ -18,7 +18,7 @@ use Symfony\Component\Console\Helper\ProgressHelper;
 class AssetCategoryGenerator implements GeneratorInterface
 {
     /** @staticvar string */
-    const ASSET_CATEGORIES_FILENAME = 'asset_categories.yml';
+    const ASSET_CATEGORIES_FILENAME = 'asset_categories.csv';
 
     /** @staticvar string */
     const ASSET_MAIN_CATALOG = 'asset_main_catalog';
@@ -56,6 +56,8 @@ class AssetCategoryGenerator implements GeneratorInterface
         $headers = array_keys($assetCategories[0]);
 
         $this->writeCsvFIle($assetCategories, $headers, $outputDir);
+
+        $progress->advance();
 
         return [ self::ASSET_MAIN_CATALOG ];
     }

@@ -59,6 +59,8 @@ class ChannelGenerator implements GeneratorInterface
 
         $this->writeChannelsFile($config);
 
+        $progress->advance();
+
         return $this;
     }
 

@@ -5,13 +5,13 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
 /**
- * Generic generator that will dispatch generation to specialized generator
+ * Fixture generator that will dispatch generation to specialized generator
  *
  * @author    Benoit Jacquemont <benoit@akeneo.com>
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Generator implements GeneratorInterface
+class FixtureGenerator implements GeneratorInterface
 {
     /** @var ChannelGenerator */
     protected $channelGenerator;
@@ -30,9 +30,6 @@ class Generator implements GeneratorInterface
 
     /** @var FamilyGenerator */
     protected $familyGenerator;
-
-    /** @var ProductGenerator */
-    protected $productGenerator;
 
     /** @var CategoryGenerator */
     protected $categoryGenerator;
@@ -68,7 +65,6 @@ class Generator implements GeneratorInterface
      * @param UserGenerator                  $userGenerator
      * @param AttributeGenerator             $attributeGenerator
      * @param FamilyGenerator                $familyGenerator
-     * @param ProductGenerator               $productGenerator
      * @param CategoryGenerator              $categoryGenerator
      * @param AttributeGroupGenerator        $attrGroupGenerator
      * @param AttributeOptionGenerator       $attributeOptionGenerator
@@ -86,7 +82,6 @@ class Generator implements GeneratorInterface
         UserGenerator                  $userGenerator,
         AttributeGenerator             $attributeGenerator,
         FamilyGenerator                $familyGenerator,
-        ProductGenerator               $productGenerator,
         CategoryGenerator              $categoryGenerator,
         AttributeGroupGenerator        $attrGroupGenerator,
         AttributeOptionGenerator       $attributeOptionGenerator,
@@ -103,7 +98,6 @@ class Generator implements GeneratorInterface
         $this->userGenerator                  = $userGenerator;
         $this->attributeGenerator             = $attributeGenerator;
         $this->familyGenerator                = $familyGenerator;
-        $this->productGenerator               = $productGenerator;
         $this->categoryGenerator              = $categoryGenerator;
         $this->attrGroupGenerator             = $attrGroupGenerator;
         $this->attributeOptionGenerator       = $attributeOptionGenerator;
@@ -130,13 +124,6 @@ class Generator implements GeneratorInterface
         $assetCategoryCodes = [];
         $jobs               = [];
 
-        if (isset($config['entities']['product']) && count($config['entities']) > 1) {
-            throw new \LogicException(
-                'Products can be generated at the same time of other entities.'.
-                'Please generate attributes and families, import them, then generate products'
-            );
-        }
-
         if (isset($config['entities']['channels'])) {
             $channelConfig = $config['entities']['channels'];
             $this->channelGenerator->generate($channelConfig, $outputDir, $progress);
@@ -152,12 +139,12 @@ class Generator implements GeneratorInterface
 
         if (isset($config['entities']['user_roles'])) {
             $userRoleConfig = $config['entities']['user_roles'];
-            $userRoles = $this->userRoleGenerator->generate($userRoleConfig, $outputDir);
+            $userRoles = $this->userRoleGenerator->generate($userRoleConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['user_groups'])) {
             $userGroupConfig = $config['entities']['user_groups'];
-            $userGroups = $this->userGroupGenerator->generate($userGroupConfig, $outputDir);
+            $userGroups = $this->userGroupGenerator->generate($userGroupConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['asset_categories'])) {
@@ -173,7 +160,7 @@ class Generator implements GeneratorInterface
             $this->userGenerator->setUserRoles($userRoles);
             $this->userGenerator->setUserGroups($userGroups);
             $this->userGenerator->setAssetCategories($assetCategoryCodes);
-            $this->userGenerator->generate($userConfig, $outputDir);
+            $this->userGenerator->generate($userConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['attribute_groups'])) {
@@ -201,7 +188,7 @@ class Generator implements GeneratorInterface
 
         if (isset($config['entities']['jobs'])) {
             $jobConfig = $config['entities']['jobs'];
-            $jobs = $this->jobGenerator->generate($jobConfig, $outputDir);
+            $jobs = $this->jobGenerator->generate($jobConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['attribute_options'])) {
@@ -209,11 +196,6 @@ class Generator implements GeneratorInterface
             $this->attributeOptionGenerator->setLocales($locales);
             $this->attributeOptionGenerator->setAttributes($attributes);
             $this->attributeOptionGenerator->generate($attributeOptionConfig, $outputDir, $progress);
-        }
-
-        if (isset($config['entities']['products'])) {
-            $productConfig = $config['entities']['products'];
-            $this->productGenerator->generate($productConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['asset_category_accesses'])) {

@@ -44,7 +44,7 @@ class UserGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir)
+    public function generate(array $config, $outputDir, ProgressHelper $progress)
     {
         $this->faker = Faker\Factory::create();
         $users = $this->generateUsers($config);
@@ -55,6 +55,8 @@ class UserGenerator
             $normalizedUsers,
             $outputDir . "/" . static::USERS_FILENAME
         );
+
+        $progress->advance();
 
         return $users;
     }

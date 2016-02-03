@@ -66,6 +66,8 @@ class LocalesAccessGenerator implements GeneratorInterface
 
         $assetCategoryAccesses = [self::LOCALE_ACCESSES => $data];
 
+        $progress->advance();
+
         $this->writeYamlFile($assetCategoryAccesses, $outputDir);
     }
 

@@ -6,7 +6,6 @@ use Faker;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\CatalogBundle\Entity\Category;
 use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation;
-use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -32,7 +31,7 @@ class CategoryGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir)
+    public function generate(array $config, $outputDir,  ProgressHelper $progress)
     {
         $this->faker = Faker\Factory::create();
 
@@ -55,6 +54,8 @@ class CategoryGenerator
         $outputFile = $outputDir.'/'.self::CATEGORIES_FILENAME;
         $this->writeCsvFile($headers, $normalizedCategories, $outputFile, $delimiter);
 
+        $progress->advance($count);
+
         return $this->flattenCategories($categories);
     }
 
@@ -65,6 +66,8 @@ class CategoryGenerator
      * @param int $level
      * @param int $count
      * @param int $levelMax
+     *
+     * @return Category
      */
     protected function generateCategories(Category $parent, $level, $count, $levelMax)
     {
@@ -86,7 +89,7 @@ class CategoryGenerator
     /**
      * Generate a category object
      *
-     * @param string $categoryCode
+     * @param string $code
      * @param string $forcedLabel
      *
      * @return Category $category
@@ -116,6 +119,8 @@ class CategoryGenerator
      *
      * @param Category $category
      * @param array    $normalizedCategories
+     *
+     * @return array
      */
     protected function normalizeCategories(Category $category, array $normalizedCategories = [])
     {

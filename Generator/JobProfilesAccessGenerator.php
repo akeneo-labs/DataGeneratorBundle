@@ -62,6 +62,8 @@ class JobProfilesAccessGenerator implements GeneratorInterface
 
         $assetCategoryAccesses = [self::JOB_PROFILE_ACCESSES => $data];
 
+        $progress->advance();
+
         $this->writeYamlFile($assetCategoryAccesses, $outputDir);
     }
 
