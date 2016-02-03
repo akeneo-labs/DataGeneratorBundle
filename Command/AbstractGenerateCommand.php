@@ -2,8 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
-use Pim\Bundle\DataGeneratorBundle\Configuration\FixtureGeneratorConfiguration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -19,16 +19,16 @@ abstract class AbstractGenerateCommand extends ContainerAwareCommand
     /**
      * Return a processed configuration from the configuration filename provided
      *
-     * @param string $filename
+     * @param string                 $filename
+     * @param ConfigurationInterface $config
      *
      * @return array
      */
-    protected function getConfiguration($filename)
+    protected function getConfiguration($filename, $config)
     {
         $rawConfig = Yaml::parse(file_get_contents($filename));
 
         $processor = new Processor();
-        $config = new FixtureGeneratorConfiguration();
 
         $processedConfig = $processor->processConfiguration(
             $config,

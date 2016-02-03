@@ -2,6 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
+use Pim\Bundle\DataGeneratorBundle\Configuration\FixtureGeneratorConfiguration;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,7 +37,7 @@ class GenerateFixtureCommand extends AbstractGenerateCommand
     {
         $configFile = $input->getArgument('configuration-file');
 
-        $config = $this->getConfiguration($configFile);
+        $config = $this->getConfiguration($configFile, new FixtureGeneratorConfiguration());
 
         $generator = $this->getContainer()->get('pim_data_generator.fixture_generator');
 

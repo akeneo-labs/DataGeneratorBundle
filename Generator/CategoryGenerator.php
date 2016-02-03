@@ -31,7 +31,7 @@ class CategoryGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir,  ProgressHelper $progress)
+    public function generate(array $config, $outputDir, ProgressHelper $progress)
     {
         $this->faker = Faker\Factory::create();
 

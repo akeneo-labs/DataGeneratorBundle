@@ -82,7 +82,6 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('user_groups')
-                            ->useAttributeAsKey('name')
                             ->defaultValue([
                                 "it_support" => [
                                     "name" => "IT support"
@@ -103,7 +102,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                             ])
                             ->prototype('array')
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->end()
+                                    ->scalarNode('label')->isRequired()->end()
                                 ->end()
                             ->end()
                         ->end()

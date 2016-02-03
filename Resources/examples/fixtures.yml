@@ -55,3 +55,20 @@ data_generator:
                     enclosure: '"'
                     escape: '\'
                     enabled: true
+        user_groups:
+            it_support:
+                name: IT support
+            manager:
+                name: Manager
+        user_roles:
+            ROLE_ADMINISTRATOR:
+                label: Administrator
+        users:
+            -   username: admin
+                password: admin
+                email: admin@example.com
+                firstname: Peter
+                lastname: Doe
+                roles: [ ROLE_ADMINISTRATOR ]
+                groups: [ IT support ]
+                enable: true

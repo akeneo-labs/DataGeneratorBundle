@@ -37,10 +37,10 @@ class FixtureGenerator implements GeneratorInterface
     /** @var AttributeGroupGenerator */
     protected $attrGroupGenerator;
 
-	/** @var AttributeOptionGenerator */
+    /** @var AttributeOptionGenerator */
     protected $attributeOptionGenerator;
 
-	/** @var JobGenerator */
+    /** @var JobGenerator */
     protected $jobGenerator;
 
     /** @var AssetCategoryGenerator */
