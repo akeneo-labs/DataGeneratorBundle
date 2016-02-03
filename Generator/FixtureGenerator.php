@@ -58,6 +58,9 @@ class FixtureGenerator implements GeneratorInterface
     /** @var LocalesAccessGenerator */
     protected $localesAccessGenerator;
 
+    /** @var ProductCategoryAccessGenerator */
+    protected $productCategoryAccessGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -74,6 +77,7 @@ class FixtureGenerator implements GeneratorInterface
      * @param AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator
      * @param JobProfilesAccessGenerator     $jobProfilesAccessGenerator
      * @param LocalesAccessGenerator         $localesAccessGenerator
+     * @param ProductCategoryAccessGenerator $productCategoryAccessGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -90,7 +94,8 @@ class FixtureGenerator implements GeneratorInterface
         AssetCategoryAccessGenerator   $assetCategoryAccessGenerator,
         AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator,
         JobProfilesAccessGenerator     $jobProfilesAccessGenerator,
-        LocalesAccessGenerator         $localesAccessGenerator
+        LocalesAccessGenerator         $localesAccessGenerator,
+        ProductCategoryAccessGenerator $productCategoryAccessGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -107,6 +112,7 @@ class FixtureGenerator implements GeneratorInterface
         $this->attributeGroupsAccessGenerator = $attributeGroupsAccessGenerator;
         $this->jobProfilesAccessGenerator     = $jobProfilesAccessGenerator;
         $this->localesAccessGenerator         = $localesAccessGenerator;
+        $this->productCategoryAccessGenerator = $productCategoryAccessGenerator;
     }
 
     /**
@@ -220,6 +226,12 @@ class FixtureGenerator implements GeneratorInterface
             $this->localesAccessGenerator->setGroups($userGroups);
             $this->localesAccessGenerator->setLocales($locales);
             $this->localesAccessGenerator->generate([], $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['product_category_accesses'])) {
+            $this->productCategoryAccessGenerator->setGroups($userGroups);
+            $this->productCategoryAccessGenerator->setCategories($categories);
+            $this->productCategoryAccessGenerator->generate([], $outputDir, $progress);
         }
     }
 }

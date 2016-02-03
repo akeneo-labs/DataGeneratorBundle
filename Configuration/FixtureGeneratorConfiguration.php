@@ -187,6 +187,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                         ->arrayNode('attribute_groups_accesses')->end()
                         ->arrayNode('job_profiles_accesses')->end()
                         ->arrayNode('locales_accesses')->end()
+                        ->arrayNode('product_category_accesses')->end()
                     ->end()
                 ->end()
             ->end()
