@@ -39,7 +39,7 @@ class GenerateProductCommand extends AbstractGenerateCommand
 
         $config = $this->getConfiguration($configFile);
 
-        $generator = $this->getContainer()->get('pim_data_generator.product_generator');
+        $generator = $this->getContainer()->get('pim_data_generator.generator.product');
 
         $totalCount = $this->getTotalCount($config);
 
@@ -52,7 +52,7 @@ class GenerateProductCommand extends AbstractGenerateCommand
         $progress = $this->getHelperSet()->get('progress');
         $progress->start($output, $totalCount);
 
-        $generator->generate($config, $outputDir, $progress);
+        $generator->generate($config['entities']['products'], $outputDir, $progress);
 
         $progress->finish();
     }

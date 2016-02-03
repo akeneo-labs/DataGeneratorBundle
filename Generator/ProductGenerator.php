@@ -6,6 +6,9 @@ use Doctrine\Common\Persistence\ObjectRepository;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
 use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Entity\Family;
+use Pim\Bundle\CatalogBundle\Model\ChannelInterface;
+use Pim\Bundle\CatalogBundle\Model\CurrencyInterface;
+use Pim\Bundle\CatalogBundle\Model\LocaleInterface;
 use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\ChannelRepositoryInterface;
@@ -242,15 +245,15 @@ class ProductGenerator implements GeneratorInterface
     {
         $keys = [];
 
-        $keys[] = $attribute->getCode();
+        $keys[$attribute->getCode()] = [];
 
         $updatedKeys = [];
         if ($attribute->isScopable() && $attribute->isLocalizable()) {
             foreach ($this->getLocales() as $locale) {
                 foreach ($this->getChannels() as $channel) {
-                    foreach ($keys as $baseKey) {
+                    foreach ($keys as $baseKey => $keyOptions) {
                         $key = $baseKey.'-'.$locale->getCode().'-'.$channel->getCode();
-                        $updatedKeys[] = $key;
+                        $updatedKeys[$key] = array_merge($keyOptions, ['locale' => $locale, 'channel' => $channel]);
                     }
                 }
             }
@@ -258,18 +261,18 @@ class ProductGenerator implements GeneratorInterface
 
         } elseif ($attribute->isScopable() && !$attribute->isLocalizable()) {
             foreach ($this->getChannels() as $channel) {
-                foreach ($keys as $baseKey) {
+                foreach ($keys as $baseKey => $keyOptions) {
                     $key = $baseKey.'-'.$channel->getCode();
-                    $updatedKeys[] = $key;
+                    $updatedKeys[$key] = array_merge($keyOptions, ['channel' => $channel]);
                 }
             }
 
             $keys = $updatedKeys;
         } elseif (!$attribute->isScopable() && $attribute->isLocalizable()) {
             foreach ($this->getLocales() as $locale) {
-                foreach ($keys as $baseKey) {
+                foreach ($keys as $baseKey => $keyOptions) {
                     $key = $baseKey.'-'.$locale->getCode();
-                    $updatedKeys[] = $key;
+                    $updatedKeys[$key] = array_merge($keyOptions, ['locale' => $locale]);
                 }
             }
             $keys = $updatedKeys;
@@ -279,9 +282,12 @@ class ProductGenerator implements GeneratorInterface
             case 'prices':
                 $updatedKeys = [];
 
-                foreach ($keys as $key) {
+                foreach ($keys as $key => $keyOptions) {
                     foreach ($this->getCurrencies() as $currency) {
-                        $updatedKeys[] = $key.'-'.$currency->getCode();
+                        $updatedKeys[$key.'-'.$currency->getCode()] = array_merge(
+                            $keyOptions,
+                            ['currency' => $currency]
+                        );
                     }
                 }
                 $keys = $updatedKeys;
@@ -289,16 +295,23 @@ class ProductGenerator implements GeneratorInterface
             case 'metric':
                 $updatedKeys = [];
 
-                foreach ($keys as $key) {
-                    $updatedKeys[] = $key;
-                    $updatedKeys[] = $key.'-'.self::METRIC_UNIT;
+                foreach ($keys as $key => $keyOptions) {
+                    $updatedKeys[$key] = $keyOptions;
+                    $updatedKeys[$key.'-'.self::METRIC_UNIT] = $keyOptions;
 
                 }
                 $keys = $updatedKeys;
                 break;
         }
 
-        return $keys;
+        $enabledKeys = [];
+        foreach ($keys as $key => $keyOptions) {
+            if ($this->isAttributeKeyValid($keyOptions)) {
+                $enabledKeys[] = $key;
+            }
+        }
+
+        return $enabledKeys;
     }
 
     /**
@@ -668,5 +681,67 @@ class ProductGenerator implements GeneratorInterface
         $this->headers = array_unique(array_merge($this->headers, array_keys($product)));
 
         file_put_contents($this->tmpFile, serialize($product)."\n", FILE_APPEND);
+    }
+
+    /**
+     * Returns true if the key is valid, according to channels locale and currency.
+     *
+     * @param $options
+     *
+     * @return bool
+     */
+    private function isAttributeKeyValid(array $options)
+    {
+        if (isset($options['channel'])) {
+            $channel = $options['channel'];
+
+            if (isset($options['locale']) && !$this->hasChannelLocale($channel, $options['locale'])) {
+                return false;
+            }
+
+            if (isset($options['currency']) && !$this->hasChannelCurrency($channel, $options['currency'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns true if channel has activated locale.
+     *
+     * @param ChannelInterface $channel
+     * @param LocaleInterface  $locale
+     *
+     * @return bool
+     */
+    private function hasChannelLocale(ChannelInterface $channel, LocaleInterface $locale)
+    {
+        foreach ($channel->getLocaleCodes() as $availableLocale) {
+            if ($locale->getCode() === $availableLocale) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if channel has activated currency.
+     *
+     * @param ChannelInterface  $channel
+     * @param CurrencyInterface $currency
+     *
+     * @return bool
+     */
+    private function hasChannelCurrency(ChannelInterface $channel, CurrencyInterface $currency)
+    {
+        foreach ($channel->getCurrencies() as $availableCurrency) {
+            if ($currency->getCode() === $availableCurrency->getCode()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
