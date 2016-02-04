@@ -2,8 +2,10 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
+use Faker;
 use Pim\Bundle\CatalogBundle\Entity\AssociationType;
 use Pim\Bundle\CatalogBundle\Entity\AssociationTypeTranslation;
+use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\CatalogBundle\Model\AssociationTypeInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -21,17 +23,30 @@ class AssociationTypeGenerator implements GeneratorInterface
 
     const ASSOCIATIONS = 'associations';
 
+    /** @var Locale[] */
+    protected $locales;
+
+    /** @var Faker\Generator */
+    protected $faker;
+
+    public function setLocales(array $locales)
+    {
+        $this->locales = $locales;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
-        $associationTypes = $this->generateAssociationTypes($config);
-
         $data = [];
+        $this->faker = Faker\Factory::create();
 
-        foreach ($associationTypes as $associationType) {
+        for ($i = 0; $i < $config['count']; $i++) {
+            $associationType = $this->generateAssociationType();
             $data = array_merge($data, $this->normalizeAssociationType($associationType));
+
+            $progress->advance();
         }
 
         $data = [self::ASSOCIATIONS => $data];
@@ -43,27 +58,31 @@ class AssociationTypeGenerator implements GeneratorInterface
         return $this;
     }
 
-    protected function generateAssociationTypes(array $config)
+    /**
+     * Generate fake association type
+     * 
+     * @return AssociationType
+     */
+    protected function generateAssociationType()
     {
-        $associationTypes = [];
+        $associationType = new AssociationType();
+        $associationType->setCode(strtoupper($this->faker->word()));
 
-        foreach ($config as $code => $associationTypeConfig) {
-            $associationType = new AssociationType();
-            $associationType->setCode($code);
-
-            foreach ($associationTypeConfig['labels'] as $locale => $label) {
-                $translation = new AssociationTypeTranslation();
-                $translation->setLocale($locale);
-                $translation->setLabel($label);
-                $associationType->addTranslation($translation);
-            }
-
-            $associationTypes[] = $associationType;
+        foreach ($this->locales as $locale) {
+            $translation = new AssociationTypeTranslation();
+            $translation->setLocale($locale->getCode());
+            $translation->setLabel($this->faker->word());
+            $associationType->addTranslation($translation);
         }
 
-        return $associationTypes;
+        return $associationType;
     }
 
+    /**
+     * @param AssociationTypeInterface $associationType
+     *
+     * @return array
+     */
     protected function normalizeAssociationType(AssociationTypeInterface $associationType)
     {
         $code = $associationType->getCode();

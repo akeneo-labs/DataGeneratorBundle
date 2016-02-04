@@ -133,16 +133,17 @@ class FixtureGenerator implements GeneratorInterface
         $assetCategoryCodes = [];
         $jobs               = [];
 
-        if (isset($config['entities']['associations'])) {
-            $associationConfig = $config['entities']['associations'];
-            $this->associationTypeGenerator->generate($associationConfig, $outputDir, $progress);
-        }
-
         if (isset($config['entities']['channels'])) {
             $channelConfig = $config['entities']['channels'];
             $this->channelGenerator->generate($channelConfig, $outputDir, $progress);
             $locales    = $this->channelGenerator->getLocales();
             $channels   = $this->channelGenerator->getChannels();
+        }
+
+        if (isset($config['entities']['associations'])) {
+            $associationConfig = $config['entities']['associations'];
+            $this->associationTypeGenerator->setLocales($locales);
+            $this->associationTypeGenerator->generate($associationConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['categories'])) {
