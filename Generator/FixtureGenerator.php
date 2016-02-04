@@ -78,6 +78,7 @@ class FixtureGenerator implements GeneratorInterface
      * @param JobProfilesAccessGenerator     $jobProfilesAccessGenerator
      * @param LocalesAccessGenerator         $localesAccessGenerator
      * @param ProductCategoryAccessGenerator $productCategoryAccessGenerator
+     * @param AssociationTypeGenerator       $associationTypeGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -95,7 +96,8 @@ class FixtureGenerator implements GeneratorInterface
         AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator,
         JobProfilesAccessGenerator     $jobProfilesAccessGenerator,
         LocalesAccessGenerator         $localesAccessGenerator,
-        ProductCategoryAccessGenerator $productCategoryAccessGenerator
+        ProductCategoryAccessGenerator $productCategoryAccessGenerator,
+        AssociationTypeGenerator       $associationTypeGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -113,6 +115,7 @@ class FixtureGenerator implements GeneratorInterface
         $this->jobProfilesAccessGenerator     = $jobProfilesAccessGenerator;
         $this->localesAccessGenerator         = $localesAccessGenerator;
         $this->productCategoryAccessGenerator = $productCategoryAccessGenerator;
+        $this->associationTypeGenerator       = $associationTypeGenerator;
     }
 
     /**
@@ -129,6 +132,11 @@ class FixtureGenerator implements GeneratorInterface
         $attributes         = [];
         $assetCategoryCodes = [];
         $jobs               = [];
+
+        if (isset($config['entities']['associations'])) {
+            $associationConfig = $config['entities']['associations'];
+            $this->associationTypeGenerator->generate($associationConfig, $outputDir, $progress);
+        }
 
         if (isset($config['entities']['channels'])) {
             $channelConfig = $config['entities']['channels'];

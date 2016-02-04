@@ -17,6 +17,7 @@ parameters:
     pim_data_generator.generator.job_profiles_access.class:     Pim\Bundle\DataGeneratorBundle\Generator\JobProfilesAccessGenerator
     pim_data_generator.generator.locales_access.class:          Pim\Bundle\DataGeneratorBundle\Generator\LocalesAccessGenerator
     pim_data_generator.generator.product_category_access.class: Pim\Bundle\DataGeneratorBundle\Generator\ProductCategoryAccessGenerator
+    pim_data_generator.generator.association_type.class:        Pim\Bundle\DataGeneratorBundle\Generator\AssociationTypeGenerator
 
 services:
     pim_data_generator.fixture_generator:
@@ -38,6 +39,7 @@ services:
             - @pim_data_generator.generator.job_profiles_access
             - @pim_data_generator.generator.locales_access
             - @pim_data_generator.generator.product_category_access
+            - @pim_data_generator.generator.association_type
 
     pim_data_generator.generator.channel:
         class: %pim_data_generator.generator.channel.class%
@@ -98,3 +100,6 @@ services:
 
     pim_data_generator.generator.product_category_access:
         class: %pim_data_generator.generator.product_category_access.class%
+
+    pim_data_generator.generator.association_type:
+        class: %pim_data_generator.generator.association_type.class%

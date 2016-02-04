@@ -1,6 +1,23 @@
 data_generator:
     output_dir: /tmp/fixtures
     entities:
+        associations:
+            X_SELL:
+                labels:
+                    en_US: Cross sell
+                    fr_FR: Vente croisée
+            UPSELL:
+                labels:
+                    en_US: Upsell
+                    fr_FR: Vente incitative
+            SUBSTITUTION:
+                labels:
+                    en_US: Substitution
+                    fr_FR: Remplacement
+            PACK:
+                labels:
+                    en_US: Pack
+                    fr_FR: Pack
         channels:
             ecommerce:
                 code: ecommerce
