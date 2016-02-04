@@ -44,8 +44,9 @@ data_generator:
         attributes:
             count: 100
             identifier_attribute: sku
-            localizable_probability: 20
-            scopable_probability: 15
+            localizable_probability: 10
+            scopable_probability: 5
+            localizable_and_scopable_probability: 2
             force_attributes:
                 - name = pim_catalog_text
         attribute_options:
