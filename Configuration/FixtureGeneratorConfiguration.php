@@ -12,7 +12,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class GeneratorConfiguration implements ConfigurationInterface
+class FixtureGeneratorConfiguration implements ConfigurationInterface
 {
     /**
      * {@inheritdoc}
@@ -28,6 +28,11 @@ class GeneratorConfiguration implements ConfigurationInterface
                 ->arrayNode('entities')
                     ->isRequired()
                     ->children()
+                        ->arrayNode('associations')
+                            ->children()
+                                ->integerNode('count')->min(0)->isRequired()->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('channels')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
@@ -47,7 +52,6 @@ class GeneratorConfiguration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->arrayNode('users')
-                            ->useAttributeAsKey('name')
                             ->defaultValue([
                                 "admin" => [
                                     "username"  => "admin",
@@ -78,11 +82,11 @@ class GeneratorConfiguration implements ConfigurationInterface
                                         ->isRequired()
                                         ->prototype('scalar')->end()
                                     ->end()
+                                    ->booleanNode('enable')->defaultFalse()->end()
                                 ->end()
                             ->end()
                         ->end()
                         ->arrayNode('user_groups')
-                            ->useAttributeAsKey('name')
                             ->defaultValue([
                                 "it_support" => [
                                     "name" => "IT support"
@@ -103,7 +107,7 @@ class GeneratorConfiguration implements ConfigurationInterface
                             ])
                             ->prototype('array')
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->end()
+                                    ->scalarNode('label')->isRequired()->end()
                                 ->end()
                             ->end()
                         ->end()
@@ -116,7 +120,6 @@ class GeneratorConfiguration implements ConfigurationInterface
                                     ->scalarNode('label')->isRequired()->end()
                                     ->scalarNode('type')->isRequired()->end()
                                     ->arrayNode('configuration')
-                                        ->isRequired()
                                         ->prototype("scalar")->end()
                                     ->end()
                                 ->end()
@@ -139,9 +142,9 @@ class GeneratorConfiguration implements ConfigurationInterface
                                 ->integerNode('count')->min(1)->isRequired()->end()
                                 ->scalarNode('identifier_attribute')->isRequired()->end()
                                 ->scalarNode('delimiter')->defaultValue(';')->end()
-                                ->integerNode('localizable_probability')->defaultValue(50)->end()
-                                ->integerNode('scopable_probability')->defaultValue(50)->end()
-                                ->integerNode('localizable_and_scopable_probability')->defaultValue(50)->end()
+                                ->floatNode('localizable_probability')->defaultValue(10)->end()
+                                ->floatNode('scopable_probability')->defaultValue(5)->end()
+                                ->floatNode('localizable_and_scopable_probability')->defaultValue(2)->end()
                                 ->arrayNode('force_attributes')
                                     ->prototype('scalar')
                                     ->end()
@@ -164,24 +167,12 @@ class GeneratorConfiguration implements ConfigurationInterface
                                 ->scalarNode('delimiter')->defaultValue(';')->end()
                             ->end()
                         ->end()
-                        ->arrayNode('products')
-                            ->children()
-                                ->scalarNode('filename')->end()
-                                ->integerNode('count')->min(1)->isRequired()->end()
-                                ->integerNode('filled_attributes_count')->min(1)->isRequired()->end()
-                                ->integerNode('filled_attributes_standard_deviation')->min(1)->defaultValue(10)->end()
-                                ->arrayNode('mandatory_attributes')
-                                    ->prototype('scalar')->end()
-                                ->end()
-                                ->scalarNode('delimiter')->defaultValue(';')->end()
-                                ->arrayNode('force_values')
-                                    ->prototype('scalar')
-                                    ->end()
-                                ->end()
-                                ->integerNode('start_index')->min(0)->defaultValue(0)->end()
-                                ->integerNode('categories_count')->min(0)->defaultValue(0)->end()
-                            ->end()
-                        ->end()
+                        ->arrayNode('asset_categories')->end()
+                        ->arrayNode('asset_category_accesses')->end()
+                        ->arrayNode('attribute_groups_accesses')->end()
+                        ->arrayNode('job_profiles_accesses')->end()
+                        ->arrayNode('locales_accesses')->end()
+                        ->arrayNode('product_category_accesses')->end()
                     ->end()
                 ->end()
             ->end()

@@ -70,6 +70,8 @@ class AttributeOptionGenerator implements GeneratorInterface
 
         $this->writeCsvFile($this->attributeOptions, $headers);
 
+        $progress->advance();
+
         return $this;
     }
 

@@ -3,7 +3,8 @@
 data_generator:
     output_dir: /tmp
     entities:
-        product:
+        products:
+            filename: product.csv
             count: 1000
             filled_attributes_count: 50
             filled_attributes_standard_deviation: 10

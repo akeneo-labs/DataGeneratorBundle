@@ -75,3 +75,9 @@ data_generator:
                 roles: [ ROLE_ADMINISTRATOR ]
                 groups: [ IT support ]
                 enable: true
+        asset_categories: ~
+        asset_category_accesses: ~
+        attribute_groups_accesses: ~
+        job_profiles_accesses: ~
+        locales_accesses: ~
+        product_category_accesses: ~

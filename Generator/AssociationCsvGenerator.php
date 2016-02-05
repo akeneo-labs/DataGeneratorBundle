@@ -87,6 +87,8 @@ class AssociationCsvGenerator implements GeneratorInterface
 
         $this->writeCsvFile($products, $headers);
 
+        $progress->advance();
+
         return $this;
     }
 

@@ -2,8 +2,10 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
+use Faker;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
-use Pim\Bundle\CatalogBundle\Entity\Currency;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -21,23 +23,30 @@ class UserGenerator
     /** @staticvar string */
     const USERS_FILENAME = 'users.yml';
 
-    /** @var Channels[] */
+    /** @var Channel[] */
     protected $channels;
 
     /** @var Locale[] */
     protected $locales;
 
-    /** @var UserGroup[] */
+    /** @var Group[] */
     protected $userGroups;
 
-    /** @var UserRole[] */
+    /** @var Role[] */
     protected $userRoles;
+
+    /** @var string[] */
+    protected $assetCategoryCodes;
+
+    /** @var Faker\Generator */
+    protected $faker;
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir)
+    public function generate(array $config, $outputDir, ProgressHelper $progress)
     {
+        $this->faker = Faker\Factory::create();
         $users = $this->generateUsers($config);
 
         $normalizedUsers = $this->normalizeUsers($users);
@@ -46,6 +55,8 @@ class UserGenerator
             $normalizedUsers,
             $outputDir . "/" . static::USERS_FILENAME
         );
+
+        $progress->advance();
 
         return $users;
     }
@@ -70,7 +81,7 @@ class UserGenerator
     /**
      * Generate a user object from the data provided
      *
-     * @param array $config
+     * @param array $userConfig
      *
      * @return User
      */
@@ -119,7 +130,7 @@ class UserGenerator
     /**
      * Normalize users objects into a structured array
      *
-     * @param User[]
+     * @param User[] $users
      *
      * @return array
      */
@@ -137,7 +148,7 @@ class UserGenerator
     /**
      * Normalize user object into a structured array
      *
-     * @param User
+     * @param User $user
      *
      * @return array
      */
@@ -153,7 +164,7 @@ class UserGenerator
             $userRoleCodes[] = $userRole->getRole();
         }
 
-        return [
+        $result = [
             "username"  => $user->getUsername(),
             "password"  => $user->getPassword(),
             "email"     => $user->getEmail(),
@@ -165,8 +176,13 @@ class UserGenerator
             "roles"          => $userRoleCodes,
             "groups"         => $userGroupCodes,
             "enable"         => $user->isEnabled()
-
         ];
+
+        if (count($this->assetCategoryCodes) > 0) {
+            $result["default_asset_tree"] = $this->faker->randomElement($this->assetCategoryCodes);
+        }
+
+        return $result;
     }
 
     public function setLocales(array $locales)
@@ -192,6 +208,11 @@ class UserGenerator
     public function setUserRoles(array $userRoles)
     {
         $this->userRoles = $userRoles;
+    }
+
+    public function setAssetCategories(array $assetCategoryCodes)
+    {
+        $this->assetCategoryCodes = $assetCategoryCodes;
     }
 
     /**

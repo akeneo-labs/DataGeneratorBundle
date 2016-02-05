@@ -67,9 +67,9 @@ class AttributeGenerator implements GeneratorInterface
 
         $count = (int) $config['count'];
 
-        $localizableProbability = (int) $config['localizable_probability'];
-        $scopableProbability = (int) $config['scopable_probability'];
-        $locScopableProbability = (int) $config['localizable_and_scopable_probability'];
+        $localizableProbability = (float) $config['localizable_probability'];
+        $scopableProbability = (float) $config['scopable_probability'];
+        $locScopableProbability = (float) $config['localizable_and_scopable_probability'];
 
         $identifier = $config['identifier_attribute'];
 
