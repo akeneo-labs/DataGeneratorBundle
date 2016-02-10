@@ -15,4 +15,4 @@ data_generator:
                 - brand = SuperProd
             start_index: 0
             categories_count: 10
-
+            products_per_variant_group: 20

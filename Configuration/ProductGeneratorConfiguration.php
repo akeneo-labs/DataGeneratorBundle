@@ -44,6 +44,7 @@ class ProductGeneratorConfiguration implements ConfigurationInterface
                                 ->end()
                                 ->integerNode('start_index')->min(0)->defaultValue(0)->end()
                                 ->integerNode('categories_count')->min(0)->defaultValue(0)->end()
+                                ->integerNode('products_per_variant_group')->min(0)->defaultValue(0)->end()
                             ->end()
                         ->end()
                     ->end()

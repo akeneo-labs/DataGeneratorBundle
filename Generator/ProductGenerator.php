@@ -8,12 +8,15 @@ use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Entity\Family;
 use Pim\Bundle\CatalogBundle\Model\ChannelInterface;
 use Pim\Bundle\CatalogBundle\Model\CurrencyInterface;
+use Pim\Bundle\CatalogBundle\Model\FamilyInterface;
+use Pim\Bundle\CatalogBundle\Model\GroupInterface;
 use Pim\Bundle\CatalogBundle\Model\LocaleInterface;
 use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\ChannelRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\CurrencyRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\GroupRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Faker;
@@ -86,11 +89,17 @@ class ProductGenerator implements GeneratorInterface
     /** @var CategoryRepositoryInterface */
     protected $categoryRepository;
 
+    /** @var GroupRepositoryInterface */
+    protected $groupRepository;
+
     /** @var Faker\Generator */
     protected $faker;
 
     /** @var array */
     protected $categoryCodes;
+
+    /** @var array */
+    protected $variantGroupCounts;
 
     /** @var string */
     protected $tmpFile;
@@ -105,6 +114,7 @@ class ProductGenerator implements GeneratorInterface
      * @param LocaleRepositoryInterface    $localeRepository
      * @param CurrencyRepositoryInterface  $currencyRepository
      * @param CategoryRepositoryInterface  $categoryRepository
+     * @param GroupRepositoryInterface     $groupRepository
      */
     public function __construct(
         FamilyRepositoryInterface $familyRepository,
@@ -112,7 +122,8 @@ class ProductGenerator implements GeneratorInterface
         ChannelRepositoryInterface $channelRepository,
         LocaleRepositoryInterface $localeRepository,
         CurrencyRepositoryInterface $currencyRepository,
-        CategoryRepositoryInterface $categoryRepository
+        CategoryRepositoryInterface $categoryRepository,
+        GroupRepositoryInterface $groupRepository
     ) {
         $this->familyRepository    = $familyRepository;
         $this->channelRepository   = $channelRepository;
@@ -120,6 +131,7 @@ class ProductGenerator implements GeneratorInterface
         $this->currencyRepository  = $currencyRepository;
         $this->categoryRepository  = $categoryRepository;
         $this->attributeRepository = $attributeRepository;
+        $this->groupRepository     = $groupRepository;
 
         $this->headers = [];
 
@@ -144,6 +156,7 @@ class ProductGenerator implements GeneratorInterface
         $nbAttrDeviation     = (int) $config['filled_attributes_standard_deviation'];
         $startIndex          = (int) $config['start_index'];
         $categoriesCount     = (int) $config['categories_count'];
+        $variantGroupCount   = (int) $config['products_per_variant_group'];
         $mandatoryAttributes = $config['mandatory_attributes'];
 
         if (!is_array($mandatoryAttributes)) {
@@ -159,6 +172,13 @@ class ProductGenerator implements GeneratorInterface
             $this->forcedValues = [];
         }
 
+        $this->variantGroupCounts = [];
+        if ($variantGroupCount > 0) {
+            foreach ($this->groupRepository->getAllVariantGroups() as $variantGroup) {
+                $this->variantGroupCounts[$variantGroup->getCode()] = $variantGroupCount;
+            }
+        }
+
         $this->identifierCode = $this->attributeRepository->getIdentifierCode();
 
         $this->faker = Faker\Factory::create();
@@ -168,24 +188,20 @@ class ProductGenerator implements GeneratorInterface
             $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
             $family = $this->getRandomFamily($this->faker);
             $product['family'] = $family->getCode();
+            $variantGroupCode = $this->getVariantGroupCode();
+            $product['group'] = (null !== $variantGroupCode) ? $variantGroupCode : '';
 
-            if ($nbAttrBase > 0) {
-                if ($nbAttrDeviation > 0) {
-                    $nbAttr = $this->faker->numberBetween(
-                        $nbAttrBase - round($nbAttrDeviation/2),
-                        $nbAttrBase + round($nbAttrDeviation/2)
-                    );
-                } else {
-                    $nbAttr = $nbAttrBase;
-                }
-            }
-            $familyAttrCount = count($this->getAttributesFromFamily($family));
+            $variantGroupAttributes = $this->getAttributesFromVariantGroupCode($variantGroupCode);
 
-            if (!isset($nbAttr) || $nbAttr > $familyAttrCount) {
-                $nbAttr = $familyAttrCount;
-            }
-
-            $attributes = $this->getRandomAttributesFromFamily($family, $nbAttr);
+            $nbAttr = $this->getAttributesCount(
+                $nbAttrBase - count($variantGroupAttributes),
+                $nbAttrDeviation,
+                $family
+            );
+            $attributes = array_merge(
+                $variantGroupAttributes,
+                $this->getRandomAttributesFromFamily($family, $nbAttr)
+            );
             foreach ($attributes as $attribute) {
                 $valueData = $this->generateValue($attribute);
                 $product = array_merge($product, $valueData);
@@ -743,5 +759,74 @@ class ProductGenerator implements GeneratorInterface
         }
 
         return false;
+    }
+
+    /**
+     * Returns the number of attributes to set.
+     *
+     * @param int             $nbAttrBase
+     * @param int             $nbAttrDeviation
+     * @param FamilyInterface $family
+     *
+     * @return int
+     */
+    protected function getAttributesCount($nbAttrBase, $nbAttrDeviation, $family)
+    {
+        if ($nbAttrBase > 0) {
+            if ($nbAttrDeviation > 0) {
+                $nbAttr = $this->faker->numberBetween(
+                    $nbAttrBase - round($nbAttrDeviation/2),
+                    $nbAttrBase + round($nbAttrDeviation/2)
+                );
+            } else {
+                $nbAttr = $nbAttrBase;
+            }
+        }
+        $familyAttrCount = count($this->getAttributesFromFamily($family));
+
+        if (!isset($nbAttr) || $nbAttr > $familyAttrCount) {
+            $nbAttr = $familyAttrCount;
+        }
+
+        return $nbAttr;
+    }
+
+    /**
+     * Get the next variant group having remaining products to set.
+     * When all the variant group are filled, returns null.
+     *
+     * @return null|string
+     */
+    protected function getVariantGroupCode()
+    {
+        $variantGroupCode = $this->faker->randomElement(array_keys($this->variantGroupCounts));
+
+        if (null !== $variantGroupCode) {
+            $this->variantGroupCounts[$variantGroupCode]--;
+            if ($this->variantGroupCounts[$variantGroupCode] <= 0) {
+                unset($this->variantGroupCounts[$variantGroupCode]);
+            }
+        }
+
+        return $variantGroupCode;
+    }
+
+    /**
+     * Return the set of attributes as variant group axis.
+     * If no variant group is set, returns an empty array.
+     *
+     * @param string|null $variantGroupCode
+     *
+     * @return array
+     */
+    private function getAttributesFromVariantGroupCode($variantGroupCode)
+    {
+        if (null === $variantGroupCode) {
+            return [];
+        }
+
+        $variantGroup = $this->groupRepository->findOneBy(['code' => $variantGroupCode]);
+
+        return $variantGroup->getAxisAttributes()->toArray();
     }
 }

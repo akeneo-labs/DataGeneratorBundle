@@ -89,6 +89,7 @@ services:
             - '@pim_catalog.repository.locale'
             - '@pim_catalog.repository.currency'
             - '@pim_catalog.repository.category'
+            - '@pim_catalog.repository.group'
 
     pim_data_generator.generator.asset_category:
         class: %pim_data_generator.generator.asset_category.class%
