@@ -61,6 +61,12 @@ class FixtureGenerator implements GeneratorInterface
     /** @var ProductCategoryAccessGenerator */
     protected $productCategoryAccessGenerator;
 
+    /** @var AssociationTypeGenerator */
+    protected $associationTypeGenerator;
+
+    /** @var GroupTypeGenerator */
+    protected $groupTypeGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -79,6 +85,7 @@ class FixtureGenerator implements GeneratorInterface
      * @param LocalesAccessGenerator         $localesAccessGenerator
      * @param ProductCategoryAccessGenerator $productCategoryAccessGenerator
      * @param AssociationTypeGenerator       $associationTypeGenerator
+     * @param GroupTypeGenerator             $groupTypeGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -97,7 +104,8 @@ class FixtureGenerator implements GeneratorInterface
         JobProfilesAccessGenerator     $jobProfilesAccessGenerator,
         LocalesAccessGenerator         $localesAccessGenerator,
         ProductCategoryAccessGenerator $productCategoryAccessGenerator,
-        AssociationTypeGenerator       $associationTypeGenerator
+        AssociationTypeGenerator       $associationTypeGenerator,
+        GroupTypeGenerator             $groupTypeGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -116,6 +124,7 @@ class FixtureGenerator implements GeneratorInterface
         $this->localesAccessGenerator         = $localesAccessGenerator;
         $this->productCategoryAccessGenerator = $productCategoryAccessGenerator;
         $this->associationTypeGenerator       = $associationTypeGenerator;
+        $this->groupTypeGenerator             = $groupTypeGenerator;
     }
 
     /**
@@ -211,6 +220,10 @@ class FixtureGenerator implements GeneratorInterface
             $this->attributeOptionGenerator->setLocales($locales);
             $this->attributeOptionGenerator->setAttributes($attributes);
             $this->attributeOptionGenerator->generate($attributeOptionConfig, $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['group_types'])) {
+            $this->groupTypeGenerator->generate([], $outputDir, $progress);
         }
 
         if (isset($config['entities']['asset_category_accesses'])) {
