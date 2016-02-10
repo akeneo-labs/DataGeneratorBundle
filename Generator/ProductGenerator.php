@@ -18,6 +18,7 @@ use Pim\Bundle\CatalogBundle\Repository\CurrencyRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\GroupRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
+use Pim\Bundle\DataGeneratorBundle\VariantGroupDataProvider;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Faker;
 
@@ -98,8 +99,8 @@ class ProductGenerator implements GeneratorInterface
     /** @var array */
     protected $categoryCodes;
 
-    /** @var array */
-    protected $variantGroupCounts;
+    /** @var VariantGroupDataProvider[] */
+    protected $variantGroups;
 
     /** @var string */
     protected $tmpFile;
@@ -172,10 +173,10 @@ class ProductGenerator implements GeneratorInterface
             $this->forcedValues = [];
         }
 
-        $this->variantGroupCounts = [];
+        $this->variantGroups = [];
         if ($variantGroupCount > 0) {
             foreach ($this->groupRepository->getAllVariantGroups() as $variantGroup) {
-                $this->variantGroupCounts[$variantGroup->getCode()] = $variantGroupCount;
+                $this->variantGroups[] = new VariantGroupDataProvider($variantGroup, $variantGroupCount);
             }
         }
 
@@ -188,20 +189,24 @@ class ProductGenerator implements GeneratorInterface
             $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
             $family = $this->getRandomFamily($this->faker);
             $product['family'] = $family->getCode();
-            $variantGroupCode = $this->getVariantGroupCode();
-            $product['group'] = (null !== $variantGroupCode) ? $variantGroupCode : '';
+            $product['groups'] = '';
 
-            $variantGroupAttributes = $this->getAttributesFromVariantGroupCode($variantGroupCode);
+            /** @var VariantGroupDataProvider $variantGroupDataProvider */
+            $variantGroupDataProvider = $this->getNextVariantGroupProvider();
+            $variantGroupAttributes = [];
+
+            if (null !== $variantGroupDataProvider) {
+                $variantGroupAttributes = $variantGroupDataProvider->getAttributes();
+                $product['groups'] = $variantGroupDataProvider->getCode();
+            }
 
             $nbAttr = $this->getAttributesCount(
                 $nbAttrBase - count($variantGroupAttributes),
                 $nbAttrDeviation,
                 $family
             );
-            $attributes = array_merge(
-                $variantGroupAttributes,
-                $this->getRandomAttributesFromFamily($family, $nbAttr)
-            );
+            $attributes = $this->getRandomAttributesFromFamily($family, $nbAttr);
+
             foreach ($attributes as $attribute) {
                 $valueData = $this->generateValue($attribute);
                 $product = array_merge($product, $valueData);
@@ -213,6 +218,10 @@ class ProductGenerator implements GeneratorInterface
                     $valueData = $this->generateValue($attribute);
                     $product = array_merge($product, $valueData);
                 }
+            }
+
+            if (null !== $variantGroupDataProvider) {
+                $product = array_merge($product, $variantGroupDataProvider->getData());
             }
 
             $categories = $this->getRandomCategoryCodes($categoriesCount);
@@ -792,41 +801,24 @@ class ProductGenerator implements GeneratorInterface
     }
 
     /**
-     * Get the next variant group having remaining products to set.
-     * When all the variant group are filled, returns null.
+     * Get a random variantGroupProvider. If this is the last usage of it, removes it from the list.
+     * If there is no remaining VariantGroupProvider, returns null.
      *
-     * @return null|string
+     * @return VariantGroupDataProvider|null
      */
-    protected function getVariantGroupCode()
+    protected function getNextVariantGroupProvider()
     {
-        $variantGroupCode = $this->faker->randomElement(array_keys($this->variantGroupCounts));
+        $variantGroupProvider = null;
 
-        if (null !== $variantGroupCode) {
-            $this->variantGroupCounts[$variantGroupCode]--;
-            if ($this->variantGroupCounts[$variantGroupCode] <= 0) {
-                unset($this->variantGroupCounts[$variantGroupCode]);
+        if (count($this->variantGroups) > 0) {
+            $variantGroupProviderIndex = $this->faker->numberBetween(0, count($this->variantGroups) - 1);
+            $variantGroupProvider = $this->variantGroups[$variantGroupProviderIndex];
+
+            if ($variantGroupProvider->isLastUsage()) {
+                array_splice($this->variantGroups, $variantGroupProviderIndex, 1);
             }
         }
 
-        return $variantGroupCode;
-    }
-
-    /**
-     * Return the set of attributes as variant group axis.
-     * If no variant group is set, returns an empty array.
-     *
-     * @param string|null $variantGroupCode
-     *
-     * @return array
-     */
-    private function getAttributesFromVariantGroupCode($variantGroupCode)
-    {
-        if (null === $variantGroupCode) {
-            return [];
-        }
-
-        $variantGroup = $this->groupRepository->findOneBy(['code' => $variantGroupCode]);
-
-        return $variantGroup->getAxisAttributes()->toArray();
+        return $variantGroupProvider;
     }
 }

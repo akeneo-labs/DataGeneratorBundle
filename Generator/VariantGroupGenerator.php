@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
+use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
 use Pim\Bundle\CatalogBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\GroupTranslation;
 use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
@@ -27,7 +28,7 @@ class VariantGroupGenerator implements GeneratorInterface
     protected $locales;
 
     /** @var AttributeInterface[] */
-    protected $attributes;
+    protected $optionsAttributes;
 
     /** @var GroupTypeInterface */
     protected $variantGroupType;
@@ -40,7 +41,12 @@ class VariantGroupGenerator implements GeneratorInterface
      */
     public function setAttributes(array $attributes)
     {
-        $this->attributes = $attributes;
+        $this->optionsAttributes = array_filter($attributes, function ($attribute) {
+            return in_array($attribute->getAttributeType(), [
+                AttributeTypes::OPTION_SIMPLE_SELECT,
+                AttributeTypes::REFERENCE_DATA_SIMPLE_SELECT
+            ]);
+        });
     }
 
     /**
@@ -106,16 +112,27 @@ class VariantGroupGenerator implements GeneratorInterface
         $group->setType($this->variantGroupType);
         $group->setCode($this->faker->word());
 
+        $attributeFaker = Faker\Factory::create();
+
         $axisAttributes = [];
         for ($i = 0; $i < $config['axis_count']; $i++) {
-            $axisAttributes[] = $this->faker->randomElement($this->attributes);
+            try {
+                $attribute = $attributeFaker->unique()->randomElement($this->optionsAttributes);
+            } catch (\OverflowException $e) {
+                throw new Exception(sprintf(
+                    'There is only %s attributes available for variant group axis, %s needed.',
+                    count($this->optionsAttributes),
+                    $config['axis_count']
+                ));
+            }
+            $axisAttributes[] = $attribute;
         }
 
         $group->setAxisAttributes($axisAttributes);
 
         foreach ($this->locales as $locale) {
             $translation = new GroupTranslation();
-            $translation->setLabel($this->faker->word());
+            $translation->setLabel($this->faker->unique()->word());
             $translation->setLocale($locale->getCode());
             $group->addTranslation($translation);
         }
