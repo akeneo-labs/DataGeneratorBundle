@@ -67,6 +67,9 @@ class FixtureGenerator implements GeneratorInterface
     /** @var GroupTypeGenerator */
     protected $groupTypeGenerator;
 
+    /** @var VariantGroupGenerator */
+    protected $variantGroupGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -86,6 +89,7 @@ class FixtureGenerator implements GeneratorInterface
      * @param ProductCategoryAccessGenerator $productCategoryAccessGenerator
      * @param AssociationTypeGenerator       $associationTypeGenerator
      * @param GroupTypeGenerator             $groupTypeGenerator
+     * @param VariantGroupGenerator          $variantGroupGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -105,7 +109,8 @@ class FixtureGenerator implements GeneratorInterface
         LocalesAccessGenerator         $localesAccessGenerator,
         ProductCategoryAccessGenerator $productCategoryAccessGenerator,
         AssociationTypeGenerator       $associationTypeGenerator,
-        GroupTypeGenerator             $groupTypeGenerator
+        GroupTypeGenerator             $groupTypeGenerator,
+        VariantGroupGenerator          $variantGroupGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -125,6 +130,7 @@ class FixtureGenerator implements GeneratorInterface
         $this->productCategoryAccessGenerator = $productCategoryAccessGenerator;
         $this->associationTypeGenerator       = $associationTypeGenerator;
         $this->groupTypeGenerator             = $groupTypeGenerator;
+        $this->variantGroupGenerator          = $variantGroupGenerator;
     }
 
     /**
@@ -223,7 +229,15 @@ class FixtureGenerator implements GeneratorInterface
         }
 
         if (isset($config['entities']['group_types'])) {
-            $this->groupTypeGenerator->generate([], $outputDir, $progress);
+            $groupTypes = $this->groupTypeGenerator->generate([], $outputDir, $progress);
+        }
+
+        if (isset($config['entities']['variant_groups'])) {
+            $VariantGroupConfig = $config['entities']['variant_groups'];
+            $this->variantGroupGenerator->setAttributes($attributes);
+            $this->variantGroupGenerator->setLocales($locales);
+            $this->variantGroupGenerator->setGroupTypes($groupTypes);
+            $this->variantGroupGenerator->generate($VariantGroupConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['asset_category_accesses'])) {

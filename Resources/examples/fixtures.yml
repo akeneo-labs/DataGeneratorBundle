@@ -76,3 +76,6 @@ data_generator:
                 roles: [ ROLE_ADMINISTRATOR ]
                 groups: [ IT support ]
                 enable: true
+        variant_groups:
+            count: 10
+            axis_count: 3

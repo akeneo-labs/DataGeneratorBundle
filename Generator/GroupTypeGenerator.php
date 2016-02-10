@@ -2,6 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
+use Pim\Bundle\CatalogBundle\Entity\GroupType;
+use Pim\Bundle\CatalogBundle\Model\GroupTypeInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -21,16 +23,41 @@ class GroupTypeGenerator implements GeneratorInterface
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
-        $data = [
-            'group_types' => [
-                'VARIANT' => ['variant' => 1],
-                'RELATED' => ['variant' => 0],
-            ]
-        ];
+        $variantGroupType = new GroupType();
+        $variantGroupType->setVariant(true);
+        $variantGroupType->setCode('VARIANT');
+
+        $relatedGroupType = new GroupType();
+        $relatedGroupType->setVariant(false);
+        $relatedGroupType->setCode('RELATED');
+
+        $groupTypes = [$variantGroupType, $relatedGroupType];
+
+        $data = ['group_types' => []];
+
+        foreach ($groupTypes as $groupType) {
+            $data['group_types'] = array_merge($data['group_types'], $this->normalizeGroupType($groupType));
+        }
 
         $progress->advance();
 
         $this->writeYamlFile($data, $outputDir);
+
+        return $groupTypes;
+    }
+
+    /**
+     * @param GroupTypeInterface $groupType
+     *
+     * @return array
+     */
+    public function normalizeGroupType(GroupTypeInterface $groupType)
+    {
+        return [
+            $groupType->getCode() => [
+                'variant' => $groupType->isVariant() ? 1 : 0
+            ]
+        ];
     }
 
     /**

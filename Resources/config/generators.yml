@@ -2,6 +2,7 @@ parameters:
     pim_data_generator.generator.fixture.class:                 Pim\Bundle\DataGeneratorBundle\Generator\FixtureGenerator
     pim_data_generator.generator.channel.class:                 Pim\Bundle\DataGeneratorBundle\Generator\ChannelGenerator
     pim_data_generator.generator.product.class:                 Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
+    pim_data_generator.generator.variant_group.class:           Pim\Bundle\DataGeneratorBundle\Generator\VariantGroupGenerator
     pim_data_generator.generator.attribute.class:               Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator
     pim_data_generator.generator.attribute_option.class:        Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator
     pim_data_generator.generator.family.class:                  Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator
@@ -42,6 +43,7 @@ services:
             - @pim_data_generator.generator.product_category_access
             - @pim_data_generator.generator.association_type
             - @pim_data_generator.generator.group_type
+            - @pim_data_generator.generator.variant_group
 
     pim_data_generator.generator.channel:
         class: %pim_data_generator.generator.channel.class%
@@ -74,6 +76,9 @@ services:
 
     pim_data_generator.generator.job:
         class: %pim_data_generator.generator.job.class%
+
+    pim_data_generator.generator.variant_group:
+        class: %pim_data_generator.generator.variant_group.class%
 
     pim_data_generator.generator.product:
         class: %pim_data_generator.generator.product.class%
