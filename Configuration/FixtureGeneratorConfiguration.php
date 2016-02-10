@@ -28,6 +28,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                 ->arrayNode('entities')
                     ->isRequired()
                     ->children()
+                        ->arrayNode('group_types')->end()
                         ->arrayNode('associations')
                             ->children()
                                 ->integerNode('count')->min(0)->isRequired()->end()

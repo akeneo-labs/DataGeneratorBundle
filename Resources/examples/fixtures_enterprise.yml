@@ -1,6 +1,7 @@
 data_generator:
     output_dir: /tmp/fixtures
     entities:
+        group_types: ~
         associations:
             count: 4
         channels:
