@@ -42,10 +42,11 @@ class VariantGroupGenerator implements GeneratorInterface
     public function setAttributes(array $attributes)
     {
         $this->optionsAttributes = array_filter($attributes, function ($attribute) {
+            /** @var $attribute AttributeInterface */
             return in_array($attribute->getAttributeType(), [
                 AttributeTypes::OPTION_SIMPLE_SELECT,
                 AttributeTypes::REFERENCE_DATA_SIMPLE_SELECT
-            ]);
+            ]) && !$attribute->isLocalizable() && !$attribute->isScopable();
         });
     }
 
@@ -72,8 +73,8 @@ class VariantGroupGenerator implements GeneratorInterface
             }
         }
 
-        throw new Exception('There is no VARIANT group. \
-            Please add "group_types: ~" into your fixtures configuration file.');
+        throw new Exception('There is no VARIANT group. ' .
+            'Please add "group_types: ~" into your fixtures configuration file.');
     }
 
     /**
@@ -87,7 +88,7 @@ class VariantGroupGenerator implements GeneratorInterface
         $data          = [];
 
         for ($i = 0; $i < $config['count']; $i++) {
-            $variantGroup = $this->generateVariantGroup($config);
+            $variantGroup = $this->generateVariantGroup($config, $i);
             $variantGroups[] = $variantGroup;
             $data[] = $this->normalizeVariantGroup($variantGroup);
 
@@ -95,7 +96,7 @@ class VariantGroupGenerator implements GeneratorInterface
         }
 
         if (count($variantGroups) > 0) {
-            $this->writeCsvFIle($data, array_keys($data[0]), $outputDir);
+            $this->writeCsvFile($data, array_keys($data[0]), $outputDir);
         }
 
         return $variantGroups;
@@ -103,26 +104,27 @@ class VariantGroupGenerator implements GeneratorInterface
 
     /**
      * @param array $config
+     * @param int   $index
      *
      * @return GroupInterface
      */
-    protected function generateVariantGroup($config)
+    protected function generateVariantGroup($config, $index)
     {
         $group = new Group();
         $group->setType($this->variantGroupType);
-        $group->setCode($this->faker->word());
+        $group->setCode(sprintf('variant_group_%s', $index));
 
         $attributeFaker = Faker\Factory::create();
 
         $axisAttributes = [];
-        for ($i = 0; $i < $config['axis_count']; $i++) {
+        for ($i = 0; $i < $config['axes_count']; $i++) {
             try {
                 $attribute = $attributeFaker->unique()->randomElement($this->optionsAttributes);
             } catch (\OverflowException $e) {
                 throw new Exception(sprintf(
-                    'There is only %s attributes available for variant group axis, %s needed.',
+                    'There is only %s attributes available for variant group axes, %s needed.',
                     count($this->optionsAttributes),
-                    $config['axis_count']
+                    $config['axes_count']
                 ));
             }
             $axisAttributes[] = $attribute;
@@ -132,7 +134,7 @@ class VariantGroupGenerator implements GeneratorInterface
 
         foreach ($this->locales as $locale) {
             $translation = new GroupTranslation();
-            $translation->setLabel($this->faker->unique()->word());
+            $translation->setLabel($this->faker->word());
             $translation->setLocale($locale->getCode());
             $group->addTranslation($translation);
         }
@@ -147,13 +149,13 @@ class VariantGroupGenerator implements GeneratorInterface
      */
     protected function normalizeVariantGroup(GroupInterface $variantGroup)
     {
-        $axis = implode(',', array_map(function ($attribute) {
+        $axes = implode(',', array_map(function ($attribute) {
             return $attribute->getCode();
         }, $variantGroup->getAxisAttributes()->toArray()));
 
         $result = [
             'code' => $variantGroup->getCode(),
-            'axis' => $axis,
+            'axis' => $axes,
             'type' => $variantGroup->getType()->getCode()
         ];
 
@@ -172,7 +174,7 @@ class VariantGroupGenerator implements GeneratorInterface
      * @param array  $headers
      * @param string $outputDir
      */
-    protected function writeCsvFIle(array $variantGroups, array $headers, $outputDir)
+    protected function writeCsvFile(array $variantGroups, array $headers, $outputDir)
     {
         $csvFile = fopen($outputDir.'/'.self::VARIANT_GROUPS_FILENAME, 'w');
 

@@ -69,8 +69,9 @@ class AttributeGenerator implements GeneratorInterface
         $count = (int) $config['count'];
 
         $localizableProbability = (float) $config['localizable_probability'];
-        $scopableProbability = (float) $config['scopable_probability'];
+        $scopableProbability    = (float) $config['scopable_probability'];
         $locScopableProbability = (float) $config['localizable_and_scopable_probability'];
+        $minVariantAttributes   = (int) $config['min_variant_attributes'];
 
         $identifier = $config['identifier_attribute'];
 
@@ -107,10 +108,11 @@ class AttributeGenerator implements GeneratorInterface
                 $attribute['label-'.$localeCode] = $label;
             }
 
-            if ($type == AttributeTypes::OPTION_SIMPLE_SELECT) {
-                // TODO Remove this condition. It's only here fot VariantGroupDataProvider.
+            if ($type == AttributeTypes::OPTION_SIMPLE_SELECT && $minVariantAttributes > 0) {
+                // Configure a minimum set of non localizable and non scopable select attributes for variant groups.
                 $attribute['localizable'] = 0;
                 $attribute['scopable'] = 0;
+                $minVariantAttributes--;
             } elseif ($this->faker->boolean($locScopableProbability)) {
                 $attribute['localizable'] = 1;
                 $attribute['scopable'] = 1;

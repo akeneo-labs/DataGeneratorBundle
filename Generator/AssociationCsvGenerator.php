@@ -418,7 +418,7 @@ class AssociationCsvGenerator implements GeneratorInterface
      * @param array $products
      * @param array $headers
      */
-    protected function writeCsvFIle(array $products, array $headers)
+    protected function writeCsvFile(array $products, array $headers)
     {
         $csvFile = fopen($this->outputFile, 'w');
 

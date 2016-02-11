@@ -202,6 +202,10 @@ class FixtureGenerator implements GeneratorInterface
 
         if (isset($config['entities']['attributes'])) {
             $attributeConfig = $config['entities']['attributes'];
+            if (isset($config['entities']['variant_groups']['axes_count'])) {
+                $variantGroupAxisCount = $config['entities']['variant_groups']['axes_count'];
+                $attributeConfig['min_variant_attributes'] = $variantGroupAxisCount;
+            }
             $this->attributeGenerator->setAttributeGroups($attributeGroups);
             $this->attributeGenerator->setLocales($locales);
             $this->attributeGenerator->generate($attributeConfig, $outputDir, $progress);
@@ -233,11 +237,11 @@ class FixtureGenerator implements GeneratorInterface
         }
 
         if (isset($config['entities']['variant_groups'])) {
-            $VariantGroupConfig = $config['entities']['variant_groups'];
+            $variantGroupConfig = $config['entities']['variant_groups'];
             $this->variantGroupGenerator->setAttributes($attributes);
             $this->variantGroupGenerator->setLocales($locales);
             $this->variantGroupGenerator->setGroupTypes($groupTypes);
-            $this->variantGroupGenerator->generate($VariantGroupConfig, $outputDir, $progress);
+            $this->variantGroupGenerator->generate($variantGroupConfig, $outputDir, $progress);
         }
 
         if (isset($config['entities']['asset_category_accesses'])) {

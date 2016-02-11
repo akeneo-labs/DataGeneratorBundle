@@ -52,10 +52,14 @@ class JobProfilesAccessGenerator implements GeneratorInterface
         $data = [];
         foreach ($this->jobs as $job) {
             $jobCode = $job->getCode();
-            $data[$jobCode] = ['executeJobProfile' => []];
+            $data[$jobCode] = [
+                'executeJobProfile' => [],
+                'editJobProfile'    => [],
+            ];
             foreach ($this->groups as $group) {
                 if ('all' !== $group->getName()) {
                     $data[$jobCode]['executeJobProfile'][] = $group->getName();
+                    $data[$jobCode]['editJobProfile'][]    = $group->getName();
                 }
             }
         }

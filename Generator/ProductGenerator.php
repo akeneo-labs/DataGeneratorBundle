@@ -9,7 +9,6 @@ use Pim\Bundle\CatalogBundle\Entity\Family;
 use Pim\Bundle\CatalogBundle\Model\ChannelInterface;
 use Pim\Bundle\CatalogBundle\Model\CurrencyInterface;
 use Pim\Bundle\CatalogBundle\Model\FamilyInterface;
-use Pim\Bundle\CatalogBundle\Model\GroupInterface;
 use Pim\Bundle\CatalogBundle\Model\LocaleInterface;
 use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
@@ -178,6 +177,16 @@ class ProductGenerator implements GeneratorInterface
             foreach ($this->groupRepository->getAllVariantGroups() as $variantGroup) {
                 $this->variantGroups[] = new VariantGroupDataProvider($variantGroup, $variantGroupCount);
             }
+        }
+
+        if (count($this->variantGroups) * $variantGroupCount > $count) {
+            throw new \Exception(sprintf(
+                'You require too much products per variant group (%s). '.
+                'There is only %s variant groups for %s required products',
+                $variantGroupCount,
+                count($this->variantGroups),
+                $count
+            ));
         }
 
         $this->identifierCode = $this->attributeRepository->getIdentifierCode();
@@ -437,7 +446,7 @@ class ProductGenerator implements GeneratorInterface
     /**
      * Generate number data
      *
-     * @param AbstractAttribute attribute
+     * @param AbstractAttribute $attribute
      *
      * @return string
      */
@@ -466,7 +475,7 @@ class ProductGenerator implements GeneratorInterface
     /**
      * Generate option data
      *
-     * @param AbstractAttribute attribute
+     * @param AbstractAttribute $attribute
      *
      * @return string
      */
@@ -696,8 +705,7 @@ class ProductGenerator implements GeneratorInterface
     }
 
     /**
-     * Bufferize the product for latter use and
-     * set the headers
+     * Bufferize the product for latter use and set the headers
      *
      * @param array $product
      */

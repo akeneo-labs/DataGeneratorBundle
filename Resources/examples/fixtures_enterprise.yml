@@ -78,7 +78,7 @@ data_generator:
                 enable: true
         variant_groups:
             count: 10
-            axis_count: 3
+            axes_count: 3
         asset_categories: ~
         asset_category_accesses: ~
         attribute_groups_accesses: ~

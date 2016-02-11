@@ -78,4 +78,4 @@ data_generator:
                 enable: true
         variant_groups:
             count: 10
-            axis_count: 3
+            axes_count: 3

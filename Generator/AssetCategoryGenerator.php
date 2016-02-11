@@ -55,7 +55,7 @@ class AssetCategoryGenerator implements GeneratorInterface
 
         $headers = array_keys($assetCategories[0]);
 
-        $this->writeCsvFIle($assetCategories, $headers, $outputDir);
+        $this->writeCsvFile($assetCategories, $headers, $outputDir);
 
         $progress->advance();
 
@@ -69,7 +69,7 @@ class AssetCategoryGenerator implements GeneratorInterface
      * @param array  $headers
      * @param string $outputDir
      */
-    protected function writeCsvFIle(array $assetCategories, array $headers, $outputDir)
+    protected function writeCsvFile(array $assetCategories, array $headers, $outputDir)
     {
         $csvFile = fopen($outputDir.'/'.self::ASSET_CATEGORIES_FILENAME, 'w');
 
