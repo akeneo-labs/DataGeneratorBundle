@@ -17,10 +17,8 @@ use Symfony\Component\Yaml;
  */
 class LocalesAccessGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const LOCALE_ACCESSES_FILENAME = 'locale_accesses.yml';
 
-    /** @staticvar string */
     const LOCALE_ACCESSES = 'locale_accesses';
 
     /** @var Group[] */
@@ -30,26 +28,13 @@ class LocalesAccessGenerator implements GeneratorInterface
     protected $locales;
 
     /**
-     * @param Group[] $groups
-     */
-    public function setGroups(array $groups)
-    {
-        $this->groups = $groups;
-    }
-
-    /**
-     * @param Locale[] $locales
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->groups  = $options['groups'];
+        $this->locales = $options['locales'];
+
         $data = [];
         foreach ($this->locales as $locale) {
             $localeCode = $locale->getCode();

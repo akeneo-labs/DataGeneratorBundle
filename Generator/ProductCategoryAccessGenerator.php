@@ -16,10 +16,8 @@ use Symfony\Component\Yaml;
  */
 class ProductCategoryAccessGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const PRODUCT_CATEGORY_ACCESSES_FILENAME = 'product_category_accesses.yml';
 
-    /** @staticvar string */
     const PRODUCT_CATEGORY_ACCESSES = 'product_category_accesses';
 
     /** @var Group[] */
@@ -29,26 +27,13 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
     protected $categories;
 
     /**
-     * @param Group[] $groups
-     */
-    public function setGroups(array $groups)
-    {
-        $this->groups = $groups;
-    }
-
-    /**
-     * @param Category[] $categories
-     */
-    public function setCategories(array $categories)
-    {
-        $this->categories = $categories;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->groups     = $options['groups'];
+        $this->categories = $options['categories'];
+
         $data = [];
         foreach ($this->categories as $category) {
             $categoryCode = $category->getCode();

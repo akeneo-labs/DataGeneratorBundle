@@ -15,7 +15,6 @@ use Symfony\Component\Yaml;
  */
 class UserRoleGenerator
 {
-    /** @staticvar string */
     const ROLES_FILENAME = 'user_roles.yml';
 
     /**

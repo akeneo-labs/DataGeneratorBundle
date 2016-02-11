@@ -31,8 +31,10 @@ class CategoryGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->locales = $options['locales'];
+
         $this->faker = Faker\Factory::create();
 
         $delimiter = $config['delimiter'];
@@ -180,16 +182,6 @@ class CategoryGenerator
         }
 
         return $flatCategories;
-    }
-
-    /**
-     * Set active locales
-     *
-     * @param Locale[]
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
     }
 
     /**

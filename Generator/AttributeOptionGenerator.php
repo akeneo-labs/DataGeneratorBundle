@@ -43,8 +43,11 @@ class AttributeOptionGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->locales    = $options['locales'];
+        $this->attributes = $options['attributes'];
+
         $this->faker = Faker\Factory::create();
         $countPerAttribute = (int) $config['count_per_attribute'];
         $this->delimiter   = $config['delimiter'];
@@ -73,16 +76,6 @@ class AttributeOptionGenerator implements GeneratorInterface
         $progress->advance();
 
         return $this;
-    }
-
-    /**
-     * Set attributes from Generator
-     *
-     * @param array $attributes
-     */
-    public function setAttributes(array $attributes)
-    {
-        $this->attributes = $attributes;
     }
 
     /**
@@ -127,16 +120,6 @@ class AttributeOptionGenerator implements GeneratorInterface
         }
 
         return $this->selectAttributes;
-    }
-
-    /**
-     * Set active locales
-     *
-     * @param Locale[]
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
     }
 
     /**

@@ -61,8 +61,11 @@ class AttributeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->locales         = $options['locales'];
+        $this->attributeGroups = $options['attribute_groups'];
+
         $this->attributesFile = $outputDir.'/'.self::ATTRIBUTES_FILENAME;
         $this->delimiter = $config['delimiter'];
 
@@ -175,16 +178,6 @@ class AttributeGenerator implements GeneratorInterface
     }
 
     /**
-     * Set attribute groups.
-     *
-     * @param array $attributeGroups
-     */
-    public function setAttributeGroups(array $attributeGroups)
-    {
-        $this->attributeGroups = $attributeGroups;
-    }
-
-    /**
      * Get a random non-identifier attribute type
      *
      * @return string
@@ -287,16 +280,6 @@ class AttributeGenerator implements GeneratorInterface
                 $this->faker->randomElements(['png', 'jpg', 'pdf'], 2)
             )
         ];
-    }
-
-    /**
-     * Set active locales
-     *
-     * @param Locale[]
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
     }
 
     /**

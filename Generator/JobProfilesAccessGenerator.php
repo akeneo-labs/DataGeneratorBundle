@@ -16,10 +16,8 @@ use Symfony\Component\Yaml;
  */
 class JobProfilesAccessGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const JOB_PROFILE_ACCESSES_FILENAME = 'job_profile_accesses.yml';
 
-    /** @staticvar string */
     const JOB_PROFILE_ACCESSES = 'job_profile_accesses';
 
     /** @var Group[] */
@@ -29,26 +27,13 @@ class JobProfilesAccessGenerator implements GeneratorInterface
     protected $jobs;
 
     /**
-     * @param Group[] $groups
-     */
-    public function setGroups(array $groups)
-    {
-        $this->groups = $groups;
-    }
-
-    /**
-     * @param JobInstance[] $jobs
-     */
-    public function setJobs(array $jobs)
-    {
-        $this->jobs = $jobs;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->groups = $options['groups'];
+        $this->jobs   = $options['jobs'];
+
         $data = [];
         foreach ($this->jobs as $job) {
             $jobCode = $job->getCode();

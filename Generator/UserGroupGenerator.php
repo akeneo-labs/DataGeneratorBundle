@@ -15,7 +15,6 @@ use Symfony\Component\Yaml;
  */
 class UserGroupGenerator
 {
-    /** @staticvar string */
     const GROUPS_FILENAME = 'user_groups.yml';
 
     /**
@@ -61,7 +60,7 @@ class UserGroupGenerator
     /**
      * Generate a group object from the data provided
      *
-     * @param array $config
+     * @param array $groupConfig
      *
      * @return Group
      */
@@ -76,7 +75,7 @@ class UserGroupGenerator
     /**
      * Normalize groups objects into a structured array
      *
-     * @param Group[]
+     * @param Group[] $groups
      *
      * @return array
      */
@@ -88,21 +87,19 @@ class UserGroupGenerator
             $normalizedGroups[] = $this->normalizeGroup($group);
         }
 
-        return [ "user_groups" => $normalizedGroups ];
+        return ['user_groups' => $normalizedGroups];
     }
 
     /**
      * Normalize group object into a structured array
      *
-     * @param Group
+     * @param Group $group
      *
      * @return array
      */
     protected function normalizeGroup(Group $group)
     {
-        return [
-            "name" => $group->getName()
-        ];
+        return ['name' => $group->getName()];
     }
 
     /**

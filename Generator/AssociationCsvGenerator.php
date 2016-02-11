@@ -19,10 +19,8 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class AssociationCsvGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const DEFAULT_DELIMITER = ',';
 
-    /** @staticvar string */
     const DEFAULT_FILENAME = 'associations.csv';
 
     /** @var string */

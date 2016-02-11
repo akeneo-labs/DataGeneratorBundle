@@ -7,6 +7,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\CatalogBundle\Model\CategoryInterface;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -20,7 +21,6 @@ use Symfony\Component\Yaml;
  */
 class UserGenerator
 {
-    /** @staticvar string */
     const USERS_FILENAME = 'users.yml';
 
     /** @var Channel[] */
@@ -38,14 +38,24 @@ class UserGenerator
     /** @var string[] */
     protected $assetCategoryCodes;
 
+    /** @var CategoryInterface[] */
+    protected $categories;
+
     /** @var Faker\Generator */
     protected $faker;
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->locales            = $options['locales'];
+        $this->channels           = $options['channels'];
+        $this->categories         = $options['categories'];
+        $this->userRoles          = $options['user_roles'];
+        $this->userGroups         = $options['user_groups'];
+        $this->assetCategoryCodes = $options['asset_category_codes'];
+
         $this->faker = Faker\Factory::create();
         $users = $this->generateUsers($config);
 
@@ -165,11 +175,11 @@ class UserGenerator
         }
 
         $result = [
-            "username"  => $user->getUsername(),
-            "password"  => $user->getPassword(),
-            "email"     => $user->getEmail(),
-            "firstname" => $user->getFirstname(),
-            "lastname"  => $user->getLastname(),
+            "username"       => $user->getUsername(),
+            "password"       => $user->getPassword(),
+            "email"          => $user->getEmail(),
+            "firstname"      => $user->getFirstname(),
+            "lastname"       => $user->getLastname(),
             "catalog_locale" => $user->getCatalogLocale()->getCode(),
             "catalog_scope"  => $user->getCatalogScope()->getCode(),
             "default_tree"   => $user->getDefaultTree()->getCode(),
@@ -183,36 +193,6 @@ class UserGenerator
         }
 
         return $result;
-    }
-
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
-    }
-
-    public function setCategories(array $categories)
-    {
-        $this->categories = $categories;
-    }
-
-    public function setChannels(array $channels)
-    {
-        $this->channels = $channels;
-    }
-
-    public function setUserGroups(array $userGroups)
-    {
-        $this->userGroups = $userGroups;
-    }
-
-    public function setUserRoles(array $userRoles)
-    {
-        $this->userRoles = $userRoles;
-    }
-
-    public function setAssetCategories(array $assetCategoryCodes)
-    {
-        $this->assetCategoryCodes = $assetCategoryCodes;
     }
 
     /**

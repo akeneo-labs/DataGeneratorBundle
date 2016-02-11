@@ -43,63 +43,14 @@ class VariantGroupGenerator implements GeneratorInterface
     protected $faker;
 
     /**
-     * Configure the 2 sets of available attributes (non localizable and non scopable):
-     * - the available attributes to define variant group axes (only selects)
-     * - the available attributes to define variant group attributes (only texts)
-     *
-     * @param AttributeInterface[] $attributes
-     */
-    public function setAttributes(array $attributes)
-    {
-        $this->availableAxes = array_filter($attributes, function ($attribute) {
-            /** @var $attribute AttributeInterface */
-            return in_array($attribute->getAttributeType(), [
-                AttributeTypes::OPTION_SIMPLE_SELECT,
-                AttributeTypes::REFERENCE_DATA_SIMPLE_SELECT
-            ]) && !$attribute->isLocalizable() && !$attribute->isScopable();
-        });
-
-        $this->availableAttributes = array_filter($attributes, function ($attribute) {
-            /** @var $attribute AttributeInterface */
-            return (($attribute->getAttributeType() == AttributeTypes::TEXT)
-                && !$attribute->isLocalizable()
-                && !$attribute->isScopable()
-            );
-        });
-    }
-
-    /**
-     * @param LocaleInterface[] $locales
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
-    }
-
-    /**
-     * @param GroupTypeInterface[] $groupTypes
-     *
-     * @return VariantGroupGenerator
-     */
-    public function setGroupTypes(array $groupTypes)
-    {
-        foreach ($groupTypes as $groupType) {
-            if ($groupType->getCode() == 'VARIANT') {
-                $this->variantGroupType = $groupType;
-
-                return $this;
-            }
-        }
-
-        throw new Exception('There is no VARIANT group. ' .
-            'Please add "group_types: ~" into your fixtures configuration file.');
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->setAttributes($options['attributes']);
+        $this->setGroupTypes($options['group_types']);
+        $this->locales = $options['locales'];
+
         $this->faker = Faker\Factory::create();
 
         $variantGroups = [];
@@ -239,7 +190,59 @@ class VariantGroupGenerator implements GeneratorInterface
         return $productTemplate;
     }
 
-    protected function getHeader($variantGroups)
+    /**
+     * Configure the 2 sets of available attributes (non localizable and non scopable):
+     * - the available attributes to define variant group axes (only selects)
+     * - the available attributes to define variant group attributes (only texts)
+     *
+     * @param AttributeInterface[] $attributes
+     */
+    protected function setAttributes(array $attributes)
+    {
+        $this->availableAxes = array_filter($attributes, function ($attribute) {
+            /** @var $attribute AttributeInterface */
+            return in_array($attribute->getAttributeType(), [
+                AttributeTypes::OPTION_SIMPLE_SELECT,
+                AttributeTypes::REFERENCE_DATA_SIMPLE_SELECT
+            ]) && !$attribute->isLocalizable() && !$attribute->isScopable();
+        });
+
+        $this->availableAttributes = array_filter($attributes, function ($attribute) {
+            /** @var $attribute AttributeInterface */
+            return (($attribute->getAttributeType() == AttributeTypes::TEXT)
+                && !$attribute->isLocalizable()
+                && !$attribute->isScopable()
+            );
+        });
+    }
+
+    /**
+     * @param GroupTypeInterface[] $groupTypes
+     *
+     * @return VariantGroupGenerator
+     */
+    protected function setGroupTypes(array $groupTypes)
+    {
+        foreach ($groupTypes as $groupType) {
+            if ($groupType->getCode() == 'VARIANT') {
+                $this->variantGroupType = $groupType;
+
+                return $this;
+            }
+        }
+
+        throw new Exception('There is no VARIANT group. ' .
+            'Please add "group_types: ~" into your fixtures configuration file.');
+    }
+
+    /**
+     * Get the header of the CSV.
+     *
+     * @param array $variantGroups
+     *
+     * @return array
+     */
+    protected function getHeader(array $variantGroups)
     {
         $header = [];
 

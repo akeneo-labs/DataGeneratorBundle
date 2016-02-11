@@ -15,8 +15,8 @@ use Symfony\Component\Yaml;
  */
 class JobGenerator
 {
-    /** @staticvar string */
     const JOB_FILENAME = 'jobs.yml';
+
     const INTERNAL_JOBS_FILE = 'Resources/config/internal_jobs.yml';
 
     /**

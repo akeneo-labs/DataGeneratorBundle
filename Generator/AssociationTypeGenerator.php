@@ -29,16 +29,13 @@ class AssociationTypeGenerator implements GeneratorInterface
     /** @var Faker\Generator */
     protected $faker;
 
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
+        $this->locales = $options['locales'];
+
         $data = [];
         $this->faker = Faker\Factory::create();
 
@@ -60,7 +57,7 @@ class AssociationTypeGenerator implements GeneratorInterface
 
     /**
      * Generate fake association type
-     * 
+     *
      * @return AssociationType
      */
     protected function generateAssociationType()

@@ -15,10 +15,8 @@ use Symfony\Component\Yaml;
  */
 class AssetCategoryAccessGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const ASSET_CATEGORY_ACCESSES_FILENAME = 'asset_category_accesses.yml';
 
-    /** @staticvar string */
     const ASSET_CATEGORY_ACCESSES = 'asset_category_accesses';
 
     /** @var Group[] */
@@ -28,26 +26,13 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
     protected $assetCategoryCodes;
 
     /**
-     * @param Group[] $groups
-     */
-    public function setGroups(array $groups)
-    {
-        $this->groups = $groups;
-    }
-
-    /**
-     * @param string[] $assetCategoryCodes
-     */
-    public function setAssetCategories(array $assetCategoryCodes)
-    {
-        $this->assetCategoryCodes = $assetCategoryCodes;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->groups             = $options['groups'];
+        $this->assetCategoryCodes = $options['asset_category_codes'];
+
         $data = [];
         foreach ($this->assetCategoryCodes as $assetCategoryCode) {
             $data[$assetCategoryCode] = [];

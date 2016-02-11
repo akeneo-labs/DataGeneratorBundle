@@ -17,24 +17,12 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class AssetCategoryGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const ASSET_CATEGORIES_FILENAME = 'asset_categories.csv';
 
-    /** @staticvar string */
     const ASSET_MAIN_CATALOG = 'asset_main_catalog';
 
     /** @var Locale[] */
     protected $locales;
-
-    /**
-     * Set active locales
-     *
-     * @param Locale[] $locales
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
-    }
 
     /**
      * Returns the codes of the generated asset categories.
@@ -43,6 +31,8 @@ class AssetCategoryGenerator implements GeneratorInterface
      */
     public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
     {
+        $this->locales = $options['locales'];
+
         $faker = Faker\Factory::create();
 
         $assetCategories = [['code' => self::ASSET_MAIN_CATALOG, 'parent' => '']];

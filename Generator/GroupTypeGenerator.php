@@ -21,7 +21,7 @@ class GroupTypeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
         $variantGroupType = new GroupType();
         $variantGroupType->setVariant(true);
