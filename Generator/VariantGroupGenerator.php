@@ -6,10 +6,13 @@ use Faker;
 use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
 use Pim\Bundle\CatalogBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\GroupTranslation;
+use Pim\Bundle\CatalogBundle\Entity\ProductTemplate;
 use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
 use Pim\Bundle\CatalogBundle\Model\GroupInterface;
 use Pim\Bundle\CatalogBundle\Model\GroupTypeInterface;
 use Pim\Bundle\CatalogBundle\Model\LocaleInterface;
+use Pim\Bundle\CatalogBundle\Model\ProductValue;
+use Pim\Bundle\CatalogBundle\Model\ProductValueInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
@@ -28,7 +31,10 @@ class VariantGroupGenerator implements GeneratorInterface
     protected $locales;
 
     /** @var AttributeInterface[] */
-    protected $optionsAttributes;
+    protected $availableAxes;
+
+    /** @var AttributeInterface[] */
+    protected $availableAttributes;
 
     /** @var GroupTypeInterface */
     protected $variantGroupType;
@@ -37,16 +43,28 @@ class VariantGroupGenerator implements GeneratorInterface
     protected $faker;
 
     /**
+     * Configure the 2 sets of available attributes (non localizable and non scopable):
+     * - the available attributes to define variant group axes (only selects)
+     * - the available attributes to define variant group attributes (only texts)
+     *
      * @param AttributeInterface[] $attributes
      */
     public function setAttributes(array $attributes)
     {
-        $this->optionsAttributes = array_filter($attributes, function ($attribute) {
+        $this->availableAxes = array_filter($attributes, function ($attribute) {
             /** @var $attribute AttributeInterface */
             return in_array($attribute->getAttributeType(), [
                 AttributeTypes::OPTION_SIMPLE_SELECT,
                 AttributeTypes::REFERENCE_DATA_SIMPLE_SELECT
             ]) && !$attribute->isLocalizable() && !$attribute->isScopable();
+        });
+
+        $this->availableAttributes = array_filter($attributes, function ($attribute) {
+            /** @var $attribute AttributeInterface */
+            return (($attribute->getAttributeType() == AttributeTypes::TEXT)
+                && !$attribute->isLocalizable()
+                && !$attribute->isScopable()
+            );
         });
     }
 
@@ -96,7 +114,7 @@ class VariantGroupGenerator implements GeneratorInterface
         }
 
         if (count($variantGroups) > 0) {
-            $this->writeCsvFile($data, array_keys($data[0]), $outputDir);
+            $this->writeCsvFile($data, $this->getHeader($data), $outputDir);
         }
 
         return $variantGroups;
@@ -114,23 +132,8 @@ class VariantGroupGenerator implements GeneratorInterface
         $group->setType($this->variantGroupType);
         $group->setCode(sprintf('variant_group_%s', $index));
 
-        $attributeFaker = Faker\Factory::create();
-
-        $axisAttributes = [];
-        for ($i = 0; $i < $config['axes_count']; $i++) {
-            try {
-                $attribute = $attributeFaker->unique()->randomElement($this->optionsAttributes);
-            } catch (\OverflowException $e) {
-                throw new Exception(sprintf(
-                    'There is only %s attributes available for variant group axes, %s needed.',
-                    count($this->optionsAttributes),
-                    $config['axes_count']
-                ));
-            }
-            $axisAttributes[] = $attribute;
-        }
-
-        $group->setAxisAttributes($axisAttributes);
+        $group->setAxisAttributes($this->getAxes($config['axes_count']));
+        $group->setProductTemplate($this->getProductTemplate($config['attributes_count']));
 
         foreach ($this->locales as $locale) {
             $translation = new GroupTranslation();
@@ -164,7 +167,91 @@ class VariantGroupGenerator implements GeneratorInterface
             $result[sprintf('label-%s', $translation->getLocale())] = $translation->getLabel();
         }
 
+        /**
+         * @var string                $attributeCode
+         * @var ProductValueInterface $productValue
+         */
+        foreach ($variantGroup->getProductTemplate()->getValuesData() as $attributeCode => $productValue) {
+            $result[$attributeCode] = $productValue->getText();
+        }
+
         return $result;
+    }
+
+    /**
+     * Return a random set of axes for a variant group.
+     *
+     * @param int $count
+     *
+     * @return AttributeInterface[]
+     */
+    protected function getAxes($count)
+    {
+        $attributesFaker = Faker\Factory::create();
+        $axes            = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            try {
+                $axis = $attributesFaker->unique()->randomElement($this->availableAxes);
+            } catch (\OverflowException $e) {
+                throw new Exception(sprintf(
+                    'There is only %s attributes available for variant group axes, %s needed.',
+                    count($this->availableAxes),
+                    $count
+                ));
+            }
+            $axes[] = $axis;
+        }
+
+        return $axes;
+    }
+
+    /**
+     * Returns a product template containing product values for a variant group.
+     *
+     * @param int $count
+     *
+     * @return ProductTemplate
+     */
+    protected function getProductTemplate($count)
+    {
+        $attributesFaker = Faker\Factory::create();
+        $valuesData      = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            try {
+                $attribute = $attributesFaker->unique($i == 0)->randomElement($this->availableAttributes);
+            } catch (\OverflowException $e) {
+                throw new Exception(sprintf(
+                    'There is only %s attributes available for variant group attribute, %s needed.',
+                    count($this->availableAttributes),
+                    $count
+                ));
+            }
+            $value = new ProductValue();
+            $value->setAttribute($attribute);
+            $value->setText(implode(' ', $this->faker->words(3)));
+            $valuesData[$attribute->getCode()] = $value;
+        }
+        $productTemplate = new ProductTemplate();
+        $productTemplate->setValuesData($valuesData);
+
+        return $productTemplate;
+    }
+
+    protected function getHeader($variantGroups)
+    {
+        $header = [];
+
+        foreach($variantGroups as $variantGroup) {
+            foreach ($variantGroup as $key => $value) {
+                if (!in_array($key, $header)) {
+                    $header[] = $key;
+                }
+            }
+        }
+
+        return $header;
     }
 
     /**

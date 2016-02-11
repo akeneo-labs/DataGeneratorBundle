@@ -79,3 +79,4 @@ data_generator:
         variant_groups:
             count: 10
             axes_count: 3
+            attributes_count: 3

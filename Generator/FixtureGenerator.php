@@ -204,7 +204,11 @@ class FixtureGenerator implements GeneratorInterface
             $attributeConfig = $config['entities']['attributes'];
             if (isset($config['entities']['variant_groups']['axes_count'])) {
                 $variantGroupAxisCount = $config['entities']['variant_groups']['axes_count'];
-                $attributeConfig['min_variant_attributes'] = $variantGroupAxisCount;
+                $attributeConfig['min_variant_axes'] = $variantGroupAxisCount;
+            }
+            if (isset($config['entities']['variant_groups']['attributes_count'])) {
+                $variantGroupAttributesCount = $config['entities']['variant_groups']['attributes_count'];
+                $attributeConfig['min_variant_attributes'] = $variantGroupAttributesCount;
             }
             $this->attributeGenerator->setAttributeGroups($attributeGroups);
             $this->attributeGenerator->setLocales($locales);

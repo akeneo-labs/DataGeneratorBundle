@@ -71,6 +71,7 @@ class AttributeGenerator implements GeneratorInterface
         $localizableProbability = (float) $config['localizable_probability'];
         $scopableProbability    = (float) $config['scopable_probability'];
         $locScopableProbability = (float) $config['localizable_and_scopable_probability'];
+        $minVariantAxes         = (int) $config['min_variant_axes'];
         $minVariantAttributes   = (int) $config['min_variant_attributes'];
 
         $identifier = $config['identifier_attribute'];
@@ -108,8 +109,13 @@ class AttributeGenerator implements GeneratorInterface
                 $attribute['label-'.$localeCode] = $label;
             }
 
-            if ($type == AttributeTypes::OPTION_SIMPLE_SELECT && $minVariantAttributes > 0) {
-                // Configure a minimum set of non localizable and non scopable select attributes for variant groups.
+            if ($type == AttributeTypes::OPTION_SIMPLE_SELECT && $minVariantAxes > 0) {
+                // Configure a minimum set of non localizable and non scopable select axes for variant groups.
+                $attribute['localizable'] = 0;
+                $attribute['scopable'] = 0;
+                $minVariantAxes--;
+            } elseif ($type == AttributeTypes::TEXT && $minVariantAttributes > 0) {
+                // Configure a minimum set of non localizable and non scopable text attributes for variant groups.
                 $attribute['localizable'] = 0;
                 $attribute['scopable'] = 0;
                 $minVariantAttributes--;

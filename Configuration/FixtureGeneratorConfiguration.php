@@ -172,6 +172,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                             ->children()
                                 ->integerNode('count')->min(0)->isRequired()->end()
                                 ->integerNode('axes_count')->min(1)->isRequired()->end()
+                                ->integerNode('attributes_count')->min(0)->end()
                             ->end()
                         ->end()
                         ->arrayNode('asset_categories')->end()
