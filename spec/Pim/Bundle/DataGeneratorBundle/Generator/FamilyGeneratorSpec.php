@@ -3,17 +3,13 @@
 namespace spec\Pim\Bundle\DataGeneratorBundle\Generator;
 
 use PhpSpec\ObjectBehavior;
-use Pim\Bundle\CatalogBundle\Repository\ChannelRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Prophecy\Argument;
 
 class FamilyGeneratorSpec extends ObjectBehavior
 {
-    function let(
-        ChannelRepositoryInterface $channelRepository,
-        LocaleRepositoryInterface $localeRepository
-    ) {
-        $this->beConstructedWith($channelRepository, $localeRepository);
+    function let()
+    {
+        $this->beConstructedWith();
     }
 
     function it_is_initializable()

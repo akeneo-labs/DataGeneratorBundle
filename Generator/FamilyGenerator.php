@@ -94,8 +94,6 @@ class FamilyGenerator implements GeneratorInterface
 
             $family['attributes'] = implode(static::ATTRIBUTE_DELIMITER, $attributes);
 
-            $requirements = [];
-
             foreach ($this->channels as $channel) {
                 $attributeReqs = $this->faker->randomElements($this->getAttributeCodes(), $requirementsCount);
                 $attributeReqs = array_merge([$this->identifierAttribute], $attributeReqs);
