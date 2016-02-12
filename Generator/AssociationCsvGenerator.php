@@ -71,7 +71,6 @@ class AssociationCsvGenerator implements GeneratorInterface
         $associations = [];
 
         for ($i = 0; $i < $amount; $i++) {
-
             $association = [];
             $association['code'] = $this->getRandomProduct($this->faker);
             $association['products'] = $this->getRandomProducts();
@@ -126,7 +125,6 @@ class AssociationCsvGenerator implements GeneratorInterface
         if ($attribute->isScopable() && $attribute->isLocalizable()) {
             foreach ($this->getLocales() as $locale) {
                 foreach ($this->getChannels() as $channel) {
-
                     foreach ($keys as $baseKey) {
                         $key = $baseKey.'-'.$locale->getCode().'-'.$channel->getCode();
                         $updatedKeys[] = $key;
@@ -134,7 +132,6 @@ class AssociationCsvGenerator implements GeneratorInterface
                 }
             }
             $keys = $updatedKeys;
-
         } elseif ($attribute->isScopable() && !$attribute->isLocalizable()) {
             foreach ($this->getChannels() as $channel) {
                 foreach ($keys as $baseKey) {
@@ -142,7 +139,6 @@ class AssociationCsvGenerator implements GeneratorInterface
                     $updatedKeys[] = $key;
                 }
             }
-
             $keys = $updatedKeys;
         } elseif (!$attribute->isScopable() && $attribute->isLocalizable()) {
             foreach ($this->getLocales() as $locale) {
@@ -171,7 +167,6 @@ class AssociationCsvGenerator implements GeneratorInterface
                 foreach ($keys as $key) {
                     $updatedKeys[] = $key;
                     $updatedKeys[] = $key.'-'.self::METRIC_UNIT;
-
                 }
                 $keys = $updatedKeys;
                 break;

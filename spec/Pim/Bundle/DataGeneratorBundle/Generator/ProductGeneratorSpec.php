@@ -8,6 +8,7 @@ use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\ChannelRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\CurrencyRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
+use Pim\Bundle\CatalogBundle\Repository\GroupRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
 use Prophecy\Argument;
 
@@ -19,7 +20,8 @@ class ProductGeneratorSpec extends ObjectBehavior
         ChannelRepositoryInterface $channelRepository,
         LocaleRepositoryInterface $localeRepository,
         CurrencyRepositoryInterface $currencyRepository,
-        CategoryRepositoryInterface $categoryRepository
+        CategoryRepositoryInterface $categoryRepository,
+        GroupRepositoryInterface $groupRepository
     ) {
         $this->beConstructedWith(
             $familyRepository,
@@ -27,7 +29,8 @@ class ProductGeneratorSpec extends ObjectBehavior
             $channelRepository,
             $localeRepository,
             $currencyRepository,
-            $categoryRepository
+            $categoryRepository,
+            $groupRepository
         );
     }
 

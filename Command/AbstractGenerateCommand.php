@@ -4,8 +4,8 @@ namespace Pim\Bundle\DataGeneratorBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Generates CSV products file
@@ -52,8 +52,7 @@ abstract class AbstractGenerateCommand extends ContainerAwareCommand
         foreach ($config['entities'] as $entity) {
             if (isset($entity['count'])) {
                 $totalCount += $entity['count'];
-            }
-            else {
+            } else {
                 $totalCount += 1;
             }
         }

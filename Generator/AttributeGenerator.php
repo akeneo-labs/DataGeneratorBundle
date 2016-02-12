@@ -108,7 +108,7 @@ class AttributeGenerator implements GeneratorInterface
             $attribute['type'] = $type;
             $attribute['group'] = $this->getRandomAttributeGroupCode();
 
-            foreach($this->getLocalizedRandomLabels($type) as $localeCode => $label) {
+            foreach ($this->getLocalizedRandomLabels($type) as $localeCode => $label) {
                 $attribute['label-'.$localeCode] = $label;
             }
 
@@ -264,7 +264,7 @@ class AttributeGenerator implements GeneratorInterface
     protected function getMetricProperties()
     {
         return [
-            "metric_family"      => "Length",
+            "metric_family"       => "Length",
             "default_metric_unit" => "METER"
         ];
     }

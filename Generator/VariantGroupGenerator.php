@@ -246,7 +246,7 @@ class VariantGroupGenerator implements GeneratorInterface
     {
         $header = [];
 
-        foreach($variantGroups as $variantGroup) {
+        foreach ($variantGroups as $variantGroup) {
             foreach ($variantGroup as $key => $value) {
                 if (!in_array($key, $header)) {
                     $header[] = $key;

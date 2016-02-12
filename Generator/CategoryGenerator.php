@@ -3,9 +3,9 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
-use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\CatalogBundle\Entity\Category;
 use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation;
+use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -222,14 +222,11 @@ class CategoryGenerator
         $prevAvgNodeCount = null;
 
         while (!$approximationFound && $avgNodeCount < $upperLimit) {
-
             $distance = abs($nodeCount - $this->calculateTotalNodesNumber($levelCount, $avgNodeCount));
 
             if ($distance > $prevDistance) {
                 $approximationFound = true;
-
             } else {
-                $previousDistance = $distance;
                 $prevAvgNodeCount = $avgNodeCount;
                 $avgNodeCount++;
             }

@@ -82,7 +82,7 @@ class FamilyGenerator implements GeneratorInterface
 
             $family['code'] =self::FAMILY_CODE_PREFIX.$i;
 
-            foreach($this->getLocalizedRandomLabels() as $localeCode => $label) {
+            foreach ($this->getLocalizedRandomLabels() as $localeCode => $label) {
                 $family['label-'.$localeCode] = $label;
             }
 
@@ -93,8 +93,6 @@ class FamilyGenerator implements GeneratorInterface
             $attributes = array_unique(array_merge([$this->identifierAttribute, $this->labelAttribute], $attributes));
 
             $family['attributes'] = implode(static::ATTRIBUTE_DELIMITER, $attributes);
-
-            $requirements = [];
 
             foreach ($this->channels as $channel) {
                 $attributeReqs = $this->faker->randomElements($this->getAttributeCodes(), $requirementsCount);
