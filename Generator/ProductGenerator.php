@@ -5,8 +5,8 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Faker;
-use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Entity\Family;
+use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
 use Pim\Bundle\CatalogBundle\Model\AttributeOptionInterface;
 use Pim\Bundle\CatalogBundle\Model\ChannelInterface;
@@ -293,7 +293,6 @@ class ProductGenerator implements GeneratorInterface
                 }
             }
             $keys = $updatedKeys;
-
         } elseif ($attribute->isScopable() && !$attribute->isLocalizable()) {
             foreach ($this->getChannels() as $channel) {
                 foreach ($keys as $baseKey => $keyOptions) {
@@ -301,7 +300,6 @@ class ProductGenerator implements GeneratorInterface
                     $updatedKeys[$key] = array_merge($keyOptions, ['channel' => $channel]);
                 }
             }
-
             $keys = $updatedKeys;
         } elseif (!$attribute->isScopable() && $attribute->isLocalizable()) {
             foreach ($this->getLocales() as $locale) {
@@ -333,7 +331,6 @@ class ProductGenerator implements GeneratorInterface
                 foreach ($keys as $key => $keyOptions) {
                     $updatedKeys[$key] = $keyOptions;
                     $updatedKeys[$key.'-'.self::METRIC_UNIT] = $keyOptions;
-
                 }
                 $keys = $updatedKeys;
                 break;
@@ -506,7 +503,7 @@ class ProductGenerator implements GeneratorInterface
             $this->attributeOptions[$attribute->getCode()] = [];
 
             foreach ($attribute->getOptions() as $option) {
-            $this->attributeOptions[$attribute->getCode()][] = $option;
+                $this->attributeOptions[$attribute->getCode()][] = $option;
             }
         }
 

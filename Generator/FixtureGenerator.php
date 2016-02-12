@@ -216,7 +216,7 @@ class FixtureGenerator implements GeneratorInterface
                 $attributeConfig['min_variant_attributes'] = $variantGroupAttributesCount;
             }
             $this->attributeGenerator->generate($attributeConfig, $outputDir, $progress, [
-                'locales' => $locales,
+                'locales'          => $locales,
                 'attribute_groups' => $attributeGroups
             ]);
             $attributes = $this->attributeGenerator->getAttributes();
@@ -225,8 +225,8 @@ class FixtureGenerator implements GeneratorInterface
         if (isset($config['entities']['families'])) {
             $familyConfig = $config['entities']['families'];
             $this->familyGenerator->generate($familyConfig, $outputDir, $progress, [
-                'channels' => $channels,
-                'locales' => $locales,
+                'channels'   => $channels,
+                'locales'    => $locales,
                 'attributes' => $attributes,
             ]);
         }

@@ -2,8 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Configuration;
 
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * Product Generator configuration

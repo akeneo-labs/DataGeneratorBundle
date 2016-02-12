@@ -2,9 +2,9 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
+use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Currency;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
-use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -192,7 +192,6 @@ class ChannelGenerator implements GeneratorInterface
     {
         $channelData = [ 'channels' => [] ];
         foreach ($this->channels as $channel) {
-
             $localeCodes   = [];
             $currencyCodes = [];
 
@@ -213,7 +212,6 @@ class ChannelGenerator implements GeneratorInterface
                     'currencies' => $currencyCodes,
                     'color'      => $channel->getColor()
                 ];
-
         }
 
         $yamlDumper = new Yaml\Dumper();

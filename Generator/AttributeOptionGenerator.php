@@ -160,5 +160,4 @@ class AttributeOptionGenerator implements GeneratorInterface
 
         return $keys;
     }
-
 }

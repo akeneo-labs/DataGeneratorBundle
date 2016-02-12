@@ -2,8 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Configuration;
 
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
  * Generator configuration
@@ -62,7 +62,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                                     "lastname"  => "Doe",
                                     "roles"     => [ "ROLE_ADMINISTRATOR" ],
                                     "groups"    => [ "IT support" ],
-                                    "enable" => true
+                                    "enable"    => true
                                 ]
                             ])
                             ->prototype('array')

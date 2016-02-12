@@ -82,7 +82,7 @@ class FamilyGenerator implements GeneratorInterface
 
             $family['code'] =self::FAMILY_CODE_PREFIX.$i;
 
-            foreach($this->getLocalizedRandomLabels() as $localeCode => $label) {
+            foreach ($this->getLocalizedRandomLabels() as $localeCode => $label) {
                 $family['label-'.$localeCode] = $label;
             }
 
