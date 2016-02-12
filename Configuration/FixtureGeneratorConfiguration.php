@@ -147,6 +147,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                                 ->floatNode('localizable_probability')->defaultValue(10)->end()
                                 ->floatNode('scopable_probability')->defaultValue(5)->end()
                                 ->floatNode('localizable_and_scopable_probability')->defaultValue(2)->end()
+                                ->floatNode('useable_as_grid_filter_probability')->defaultValue(10)->end()
                                 ->arrayNode('force_attributes')
                                     ->prototype('scalar')
                                     ->end()
