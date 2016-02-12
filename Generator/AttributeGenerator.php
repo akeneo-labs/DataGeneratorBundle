@@ -108,7 +108,7 @@ class AttributeGenerator implements GeneratorInterface
             $attribute['type'] = $type;
             $attribute['group'] = $this->getRandomAttributeGroupCode();
 
-            foreach($this->getLocalizedRandomLabels() as $localeCode => $label) {
+            foreach($this->getLocalizedRandomLabels($type) as $localeCode => $label) {
                 $attribute['label-'.$localeCode] = $label;
             }
 
@@ -241,14 +241,16 @@ class AttributeGenerator implements GeneratorInterface
     /**
      * Get localized random labels
      *
+     * @param string $type
+     *
      * @return array
      */
-    protected function getLocalizedRandomLabels()
+    protected function getLocalizedRandomLabels($type)
     {
         $labels = [];
 
         foreach ($this->locales as $locale) {
-            $labels[$locale->getCode()] = $this->faker->sentence(2);
+            $labels[$locale->getCode()] = sprintf("%s %s", $type, implode(' ', $this->faker->words(2)));
         }
 
         return $labels;
