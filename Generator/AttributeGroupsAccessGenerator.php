@@ -17,10 +17,8 @@ use Symfony\Component\Yaml;
  */
 class AttributeGroupsAccessGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_groups_accesses.yml';
 
-    /** @staticvar string */
     const ATTRIBUTE_GROUPS_ACCESSES = 'attribute_groups_accesses';
 
     /** @var Group[] */
@@ -30,26 +28,13 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
     protected $attributeGroups;
 
     /**
-     * @param Group[] $groups
-     */
-    public function setGroups(array $groups)
-    {
-        $this->groups = $groups;
-    }
-
-    /**
-     * @param AttributeGroup[] $attributeGroups
-     */
-    public function setAttributeGroups(array $attributeGroups)
-    {
-        $this->attributeGroups = $attributeGroups;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->groups          = $options['groups'];
+        $this->attributeGroups = $options['attribute_groups'];
+
         $data = [];
         foreach ($this->attributeGroups as $attributeGroup) {
             $attributeGroupCode = $attributeGroup->getCode();

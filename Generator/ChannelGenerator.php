@@ -17,13 +17,10 @@ use Symfony\Component\Yaml;
  */
 class ChannelGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const CHANNEL_FILENAME = 'channels.yml';
 
-    /** @staticvar string */
     const CURRENCY_FILENAME = 'currencies.yml';
 
-    /** @staticvar string */
     const DEFAULT_TREE = 'master';
 
     /** @var string */
@@ -44,7 +41,7 @@ class ChannelGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
         $this->channelsFilePath  = $outputDir . '/' . static::CHANNEL_FILENAME;
         $this->currenciesFilePath = $outputDir . '/' . static::CURRENCY_FILENAME;

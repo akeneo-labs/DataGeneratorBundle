@@ -18,10 +18,8 @@ use Symfony\Component\Yaml;
  */
 class AttributeGroupGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const ATTR_GROUP_CODE_PREFIX = 'attr_gr_';
 
-    /** @staticvar string */
     const ATTRIBUTE_GROUP_FILENAME = 'attribute_groups.yml';
 
     /** @var array */
@@ -39,8 +37,10 @@ class AttributeGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->locales = $options['locales'];
+
         $this->attributeGroupsFile = $outputDir . '/' . static::ATTRIBUTE_GROUP_FILENAME;
 
         $count = (int) $config['count'];
@@ -98,16 +98,6 @@ class AttributeGroupGenerator implements GeneratorInterface
         }
 
         return $labels;
-    }
-
-    /**
-     * Set active locales
-     *
-     * @param Locale[]
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
     }
 
     /**

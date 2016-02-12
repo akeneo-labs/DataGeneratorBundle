@@ -4,6 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
 use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypeRegistry;
+use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -60,16 +61,21 @@ class AttributeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->locales         = $options['locales'];
+        $this->attributeGroups = $options['attribute_groups'];
+
         $this->attributesFile = $outputDir.'/'.self::ATTRIBUTES_FILENAME;
         $this->delimiter = $config['delimiter'];
 
         $count = (int) $config['count'];
 
         $localizableProbability = (float) $config['localizable_probability'];
-        $scopableProbability = (float) $config['scopable_probability'];
+        $scopableProbability    = (float) $config['scopable_probability'];
         $locScopableProbability = (float) $config['localizable_and_scopable_probability'];
+        $minVariantAxes         = (int) $config['min_variant_axes'];
+        $minVariantAttributes   = (int) $config['min_variant_attributes'];
 
         $identifier = $config['identifier_attribute'];
 
@@ -106,7 +112,17 @@ class AttributeGenerator implements GeneratorInterface
                 $attribute['label-'.$localeCode] = $label;
             }
 
-            if ($this->faker->boolean($locScopableProbability)) {
+            if ($type == AttributeTypes::OPTION_SIMPLE_SELECT && $minVariantAxes > 0) {
+                // Configure a minimum set of non localizable and non scopable select axes for variant groups.
+                $attribute['localizable'] = 0;
+                $attribute['scopable'] = 0;
+                $minVariantAxes--;
+            } elseif ($type == AttributeTypes::TEXT && $minVariantAttributes > 0) {
+                // Configure a minimum set of non localizable and non scopable text attributes for variant groups.
+                $attribute['localizable'] = 0;
+                $attribute['scopable'] = 0;
+                $minVariantAttributes--;
+            } elseif ($this->faker->boolean($locScopableProbability)) {
                 $attribute['localizable'] = 1;
                 $attribute['scopable'] = 1;
             } else {
@@ -150,24 +166,15 @@ class AttributeGenerator implements GeneratorInterface
             if (isset($attribute['localizable'])) {
                 $attributeObject->setLocalizable($attribute['localizable']);
             }
-            if (isset($attribute['localizable'])) {
+            if (isset($attribute['scopable'])) {
                 $attributeObject->setScopable($attribute['scopable']);
             }
+            $attributeObject->setAttributeType($attribute['type']);
 
             $attributeObjects[$code] = $attributeObject;
         }
 
         return $attributeObjects;
-    }
-
-    /**
-     * Set attribute groups.
-     *
-     * @param array $attributeGroups
-     */
-    public function setAttributeGroups(array $attributeGroups)
-    {
-        $this->attributeGroups = $attributeGroups;
     }
 
     /**
@@ -273,16 +280,6 @@ class AttributeGenerator implements GeneratorInterface
                 $this->faker->randomElements(['png', 'jpg', 'pdf'], 2)
             )
         ];
-    }
-
-    /**
-     * Set active locales
-     *
-     * @param Locale[]
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
     }
 
     /**

@@ -23,5 +23,5 @@ interface GeneratorInterface
      *
      * @return $this
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null);
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = []);
 }

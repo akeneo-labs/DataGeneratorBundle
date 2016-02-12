@@ -19,10 +19,8 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class AssociationCsvGenerator implements GeneratorInterface
 {
-    /** @staticvar string */
     const DEFAULT_DELIMITER = ',';
 
-    /** @staticvar string */
     const DEFAULT_FILENAME = 'associations.csv';
 
     /** @var string */
@@ -418,7 +416,7 @@ class AssociationCsvGenerator implements GeneratorInterface
      * @param array $products
      * @param array $headers
      */
-    protected function writeCsvFIle(array $products, array $headers)
+    protected function writeCsvFile(array $products, array $headers)
     {
         $csvFile = fopen($this->outputFile, 'w');
 

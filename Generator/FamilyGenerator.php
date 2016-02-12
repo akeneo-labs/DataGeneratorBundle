@@ -57,8 +57,12 @@ class FamilyGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
     {
+        $this->locales    = $options['locales'];
+        $this->attributes = $options['attributes'];
+        $this->channels   = $options['channels'];
+
         $this->familiesFile = $outputDir.'/'.self::FAMILIES_FILENAME;
 
         $this->delimiter = $config['delimiter'];
@@ -133,16 +137,6 @@ class FamilyGenerator implements GeneratorInterface
     }
 
     /**
-     * Set attributes
-     *
-     * @param array $attributes
-     */
-    public function setAttributes(array $attributes)
-    {
-        $this->attributes = $attributes;
-    }
-
-    /**
      * Get localized random labels
      *
      * @return array
@@ -156,16 +150,6 @@ class FamilyGenerator implements GeneratorInterface
         }
 
         return $labels;
-    }
-
-    /**
-     * Set active locales
-     *
-     * @param Locale[]
-     */
-    public function setLocales(array $locales)
-    {
-        $this->locales = $locales;
     }
 
     /**
@@ -185,16 +169,6 @@ class FamilyGenerator implements GeneratorInterface
         }
 
         return $this->filteredAttrCodes;
-    }
-
-    /**
-     * Set channels
-     *
-     * @param Channel[]
-     */
-    public function setChannels(array $channels)
-    {
-        $this->channels = $channels;
     }
 
     /**

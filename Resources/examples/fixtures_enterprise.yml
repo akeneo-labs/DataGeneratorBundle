@@ -76,6 +76,10 @@ data_generator:
                 roles: [ ROLE_ADMINISTRATOR ]
                 groups: [ IT support ]
                 enable: true
+        variant_groups:
+            count: 10
+            axes_count: 3
+            attributes_count: 3
         asset_categories: ~
         asset_category_accesses: ~
         attribute_groups_accesses: ~
