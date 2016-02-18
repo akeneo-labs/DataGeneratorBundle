@@ -47,7 +47,7 @@ class UserGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales            = $options['locales'];
         $this->channels           = $options['channels'];
@@ -57,13 +57,16 @@ class UserGenerator
         $this->assetCategoryCodes = $options['asset_category_codes'];
 
         $this->faker = Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
         $users = $this->generateUsers($config);
 
         $normalizedUsers = $this->normalizeUsers($users);
 
         $this->writeYamlFile(
             $normalizedUsers,
-            $outputDir . "/" . static::USERS_FILENAME
+            $globalConfig['output_dir']. "/" . static::USERS_FILENAME
         );
 
         $progress->advance();

@@ -16,12 +16,12 @@ interface GeneratorInterface
     /**
      * Generate the amount of entity
      *
-     * @param array          $config
-     * @param string         $outputDir
+     * @param array          $globalConfig
+     * @param array          $generatorConfig
      * @param ProgressHelper $progress
      * @param array          $options
      *
      * @return $this
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = []);
+    public function generate(array $globalConfig, array $generatorConfig, ProgressHelper $progress, array $options = []);
 }

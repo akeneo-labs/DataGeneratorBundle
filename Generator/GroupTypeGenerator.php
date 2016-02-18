@@ -21,7 +21,7 @@ class GroupTypeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $variantGroupType = new GroupType();
         $variantGroupType->setVariant(true);
@@ -41,7 +41,7 @@ class GroupTypeGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        $this->writeYamlFile($data, $outputDir);
+        $this->writeYamlFile($data, $globalConfig['output_dir']);
 
         return $groupTypes;
     }

@@ -37,15 +37,18 @@ class AttributeGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
-        $this->attributeGroupsFile = $outputDir . '/' . static::ATTRIBUTE_GROUP_FILENAME;
+        $this->attributeGroupsFile = $globalConfig['output_dir'] . '/' . static::ATTRIBUTE_GROUP_FILENAME;
 
         $count = (int) $config['count'];
 
         $this->faker = Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
 
         $this->attributeGroups = [];
 

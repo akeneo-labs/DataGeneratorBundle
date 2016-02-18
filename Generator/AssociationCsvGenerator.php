@@ -54,23 +54,26 @@ class AssociationCsvGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $amount, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         if (!empty($config['filename'])) {
-            $this->outputFile = $outputDir.'/'.trim($config['filename']);
+            $this->outputFile = $globalConfig['output_dir'].'/'.trim($config['filename']);
         } else {
-            $this->outputFile = $outputDir.'/'.self::DEFAULT_FILENAME;
+            $this->outputFile = $globalConfig['output_dir'].'/'.self::DEFAULT_FILENAME;
         }
 
         $this->delimiter = ($options['delimiter'] != null) ? $options['delimiter'] : self::DEFAULT_DELIMITER;
 
         $this->forcedValues = [];
 
-        $this->faker = Faker\Factory::create();
+        $this->faker = \Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
 
         $associations = [];
 
-        for ($i = 0; $i < $amount; $i++) {
+        for ($i = 0; $i < $config; $i++) {
             $association = [];
             $association['code'] = $this->getRandomProduct($this->faker);
             $association['products'] = $this->getRandomProducts();

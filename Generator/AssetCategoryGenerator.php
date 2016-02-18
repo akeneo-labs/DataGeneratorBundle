@@ -29,11 +29,14 @@ class AssetCategoryGenerator implements GeneratorInterface
      *
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
-        $faker = Faker\Factory::create();
+        $faker = \Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $faker->seed($globalConfig['seed']);
+        }
 
         $assetCategories = [['code' => self::ASSET_MAIN_CATALOG, 'parent' => '']];
 
@@ -45,7 +48,7 @@ class AssetCategoryGenerator implements GeneratorInterface
 
         $headers = array_keys($assetCategories[0]);
 
-        $this->writeCsvFile($assetCategories, $headers, $outputDir);
+        $this->writeCsvFile($assetCategories, $headers, $globalConfig['output_dir']);
 
         $progress->advance();
 

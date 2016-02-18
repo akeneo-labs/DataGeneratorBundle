@@ -57,13 +57,13 @@ class FamilyGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales    = $options['locales'];
         $this->attributes = $options['attributes'];
         $this->channels   = $options['channels'];
 
-        $this->familiesFile = $outputDir.'/'.self::FAMILIES_FILENAME;
+        $this->familiesFile = $globalConfig['output_dir'].'/'.self::FAMILIES_FILENAME;
 
         $this->delimiter = $config['delimiter'];
 
@@ -74,6 +74,9 @@ class FamilyGenerator implements GeneratorInterface
         $this->labelAttribute      = $config['label_attribute'];
 
         $this->faker = Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
 
         $families = [];
 

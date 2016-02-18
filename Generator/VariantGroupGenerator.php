@@ -45,19 +45,22 @@ class VariantGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->setAttributes($options['attributes']);
         $this->setGroupTypes($options['group_types']);
         $this->locales = $options['locales'];
 
         $this->faker = Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
 
         $variantGroups = [];
         $data          = [];
 
         for ($i = 0; $i < $config['count']; $i++) {
-            $variantGroup = $this->generateVariantGroup($config, $i);
+            $variantGroup = $this->generateVariantGroup($globalConfig, $config, $i);
             $variantGroups[] = $variantGroup;
             $data[] = $this->normalizeVariantGroup($variantGroup);
 
@@ -65,26 +68,27 @@ class VariantGroupGenerator implements GeneratorInterface
         }
 
         if (count($variantGroups) > 0) {
-            $this->writeCsvFile($data, $this->getHeader($data), $outputDir);
+            $this->writeCsvFile($data, $this->getHeader($data), $globalConfig['output_dir']);
         }
 
         return $variantGroups;
     }
 
     /**
+     * @param array $globalConfig
      * @param array $config
      * @param int   $index
      *
      * @return GroupInterface
      */
-    protected function generateVariantGroup($config, $index)
+    protected function generateVariantGroup(array $globalConfig, array $config, $index)
     {
         $group = new Group();
         $group->setType($this->variantGroupType);
         $group->setCode(sprintf('variant_group_%s', $index));
 
-        $group->setAxisAttributes($this->getAxes($config['axes_count']));
-        $group->setProductTemplate($this->getProductTemplate($config['attributes_count']));
+        $group->setAxisAttributes($this->getAxes($config['axes_count'], $globalConfig['seed']));
+        $group->setProductTemplate($this->getProductTemplate($config['attributes_count'], $globalConfig['seed']));
 
         foreach ($this->locales as $locale) {
             $translation = new GroupTranslation();
@@ -133,13 +137,17 @@ class VariantGroupGenerator implements GeneratorInterface
      * Return a random set of axes for a variant group.
      *
      * @param int $count
+     * @param int $seed
      *
      * @return AttributeInterface[]
      */
-    protected function getAxes($count)
+    protected function getAxes($count, $seed = null)
     {
         $attributesFaker = Faker\Factory::create();
-        $axes            = [];
+        if (null !== $seed) {
+            $attributesFaker->seed($seed);
+        }
+        $axes = [];
 
         for ($i = 0; $i < $count; $i++) {
             try {
@@ -161,13 +169,18 @@ class VariantGroupGenerator implements GeneratorInterface
      * Returns a product template containing product values for a variant group.
      *
      * @param int $count
+     * @param int $seed
      *
      * @return ProductTemplate
      */
-    protected function getProductTemplate($count)
+    protected function getProductTemplate($count, $seed = null)
     {
         $attributesFaker = Faker\Factory::create();
-        $valuesData      = [];
+        if (null !== $seed) {
+            $attributesFaker->seed($seed);
+        }
+
+        $valuesData = [];
 
         for ($i = 0; $i < $count; $i++) {
             try {

@@ -20,7 +20,7 @@ class UserRoleGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress)
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $roles = $this->generateRoles($config);
 
@@ -28,7 +28,7 @@ class UserRoleGenerator
 
         $this->writeYamlFile(
             $normalizedRoles,
-            $outputDir . "/" . static::ROLES_FILENAME
+            $globalConfig['output_dir'] . "/" . static::ROLES_FILENAME
         );
 
         $progress->advance();

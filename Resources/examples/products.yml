@@ -2,6 +2,7 @@
 # in Akeneo PIM
 data_generator:
     output_dir: /tmp
+    seed: 20160218
     entities:
         products:
             filename: product.csv

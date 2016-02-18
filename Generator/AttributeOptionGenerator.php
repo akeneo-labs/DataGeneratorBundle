@@ -43,16 +43,20 @@ class AttributeOptionGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales    = $options['locales'];
         $this->attributes = $options['attributes'];
 
         $this->faker = Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
+
         $countPerAttribute = (int) $config['count_per_attribute'];
         $this->delimiter   = $config['delimiter'];
 
-        $this->attributeOptionsFile =  $outputDir.'/'.static::ATTRIBUTE_OPTIONS_FILENAME;
+        $this->attributeOptionsFile =  $globalConfig['output_dir'].'/'.static::ATTRIBUTE_OPTIONS_FILENAME;
 
         foreach ($this->getSelectAttributes() as $attribute) {
             for ($i = 0; $i < $countPerAttribute; $i++) {

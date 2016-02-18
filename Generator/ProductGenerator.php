@@ -142,14 +142,14 @@ class ProductGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->tmpFile = tempnam(sys_get_temp_dir(), 'data-gene');
 
         if (!empty($config['filename'])) {
-            $this->outputFile = $outputDir.'/'.trim($config['filename']);
+            $this->outputFile = $globalConfig['output_dir'].'/'.trim($config['filename']);
         } else {
-            $this->outputFile = $outputDir.'/'.self::DEFAULT_FILENAME;
+            $this->outputFile = $globalConfig['output_dir'].'/'.self::DEFAULT_FILENAME;
         }
 
         $count               = (int) $config['count'];
@@ -193,6 +193,9 @@ class ProductGenerator implements GeneratorInterface
         $this->identifierCode = $this->attributeRepository->getIdentifierCode();
 
         $this->faker = Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
             $product = [];

@@ -57,7 +57,7 @@ class GenerateFixtureCommand extends AbstractGenerateCommand
         $progress = $this->getHelperSet()->get('progress');
         $progress->start($output, $totalCount);
 
-        $generator->generate($config, $outputDir, $progress);
+        $generator->generate($config, [], $progress);
 
         $progress->finish();
     }
