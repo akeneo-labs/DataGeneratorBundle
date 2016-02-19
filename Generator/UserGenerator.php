@@ -125,7 +125,7 @@ class UserGenerator
 
         if (isset($userConfig['catalog_scope'])) {
             $channelCode = $userConfig['catalog_scope'];
-            $user->setCatalogScope($channels[$channelCode]);
+            $user->setCatalogScope($this->channels[$channelCode]);
         } else {
             $user->setCatalogScope(reset($this->channels));
         }

@@ -264,8 +264,8 @@ class FixtureGenerator implements GeneratorInterface
 
         if (isset($config['entities']['asset_category_accesses'])) {
             $this->assetCategoryAccessGenerator->generate($globalConfig, [], $progress, [
-                'groups'              => $userGroups,
-                'asset_category_code' => $assetCategoryCodes,
+                'groups'               => $userGroups,
+                'asset_category_codes' => $assetCategoryCodes,
             ]);
         }
 
