@@ -34,6 +34,7 @@ data_generator:
             localizable_probability: 10
             scopable_probability: 5
             localizable_and_scopable_probability: 2
+            useable_as_grid_filter_probability: 10
             force_attributes:
                 - name = pim_catalog_text
         attribute_options:

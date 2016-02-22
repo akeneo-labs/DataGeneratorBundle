@@ -74,6 +74,7 @@ class AttributeGenerator implements GeneratorInterface
         $localizableProbability = (float) $config['localizable_probability'];
         $scopableProbability    = (float) $config['scopable_probability'];
         $locScopableProbability = (float) $config['localizable_and_scopable_probability'];
+        $gridFilterProbability  = (float) $config['useable_as_grid_filter_probability'];
         $minVariantAxes         = (int) $config['min_variant_axes'];
         $minVariantAttributes   = (int) $config['min_variant_attributes'];
 
@@ -87,9 +88,10 @@ class AttributeGenerator implements GeneratorInterface
         $this->attributes = [];
 
         $this->attributes[$identifier] = [
-            'code'  => $identifier,
-            'type'  => 'pim_catalog_identifier',
-            'group' => $this->getRandomAttributeGroupCode()
+            'code'                   => $identifier,
+            'type'                   => 'pim_catalog_identifier',
+            'group'                  => $this->getRandomAttributeGroupCode(),
+            'useable_as_grid_filter' => 1,
         ];
 
         $forceAttributes = $config['force_attributes'];
@@ -99,7 +101,7 @@ class AttributeGenerator implements GeneratorInterface
             $this->attributes[trim($code)] = [
                 'code'  => trim($code),
                 'type'  => trim($type),
-                'group' => $this->getRandomAttributeGroupCode()
+                'group' => $this->getRandomAttributeGroupCode(),
             ];
         }
 
@@ -110,10 +112,6 @@ class AttributeGenerator implements GeneratorInterface
             $type = $this->getRandomAttributeType();
             $attribute['type'] = $type;
             $attribute['group'] = $this->getRandomAttributeGroupCode();
-
-            foreach ($this->getLocalizedRandomLabels($type) as $localeCode => $label) {
-                $attribute['label-'.$localeCode] = $label;
-            }
 
             if ($type == AttributeTypes::OPTION_SIMPLE_SELECT && $minVariantAxes > 0) {
                 // Configure a minimum set of non localizable and non scopable select axes for variant groups.
@@ -144,6 +142,18 @@ class AttributeGenerator implements GeneratorInterface
             $this->attributes[$attribute['code']] = $attribute;
             $progress->advance();
         }
+
+        foreach ($this->attributes as $code => $attribute) {
+            foreach ($this->getLocalizedRandomLabels($type) as $localeCode => $label) {
+                $this->attributes[$code]['label-' . $localeCode] = $label;
+            }
+
+            if (!isset($attribute['useable_as_grid_filter'])) {
+                $useable = (int) $this->faker->boolean($gridFilterProbability);
+                $this->attributes[$code]['useable_as_grid_filter'] = $useable;
+            }
+        }
+
         $headers = $this->getAllKeys($this->attributes);
 
         $this->writeCsvFile($this->attributes, $headers);
@@ -173,6 +183,7 @@ class AttributeGenerator implements GeneratorInterface
                 $attributeObject->setScopable($attribute['scopable']);
             }
             $attributeObject->setAttributeType($attribute['type']);
+            $attributeObject->setUseableAsGridFilter($attribute['useable_as_grid_filter']);
 
             $attributeObjects[$code] = $attributeObject;
         }
