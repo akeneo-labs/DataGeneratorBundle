@@ -32,12 +32,15 @@ class AssociationTypeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
         $data = [];
-        $this->faker = Faker\Factory::create();
+        $this->faker = \Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
 
         for ($i = 0; $i < $config['count']; $i++) {
             $associationType = $this->generateAssociationType();
@@ -48,7 +51,7 @@ class AssociationTypeGenerator implements GeneratorInterface
 
         $data = [self::ASSOCIATIONS => $data];
 
-        $this->writeYamlFile($data, $outputDir);
+        $this->writeYamlFile($data, $globalConfig['output_dir']);
 
         $progress->advance();
 

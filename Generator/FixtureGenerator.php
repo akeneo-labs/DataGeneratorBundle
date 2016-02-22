@@ -136,7 +136,7 @@ class FixtureGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = null)
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = null)
     {
         $locales            = [];
         $channels           = [];
@@ -148,46 +148,49 @@ class FixtureGenerator implements GeneratorInterface
         $assetCategoryCodes = [];
         $jobs               = [];
 
+        $config = $globalConfig;
+        unset($globalConfig['entities']);
+
         if (isset($config['entities']['channels'])) {
             $channelConfig = $config['entities']['channels'];
-            $this->channelGenerator->generate($channelConfig, $outputDir, $progress);
+            $this->channelGenerator->generate($globalConfig, $channelConfig, $progress);
             $locales    = $this->channelGenerator->getLocales();
             $channels   = $this->channelGenerator->getChannels();
         }
 
         if (isset($config['entities']['associations'])) {
             $associationConfig = $config['entities']['associations'];
-            $this->associationTypeGenerator->generate($associationConfig, $outputDir, $progress, [
+            $this->associationTypeGenerator->generate($globalConfig, $associationConfig, $progress, [
                 'locales' => $locales,
             ]);
         }
 
         if (isset($config['entities']['categories'])) {
             $categoryConfig = $config['entities']['categories'];
-            $categories = $this->categoryGenerator->generate($categoryConfig, $outputDir, $progress, [
+            $categories = $this->categoryGenerator->generate($globalConfig, $categoryConfig, $progress, [
                 'locales' => $locales,
             ]);
         }
 
         if (isset($config['entities']['user_roles'])) {
             $userRoleConfig = $config['entities']['user_roles'];
-            $userRoles = $this->userRoleGenerator->generate($userRoleConfig, $outputDir, $progress);
+            $userRoles = $this->userRoleGenerator->generate($globalConfig, $userRoleConfig, $progress);
         }
 
         if (isset($config['entities']['user_groups'])) {
             $userGroupConfig = $config['entities']['user_groups'];
-            $userGroups = $this->userGroupGenerator->generate($userGroupConfig, $outputDir, $progress);
+            $userGroups = $this->userGroupGenerator->generate($globalConfig, $userGroupConfig, $progress);
         }
 
         if (isset($config['entities']['asset_categories'])) {
-            $assetCategoryCodes = $this->assetCategoryGenerator->generate([], $outputDir, $progress, [
+            $assetCategoryCodes = $this->assetCategoryGenerator->generate($globalConfig, [], $progress, [
                 'locales' => $locales,
             ]);
         }
 
         if (isset($config['entities']['users'])) {
             $userConfig = $config['entities']['users'];
-            $this->userGenerator->generate($userConfig, $outputDir, $progress, [
+            $this->userGenerator->generate($globalConfig, $userConfig, $progress, [
                 'locales'              => $locales,
                 'channels'             => $channels,
                 'categories'           => $categories,
@@ -199,7 +202,7 @@ class FixtureGenerator implements GeneratorInterface
 
         if (isset($config['entities']['attribute_groups'])) {
             $attributeGroupConfig = $config['entities']['attribute_groups'];
-            $this->attrGroupGenerator->generate($attributeGroupConfig, $outputDir, $progress, [
+            $this->attrGroupGenerator->generate($globalConfig, $attributeGroupConfig, $progress, [
                 'locales' => $locales,
             ]);
             $attributeGroups = $this->attrGroupGenerator->getAttributeGroups();
@@ -215,7 +218,7 @@ class FixtureGenerator implements GeneratorInterface
                 $variantGroupAttributesCount = $config['entities']['variant_groups']['attributes_count'];
                 $attributeConfig['min_variant_attributes'] = $variantGroupAttributesCount;
             }
-            $this->attributeGenerator->generate($attributeConfig, $outputDir, $progress, [
+            $this->attributeGenerator->generate($globalConfig, $attributeConfig, $progress, [
                 'locales'          => $locales,
                 'attribute_groups' => $attributeGroups
             ]);
@@ -224,7 +227,7 @@ class FixtureGenerator implements GeneratorInterface
 
         if (isset($config['entities']['families'])) {
             $familyConfig = $config['entities']['families'];
-            $this->familyGenerator->generate($familyConfig, $outputDir, $progress, [
+            $this->familyGenerator->generate($globalConfig, $familyConfig, $progress, [
                 'channels'   => $channels,
                 'locales'    => $locales,
                 'attributes' => $attributes,
@@ -233,24 +236,26 @@ class FixtureGenerator implements GeneratorInterface
 
         if (isset($config['entities']['jobs'])) {
             $jobConfig = $config['entities']['jobs'];
-            $jobs = $this->jobGenerator->generate($jobConfig, $outputDir, $progress);
+            $jobs = $this->jobGenerator->generate($globalConfig, $jobConfig, $progress);
         }
 
         if (isset($config['entities']['attribute_options'])) {
             $attributeOptionConfig = $config['entities']['attribute_options'];
-            $this->attributeOptionGenerator->generate($attributeOptionConfig, $outputDir, $progress, [
+            $this->attributeOptionGenerator->generate($globalConfig, $attributeOptionConfig, $progress, [
                 'locales'    => $locales,
                 'attributes' => $attributes,
             ]);
         }
 
         if (isset($config['entities']['group_types'])) {
-            $groupTypes = $this->groupTypeGenerator->generate([], $outputDir, $progress);
+            $groupTypes = $this->groupTypeGenerator->generate($globalConfig, [], $progress);
+        } else {
+            $groupTypes = [];
         }
 
         if (isset($config['entities']['variant_groups'])) {
             $variantGroupConfig = $config['entities']['variant_groups'];
-            $this->variantGroupGenerator->generate($variantGroupConfig, $outputDir, $progress, [
+            $this->variantGroupGenerator->generate($globalConfig, $variantGroupConfig, $progress, [
                 'attributes'  => $attributes,
                 'locales'     => $locales,
                 'group_types' => $groupTypes,
@@ -258,35 +263,35 @@ class FixtureGenerator implements GeneratorInterface
         }
 
         if (isset($config['entities']['asset_category_accesses'])) {
-            $this->assetCategoryAccessGenerator->generate([], $outputDir, $progress, [
-                'groups'              => $userGroups,
-                'asset_category_code' => $assetCategoryCodes,
+            $this->assetCategoryAccessGenerator->generate($globalConfig, [], $progress, [
+                'groups'               => $userGroups,
+                'asset_category_codes' => $assetCategoryCodes,
             ]);
         }
 
         if (isset($config['entities']['attribute_groups_accesses'])) {
-            $this->attributeGroupsAccessGenerator->generate([], $outputDir, $progress, [
+            $this->attributeGroupsAccessGenerator->generate($globalConfig, [], $progress, [
                 'groups'           => $userGroups,
                 'attribute_groups' => $attributeGroups,
             ]);
         }
 
         if (isset($config['entities']['job_profiles_accesses'])) {
-            $this->jobProfilesAccessGenerator->generate([], $outputDir, $progress, [
+            $this->jobProfilesAccessGenerator->generate($globalConfig, [], $progress, [
                 'groups' => $userGroups,
                 'jobs'   => $jobs,
             ]);
         }
 
         if (isset($config['entities']['locales_accesses'])) {
-            $this->localesAccessGenerator->generate([], $outputDir, $progress, [
+            $this->localesAccessGenerator->generate($globalConfig, [], $progress, [
                 'groups'  => $userGroups,
                 'locales' => $locales,
             ]);
         }
 
         if (isset($config['entities']['product_category_accesses'])) {
-            $this->productCategoryAccessGenerator->generate([], $outputDir, $progress, [
+            $this->productCategoryAccessGenerator->generate($globalConfig, [], $progress, [
                 'groups'     => $userGroups,
                 'categories' => $categories,
             ]);

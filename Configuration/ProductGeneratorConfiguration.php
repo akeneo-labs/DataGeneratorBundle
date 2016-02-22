@@ -25,6 +25,7 @@ class ProductGeneratorConfiguration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('output_dir')->isRequired()->cannotBeEmpty()->end()
+                ->integerNode('seed')->defaultValue(null)->end()
                 ->arrayNode('entities')
                     ->isRequired()
                     ->children()

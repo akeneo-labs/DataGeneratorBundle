@@ -25,6 +25,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('output_dir')->isRequired()->cannotBeEmpty()->end()
+                ->integerNode('seed')->defaultValue(null)->end()
                 ->arrayNode('entities')
                     ->isRequired()
                     ->children()
@@ -172,7 +173,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                             ->children()
                                 ->integerNode('count')->min(0)->isRequired()->end()
                                 ->integerNode('axes_count')->min(1)->isRequired()->end()
-                                ->integerNode('attributes_count')->min(0)->end()
+                                ->integerNode('attributes_count')->min(0)->isRequired()->end()
                             ->end()
                         ->end()
                         ->arrayNode('asset_categories')->end()

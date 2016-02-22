@@ -29,7 +29,7 @@ class JobProfilesAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->groups = $options['groups'];
         $this->jobs   = $options['jobs'];
@@ -53,7 +53,7 @@ class JobProfilesAccessGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        $this->writeYamlFile($assetCategoryAccesses, $outputDir);
+        $this->writeYamlFile($assetCategoryAccesses, $globalConfig['output_dir']);
     }
 
     /**

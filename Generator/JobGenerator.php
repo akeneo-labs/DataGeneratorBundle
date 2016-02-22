@@ -22,7 +22,7 @@ class JobGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress)
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $jobs = $this->generateJobs($config);
 
@@ -35,7 +35,7 @@ class JobGenerator
 
         $this->writeYamlFile(
             $normalizedJobs,
-            $outputDir . "/" . static::JOB_FILENAME
+            $globalConfig['output_dir'] . "/" . static::JOB_FILENAME
         );
 
         $progress->advance();

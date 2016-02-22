@@ -53,7 +53,7 @@ class GenerateProductCommand extends AbstractGenerateCommand
         $progress = $this->getHelperSet()->get('progress');
         $progress->start($output, $totalCount);
 
-        $generator->generate($config['entities']['products'], $outputDir, $progress);
+        $generator->generate($config, $config['entities']['products'], $progress);
 
         $progress->finish();
     }

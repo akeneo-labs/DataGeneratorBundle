@@ -30,7 +30,7 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->groups          = $options['groups'];
         $this->attributeGroups = $options['attribute_groups'];
@@ -53,7 +53,7 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        $this->writeYamlFile($attributeGroupsAccesses, $outputDir);
+        $this->writeYamlFile($attributeGroupsAccesses, $globalConfig['output_dir']);
     }
 
     /**

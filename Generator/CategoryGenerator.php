@@ -31,11 +31,14 @@ class CategoryGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
         $this->faker = Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
 
         $delimiter = $config['delimiter'];
         $count     = (int)$config['count'];
@@ -53,7 +56,7 @@ class CategoryGenerator
 
         $normalizedCategories = $this->normalizeCategories($categories);
 
-        $outputFile = $outputDir.'/'.self::CATEGORIES_FILENAME;
+        $outputFile = $globalConfig['output_dir'].'/'.self::CATEGORIES_FILENAME;
         $this->writeCsvFile($headers, $normalizedCategories, $outputFile, $delimiter);
 
         $progress->advance($count);

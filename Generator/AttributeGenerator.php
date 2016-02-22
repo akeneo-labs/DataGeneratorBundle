@@ -61,12 +61,12 @@ class AttributeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales         = $options['locales'];
         $this->attributeGroups = $options['attribute_groups'];
 
-        $this->attributesFile = $outputDir.'/'.self::ATTRIBUTES_FILENAME;
+        $this->attributesFile = $globalConfig['output_dir'].'/'.self::ATTRIBUTES_FILENAME;
         $this->delimiter = $config['delimiter'];
 
         $count = (int) $config['count'];
@@ -80,6 +80,9 @@ class AttributeGenerator implements GeneratorInterface
         $identifier = $config['identifier_attribute'];
 
         $this->faker = Faker\Factory::create();
+        if (isset($globalConfig['seed'])) {
+            $this->faker->seed($globalConfig['seed']);
+        }
 
         $this->attributes = [];
 

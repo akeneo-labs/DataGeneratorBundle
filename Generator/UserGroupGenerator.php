@@ -20,7 +20,7 @@ class UserGroupGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $config, $outputDir, ProgressHelper $progress)
+    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $groups = $this->generateGroups($config);
 
@@ -28,7 +28,7 @@ class UserGroupGenerator
 
         $this->writeYamlFile(
             $normalizedGroups,
-            $outputDir . "/" . static::GROUPS_FILENAME
+            $globalConfig['output_dir'] . "/" . static::GROUPS_FILENAME
         );
 
         $progress->advance();
