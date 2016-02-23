@@ -228,7 +228,7 @@ class ProductGenerator implements GeneratorInterface
     protected function generateValue(AttributeInterface $attribute)
     {
         if (isset($this->forcedValues[$attribute->getCode()])) {
-            return $this->forcedValues[$attribute->getCode()];
+            return [$attribute->getCode() => $this->forcedValues[$attribute->getCode()]];
         }
 
         return $this->valueBuilder->build($attribute);

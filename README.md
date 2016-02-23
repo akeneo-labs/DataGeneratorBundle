@@ -65,9 +65,7 @@ data_generator:
             filled_attributes_standard_deviation: 10
             mandatory_attributes: [sku, name]
             delimiter: ,
-            force_values:
-                - manufacturer = FactoryInc
-                - brand = SuperProd
+            force_values: { manufacturer: 'FactoryInc', brand: 'SuperProd' }
             start_index: 0
             categories_count: 10
 ```
