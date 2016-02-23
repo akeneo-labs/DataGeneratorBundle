@@ -27,7 +27,7 @@ class ProductGenerator implements GeneratorInterface
     const IDENTIFIER_PREFIX = 'id-';
 
     const CATEGORY_FIELD = 'categories';
-    const DEFAULT_DELIMITER = ',';
+    const DEFAULT_DELIMITER = ';';
 
     /** @var string */
     private $outputFile;

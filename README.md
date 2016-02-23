@@ -63,9 +63,9 @@ data_generator:
             count: 1000
             filled_attributes_count: 50
             filled_attributes_standard_deviation: 10
-            mandatory_attributes: [sku, name]
+            mandatory_attributes: [sku, name] # properties that will always be filled in with a random value
             delimiter: ,
-            force_values: { manufacturer: 'FactoryInc', brand: 'SuperProd' }
+            force_values: { manufacturer: 'FactoryInc', brand: 'SuperProd' } # properties that if they are filled in, will be filled in the given value
             start_index: 0
             categories_count: 10
 ```
