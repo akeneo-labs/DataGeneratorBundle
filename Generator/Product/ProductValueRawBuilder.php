@@ -19,7 +19,7 @@ use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
  * @copyright 2014 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class ProductValueBuilder
+class ProductValueRawBuilder
 {
     const METRIC_UNIT = 'unit';
     const DEFAULT_NUMBER_MIN = '0';
@@ -51,7 +51,7 @@ class ProductValueBuilder
     private $attributeOptions;
 
     /**
-     * ProductValueBuilder constructor.
+     * ProductValueRawBuilder constructor.
      *
      * @param ChannelRepositoryInterface  $channelRepository
      * @param LocaleRepositoryInterface   $localeRepository
@@ -70,7 +70,7 @@ class ProductValueBuilder
     /**
      * @param Faker\Generator $faker
      *
-     * @return ProductValueBuilder
+     * @return ProductValueRawBuilder
      */
     public function setFakerGenerator(Faker\Generator $faker)
     {

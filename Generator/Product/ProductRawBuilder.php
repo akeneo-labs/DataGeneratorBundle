@@ -20,7 +20,7 @@ class ProductRawBuilder
     /** @var Faker\Generator */
     private $faker;
 
-    /** @var ProductValueBuilder */
+    /** @var ProductValueRawBuilder */
     private $valueBuilder;
 
     /** @var AttributeRepositoryInterface */
@@ -29,7 +29,7 @@ class ProductRawBuilder
     /** @var array */
     private $attributesByFamily;
 
-    public function __construct(ProductValueBuilder $valueBuilder, AttributeRepositoryInterface $attributeRepository)
+    public function __construct(ProductValueRawBuilder $valueBuilder, AttributeRepositoryInterface $attributeRepository)
     {
         $this->valueBuilder = $valueBuilder;
         $this->attributeRepository = $attributeRepository;

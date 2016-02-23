@@ -10,7 +10,7 @@ use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\GroupRepositoryInterface;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
-use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductValueBuilder;
+use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductValueRawBuilder;
 use Pim\Bundle\DataGeneratorBundle\VariantGroupDataProvider;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
@@ -68,14 +68,14 @@ class ProductGenerator implements GeneratorInterface
     /** @var array */
     private $headers;
 
-    /** @var ProductValueBuilder */
-    private $valueBuilder;
+    /** @var ProductValueRawBuilder */
+    private $valueRawBuilder;
 
     /** @var ProductRawBuilder */
     private $productRawBuilder;
 
     /**
-     * @param ProductValueBuilder          $valueBuilder
+     * @param ProductValueRawBuilder       $valueRawBuilder
      * @param ProductRawBuilder            $productRawBuilder
      * @param FamilyRepositoryInterface    $familyRepository
      * @param AttributeRepositoryInterface $attributeRepository
@@ -83,14 +83,14 @@ class ProductGenerator implements GeneratorInterface
      * @param GroupRepositoryInterface     $groupRepository
      */
     public function __construct(
-        ProductValueBuilder $valueBuilder,
+        ProductValueRawBuilder $valueRawBuilder,
         ProductRawBuilder $productRawBuilder,
         FamilyRepositoryInterface $familyRepository,
         AttributeRepositoryInterface $attributeRepository,
         CategoryRepositoryInterface $categoryRepository,
         GroupRepositoryInterface $groupRepository
     ) {
-        $this->valueBuilder        = $valueBuilder;
+        $this->valueRawBuilder     = $valueRawBuilder;
         $this->productRawBuilder   = $productRawBuilder;
         $this->familyRepository    = $familyRepository;
         $this->categoryRepository  = $categoryRepository;
@@ -154,7 +154,7 @@ class ProductGenerator implements GeneratorInterface
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
-        $this->valueBuilder->setFakerGenerator($this->faker);
+        $this->valueRawBuilder->setFakerGenerator($this->faker);
         $this->productRawBuilder->setFakerGenerator($this->faker);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {

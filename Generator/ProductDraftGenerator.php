@@ -4,16 +4,15 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Box\Spout\Reader\ReaderFactory;
 use Box\Spout\Common\Type;
-use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
 use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
-use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductValueBuilder;
+use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductValueRawBuilder;
 use Pim\Bundle\UserBundle\Entity\Repository\UserRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
 class ProductDraftGenerator
 {
-    /** @var ProductValueBuilder */
-    private $valueBuilder;
+    /** @var ProductValueRawBuilder */
+    private $valueRawBuilder;
 
     /** @var AttributeRepositoryInterface */
     private $attributeRepository;
@@ -26,13 +25,13 @@ class ProductDraftGenerator
 
 
     public function __construct(
-        ProductValueBuilder $valueBuilder,
+        ProductValueRawBuilder $valueRawBuilder,
         AttributeRepositoryInterface $attributeRepository,
         UserRepositoryInterface $userRepository
     ) {
-        $this->valueBuilder = $valueBuilder;
+        $this->valueRawBuilder     = $valueRawBuilder;
         $this->attributeRepository = $attributeRepository;
-        $this->userRepository = $userRepository;
+        $this->userRepository      = $userRepository;
     }
 
     /**
@@ -101,7 +100,7 @@ class ProductDraftGenerator
 
         foreach ($product as $code => $value) {
             if (!in_array($code, $lockedValues)) {
-                $newValue = $this->valueBuilder->build(
+                $newValue = $this->valueRawBuilder->build(
                     $this->attributeRepository->findOneByIdentifier($code)
                 );
                 $product[$code] = $newValue;
