@@ -17,6 +17,8 @@ use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
  */
 class ProductRawBuilder
 {
+    const CATEGORY_FIELD = 'categories';
+
     /** @var Faker\Generator */
     private $faker;
 
@@ -28,6 +30,12 @@ class ProductRawBuilder
 
     /** @var array */
     private $attributesByFamily;
+
+    /** @var array */
+    private $categoryCodes;
+
+    /** @var string */
+    private $identifierCode;
 
     public function __construct(ProductValueRawBuilder $valueBuilder, AttributeRepositoryInterface $attributeRepository)
     {
@@ -45,18 +53,37 @@ class ProductRawBuilder
     }
 
     /**
-     * Modify the $product to fill some random properties
+     * Build a raw product with its basic fields.
      *
      * @param FamilyInterface $family
-     * @param array           $product
-     * @param array           $forcedProperties
-     * @param int             $nbAttr
-     * @param int             $nbAttrDeviation
+     * @param string          $id
+     * @param string          $groups
+     *
+     * @return array
      */
-    public function fillInRandomProperties(
+    public function buildBaseProduct(FamilyInterface $family, $id, $groups)
+    {
+        $product = [];
+        $product[$this->getIdentifierCode()] = $id;
+        $product['family'] = $family->getCode();
+        $product['groups'] = $groups;
+
+        return $product;
+    }
+
+    /**
+     * Modify the $product to fill some random attributes
+     *
+     * @param FamilyInterface $family
+     * @param array     $product
+     * @param array     $forcedAttributes
+     * @param int       $nbAttr
+     * @param int       $nbAttrDeviation
+     */
+    public function fillInRandomAttributes(
         FamilyInterface $family,
         array &$product,
-        array $forcedProperties,
+        array $forcedAttributes,
         $nbAttr,
         $nbAttrDeviation
     ) {
@@ -68,32 +95,45 @@ class ProductRawBuilder
         $attributes = $this->getRandomAttributesFromFamily($family, $randomNbAttr);
 
         foreach ($attributes as $attribute) {
-            $valueData = $this->generateValue($attribute, $forcedProperties);
+            $valueData = $this->generateValue($attribute, $forcedAttributes);
             $product   = array_merge($product, $valueData);
         }
     }
 
     /**
-     * Modify the $product to fill in its mandatory properties.
+     * Modify the $product to fill in its mandatory attributes.
      *
      * @param FamilyInterface $family
-     * @param array           $product
-     * @param array           $forcedProperties
-     * @param array           $mandatoryProperties
+     * @param array     $product
+     * @param array     $forcedAttributes
+     * @param array     $mandatoryAttributes
      */
-    public function fillInMandatoryProperties(
+    public function fillInMandatoryAttributes(
         FamilyInterface $family,
         array &$product,
-        array $forcedProperties,
-        array $mandatoryProperties
+        array $forcedAttributes,
+        array $mandatoryAttributes
     ) {
-        foreach ($mandatoryProperties as $property) {
-            if (isset($this->attributesByFamily[$family->getCode()][$property])) {
-                $attribute = $this->attributesByFamily[$family->getCode()][$property];
-                $valueData = $this->generateValue($attribute, $forcedProperties);
+        foreach ($mandatoryAttributes as $attribute) {
+            if (isset($this->attributesByFamily[$family->getCode()][$attribute])) {
+                $attribute = $this->attributesByFamily[$family->getCode()][$attribute];
+                $valueData = $this->generateValue($attribute, $forcedAttributes);
                 $product   = array_merge($product, $valueData);
             }
         }
+    }
+
+    /**
+     * Modify the $product to fill in some random categories.
+     *
+     * @param array $product
+     * @param int   $categoriesCount
+     */
+    public function fillInRandomCategories(array &$product, $categoriesCount)
+    {
+        $categories = $this->faker->randomElements($this->getCategoryCodes(), $categoriesCount);
+
+        $product[self::CATEGORY_FIELD] = implode(',', $categories);
     }
 
     /**
@@ -170,12 +210,44 @@ class ProductRawBuilder
 
             $attributes = $family->getAttributes();
             foreach ($attributes as $attribute) {
-                if ($attribute->getCode() !== $this->attributeRepository->getIdentifierCode()) {
+                if ($attribute->getCode() !== $this->getIdentifierCode()) {
                     $this->attributesByFamily[$familyCode][$attribute->getCode()] = $attribute;
                 }
             }
         }
 
         return $this->attributesByFamily[$familyCode];
+    }
+
+    /**
+     * Get all categories that are not root
+     *
+     * @return string[]
+     */
+    private function getCategoryCodes()
+    {
+        if (null === $this->categoryCodes) {
+            $this->categoryCodes = [];
+            $categories = $this->categoryRepository->findAll();
+            foreach ($categories as $category) {
+                if (null !== $category->getParent()) {
+                    $this->categoryCodes[] = $category->getCode();
+                }
+            }
+        }
+
+        return $this->categoryCodes;
+    }
+
+    /**
+     * @return string
+     */
+    private function getIdentifierCode()
+    {
+        if (null === $this->identifierCode) {
+            $this->identifierCode = $this->attributeRepository->getIdentifierCode();
+        }
+
+        return $this->identifierCode;
     }
 }

@@ -26,7 +26,6 @@ class ProductGenerator implements GeneratorInterface
     const DEFAULT_FILENAME = 'products.csv';
     const IDENTIFIER_PREFIX = 'id-';
 
-    const CATEGORY_FIELD = 'categories';
     const DEFAULT_DELIMITER = ';';
 
     /** @var string */
@@ -158,11 +157,8 @@ class ProductGenerator implements GeneratorInterface
         $this->productRawBuilder->setFakerGenerator($this->faker);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
-            $product = [];
-            $product[$identifierCode] = self::IDENTIFIER_PREFIX . $i;
             $family = $this->getRandomFamily($this->faker);
-            $product['family'] = $family->getCode();
-            $product['groups'] = '';
+            $product = $this->productRawBuilder->buildBaseProduct($family, self::IDENTIFIER_PREFIX . $i, '');
 
             $variantGroupDataProvider = $this->getNextVariantGroupProvider();
             $variantGroupAttributes = [];
@@ -172,22 +168,20 @@ class ProductGenerator implements GeneratorInterface
                 $product['groups'] = $variantGroupDataProvider->getCode();
             }
 
-            $this->productRawBuilder->fillInRandomProperties(
+            $this->productRawBuilder->fillInRandomCategories($product, $categoriesCount);
+            $this->productRawBuilder->fillInRandomAttributes(
                 $family,
                 $product,
                 $forcedValues,
                 $nbAttrBase - count($variantGroupAttributes),
                 $nbAttrDeviation
             );
-            $this->productRawBuilder->fillInMandatoryProperties($family, $product, $forcedValues, $mandatoryAttributes);
+            $this->productRawBuilder->fillInMandatoryAttributes($family, $product, $forcedValues, $mandatoryAttributes);
 
             if (null !== $variantGroupDataProvider) {
                 $product = array_merge($product, $variantGroupDataProvider->getData());
             }
 
-            $categories = $this->getRandomCategoryCodes($categoriesCount);
-
-            $product[self::CATEGORY_FIELD] = implode(',', $categories);
 
             $this->bufferizeProduct($product);
 
