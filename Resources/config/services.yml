@@ -5,3 +5,9 @@ services:
             - '@pim_catalog.repository.channel'
             - '@pim_catalog.repository.locale'
             - '@pim_catalog.repository.currency'
+
+    pim_data_generator.product.product_raw_builder:
+        class: 'Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder'
+        arguments:
+            - '@pim_data_generator.product.value_builder'
+            - '@pim_catalog.repository.attribute'

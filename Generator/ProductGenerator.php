@@ -6,11 +6,10 @@ use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Faker;
 use Pim\Bundle\CatalogBundle\Entity\Family;
-use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
-use Pim\Bundle\CatalogBundle\Model\FamilyInterface;
 use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\GroupRepositoryInterface;
+use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductValueBuilder;
 use Pim\Bundle\DataGeneratorBundle\VariantGroupDataProvider;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -31,58 +30,53 @@ class ProductGenerator implements GeneratorInterface
     const DEFAULT_DELIMITER = ',';
 
     /** @var string */
-    protected $outputFile;
+    private $outputFile;
 
     /** @var string */
-    protected $delimiter;
+    private $delimiter;
 
     /** @var array */
-    protected $forcedValues;
+    private $families;
 
     /** @var array */
-    protected $families;
-
-    /** @var array */
-    protected $attributes;
-
-    /** @var array */
-    protected $attributesByFamily;
+    private $attributesByFamily;
 
     /** @var FamilyRepositoryInterface */
-    protected $familyRepository;
+    private $familyRepository;
 
     /** @var AttributeRepositoryInterface */
-    protected $attributeRepository;
-
-    /** @var string */
-    protected $identifierCode;
+    private $attributeRepository;
 
     /** @var CategoryRepositoryInterface */
-    protected $categoryRepository;
+    private $categoryRepository;
 
     /** @var GroupRepositoryInterface */
-    protected $groupRepository;
+    private $groupRepository;
 
     /** @var Faker\Generator */
-    protected $faker;
+    private $faker;
 
     /** @var array */
-    protected $categoryCodes;
+    private $categoryCodes;
 
     /** @var VariantGroupDataProvider[] */
-    protected $variantGroupDataProviders;
+    private $variantGroupDataProviders;
 
     /** @var string */
-    protected $tmpFile;
+    private $tmpFile;
 
     /** @var array */
-    protected $headers;
+    private $headers;
 
     /** @var ProductValueBuilder */
-    protected $valueBuilder;
+    private $valueBuilder;
+
+    /** @var ProductRawBuilder */
+    private $productRawBuilder;
 
     /**
      * @param ProductValueBuilder          $valueBuilder
+     * @param ProductRawBuilder            $productRawBuilder
      * @param FamilyRepositoryInterface    $familyRepository
      * @param AttributeRepositoryInterface $attributeRepository
      * @param CategoryRepositoryInterface  $categoryRepository
@@ -90,12 +84,14 @@ class ProductGenerator implements GeneratorInterface
      */
     public function __construct(
         ProductValueBuilder $valueBuilder,
+        ProductRawBuilder $productRawBuilder,
         FamilyRepositoryInterface $familyRepository,
         AttributeRepositoryInterface $attributeRepository,
         CategoryRepositoryInterface $categoryRepository,
         GroupRepositoryInterface $groupRepository
     ) {
         $this->valueBuilder        = $valueBuilder;
+        $this->productRawBuilder   = $productRawBuilder;
         $this->familyRepository    = $familyRepository;
         $this->categoryRepository  = $categoryRepository;
         $this->attributeRepository = $attributeRepository;
@@ -126,6 +122,7 @@ class ProductGenerator implements GeneratorInterface
         $categoriesCount     = (int) $config['categories_count'];
         $variantGroupCount   = (int) $config['products_per_variant_group'];
         $mandatoryAttributes = $config['mandatory_attributes'];
+        $forcedValues = $config['force_values'];
 
         if (!is_array($mandatoryAttributes)) {
             $mandatoryAttributes = [];
@@ -133,12 +130,6 @@ class ProductGenerator implements GeneratorInterface
         $delimiter = $config['delimiter'];
 
         $this->delimiter = ($delimiter != null) ? $delimiter : self::DEFAULT_DELIMITER;
-
-        if (isset($config['force_values'])) {
-            $this->forcedValues = $config['force_values'];
-        } else {
-            $this->forcedValues = [];
-        }
 
         $this->variantGroupDataProviders = [];
         if ($variantGroupCount > 0) {
@@ -157,17 +148,18 @@ class ProductGenerator implements GeneratorInterface
             ));
         }
 
-        $this->identifierCode = $this->attributeRepository->getIdentifierCode();
+        $identifierCode = $this->attributeRepository->getIdentifierCode();
 
         $this->faker = Faker\Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
         $this->valueBuilder->setFakerGenerator($this->faker);
+        $this->productRawBuilder->setFakerGenerator($this->faker);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
             $product = [];
-            $product[$this->identifierCode] = self::IDENTIFIER_PREFIX . $i;
+            $product[$identifierCode] = self::IDENTIFIER_PREFIX . $i;
             $family = $this->getRandomFamily($this->faker);
             $product['family'] = $family->getCode();
             $product['groups'] = '';
@@ -180,25 +172,14 @@ class ProductGenerator implements GeneratorInterface
                 $product['groups'] = $variantGroupDataProvider->getCode();
             }
 
-            $nbAttr = $this->getAttributesCount(
+            $this->productRawBuilder->fillInRandomProperties(
+                $family,
+                $product,
+                $forcedValues,
                 $nbAttrBase - count($variantGroupAttributes),
-                $nbAttrDeviation,
-                $family
+                $nbAttrDeviation
             );
-            $attributes = $this->getRandomAttributesFromFamily($family, $nbAttr);
-
-            foreach ($attributes as $attribute) {
-                $valueData = $this->generateValue($attribute);
-                $product = array_merge($product, $valueData);
-            }
-
-            foreach ($mandatoryAttributes as $mandatoryAttribute) {
-                if (isset($this->attributesByFamily[$family->getCode()][$mandatoryAttribute])) {
-                    $attribute = $this->attributesByFamily[$family->getCode()][$mandatoryAttribute];
-                    $valueData = $this->generateValue($attribute);
-                    $product = array_merge($product, $valueData);
-                }
-            }
+            $this->productRawBuilder->fillInMandatoryProperties($family, $product, $forcedValues, $mandatoryAttributes);
 
             if (null !== $variantGroupDataProvider) {
                 $product = array_merge($product, $variantGroupDataProvider->getData());
@@ -220,20 +201,6 @@ class ProductGenerator implements GeneratorInterface
         return $this;
     }
 
-    /**
-     * @param AttributeInterface $attribute
-     *
-     * @return array
-     */
-    protected function generateValue(AttributeInterface $attribute)
-    {
-        if (isset($this->forcedValues[$attribute->getCode()])) {
-            return [$attribute->getCode() => $this->forcedValues[$attribute->getCode()]];
-        }
-
-        return $this->valueBuilder->build($attribute);
-    }
-
 
     /**
      * Get a random family
@@ -242,59 +209,9 @@ class ProductGenerator implements GeneratorInterface
      *
      * @return Family
      */
-    protected function getRandomFamily($faker)
+    private function getRandomFamily($faker)
     {
         return $this->getRandomItem($faker, $this->familyRepository, $this->families);
-    }
-
-    /**
-     * Get a random attribute
-     *
-     * @param mixed $faker
-     *
-     * @return AttributeInterface
-     */
-    protected function getRandomAttribute($faker)
-    {
-        return $this->getRandomItem($faker, $this->attributeRepository, $this->attributes);
-    }
-
-    /**
-     * Get non-identifier attribute from family
-     *
-     * @param FamilyInterface $family
-     *
-     * @return AttributeInterface[]
-     */
-    protected function getAttributesFromFamily(FamilyInterface $family)
-    {
-        $familyCode = $family->getCode();
-
-        if (!isset($this->attributesByFamily[$familyCode])) {
-            $this->attributesByFamily[$familyCode] = [];
-
-            $attributes = $family->getAttributes();
-            foreach ($attributes as $attribute) {
-                if ($attribute->getCode() !== $this->identifierCode) {
-                    $this->attributesByFamily[$familyCode][$attribute->getCode()] = $attribute;
-                }
-            }
-        }
-
-        return $this->attributesByFamily[$familyCode];
-    }
-
-    /**
-     * Get random attributes from the family
-     *
-     * @param FamilyInterface $family
-     * @param int             $count
-     *
-     * @return AttributeInterface[]
-     */
-    protected function getRandomAttributesFromFamily(FamilyInterface $family, $count)
-    {
-        return $this->faker->randomElements($this->getAttributesFromFamily($family), $count);
     }
 
     /**
@@ -304,7 +221,7 @@ class ProductGenerator implements GeneratorInterface
      *
      * @return array
      */
-    protected function getRandomCategoryCodes($count)
+    private function getRandomCategoryCodes($count)
     {
         return $this->faker->randomElements($this->getCategoryCodes(), $count);
     }
@@ -314,7 +231,7 @@ class ProductGenerator implements GeneratorInterface
      *
      * @return string[]
      */
-    protected function getCategoryCodes()
+    private function getCategoryCodes()
     {
         if (null === $this->categoryCodes) {
             $this->categoryCodes = [];
@@ -338,7 +255,7 @@ class ProductGenerator implements GeneratorInterface
      *
      * @return mixed
      */
-    protected function getRandomItem(Faker\Generator $faker, ObjectRepository $repo, array &$items = null)
+    private function getRandomItem(Faker\Generator $faker, ObjectRepository $repo, array &$items = null)
     {
         if (null === $items) {
             $items = [];
@@ -354,7 +271,7 @@ class ProductGenerator implements GeneratorInterface
     /**
      * Write the CSV file from data coming from the buffer
      */
-    protected function writeCsvFile()
+    private function writeCsvFile()
     {
         $buffer = fopen($this->tmpFile, 'r');
 
@@ -377,42 +294,13 @@ class ProductGenerator implements GeneratorInterface
      *
      * @param array $product
      */
-    protected function bufferizeProduct(array $product)
+    private function bufferizeProduct(array $product)
     {
         $this->headers = array_unique(array_merge($this->headers, array_keys($product)));
 
         file_put_contents($this->tmpFile, serialize($product)."\n", FILE_APPEND);
     }
 
-    /**
-     * Returns the number of attributes to set.
-     *
-     * @param int             $nbAttrBase
-     * @param int             $nbAttrDeviation
-     * @param FamilyInterface $family
-     *
-     * @return int
-     */
-    protected function getAttributesCount($nbAttrBase, $nbAttrDeviation, $family)
-    {
-        if ($nbAttrBase > 0) {
-            if ($nbAttrDeviation > 0) {
-                $nbAttr = $this->faker->numberBetween(
-                    $nbAttrBase - round($nbAttrDeviation/2),
-                    $nbAttrBase + round($nbAttrDeviation/2)
-                );
-            } else {
-                $nbAttr = $nbAttrBase;
-            }
-        }
-        $familyAttrCount = count($this->getAttributesFromFamily($family));
-
-        if (!isset($nbAttr) || $nbAttr > $familyAttrCount) {
-            $nbAttr = $familyAttrCount;
-        }
-
-        return $nbAttr;
-    }
 
     /**
      * Get a random variantGroupProvider. If this is the last usage of it, removes it from the list.
@@ -420,7 +308,7 @@ class ProductGenerator implements GeneratorInterface
      *
      * @return VariantGroupDataProvider|null
      */
-    protected function getNextVariantGroupProvider()
+    private function getNextVariantGroupProvider()
     {
         $variantGroupProvider = null;
 
@@ -435,4 +323,5 @@ class ProductGenerator implements GeneratorInterface
 
         return $variantGroupProvider;
     }
+
 }

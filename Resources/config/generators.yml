@@ -84,6 +84,7 @@ services:
         class: %pim_data_generator.generator.product.class%
         arguments:
             - '@pim_data_generator.product.value_builder'
+            - '@pim_data_generator.product.product_raw_builder'
             - '@pim_catalog.repository.family'
             - '@pim_catalog.repository.attribute'
             - '@pim_catalog.repository.category'
