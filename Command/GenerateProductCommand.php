@@ -40,6 +40,7 @@ class GenerateProductCommand extends AbstractGenerateCommand
         $globalConfig = $this->getConfiguration($configFile, new ProductGeneratorConfiguration());
 
         $outputDir = $globalConfig['output_dir'];
+        $this->checkOutputDirExists($outputDir);
 
         $productGenerator = $this->getContainer()->get('pim_data_generator.generator.product');
 
