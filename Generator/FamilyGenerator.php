@@ -92,13 +92,12 @@ class FamilyGenerator implements GeneratorInterface
             $family['attribute_as_label'] = $this->labelAttribute;
 
             $attributes = $this->faker->randomElements($this->getAttributeCodes(), $attributesCount);
-
             $attributes = array_unique(array_merge([$this->identifierAttribute, $this->labelAttribute], $attributes));
 
             $family['attributes'] = implode(static::ATTRIBUTE_DELIMITER, $attributes);
 
             foreach ($this->channels as $channel) {
-                $attributeReqs = $this->faker->randomElements($this->getAttributeCodes(), $requirementsCount);
+                $attributeReqs = $this->faker->randomElements($attributes, $requirementsCount);
                 $attributeReqs = array_merge([$this->identifierAttribute], $attributeReqs);
 
                 $family['requirements-'.$channel->getCode()] = implode(static::ATTRIBUTE_DELIMITER, $attributeReqs);
