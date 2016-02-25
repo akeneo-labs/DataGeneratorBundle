@@ -3,6 +3,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator\Product;
 
+use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
 use Faker;
 use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
 use Pim\Bundle\CatalogBundle\Model\FamilyInterface;
@@ -23,10 +24,13 @@ class ProductRawBuilder
     private $faker;
 
     /** @var ProductValueRawBuilder */
-    private $valueBuilder;
+    private $valueRawBuilder;
 
     /** @var AttributeRepositoryInterface */
     private $attributeRepository;
+
+    /** @var CategoryRepositoryInterface */
+    private $categoryRepository;
 
     /** @var array */
     private $attributesByFamily;
@@ -37,11 +41,23 @@ class ProductRawBuilder
     /** @var string */
     private $identifierCode;
 
-    public function __construct(ProductValueRawBuilder $valueBuilder, AttributeRepositoryInterface $attributeRepository)
+    /**
+     * ProductRawBuilder constructor.
+     *
+     * @param ProductValueRawBuilder       $valueBuilder
+     * @param AttributeRepositoryInterface $attributeRepository
+     * @param CategoryRepositoryInterface  $categoryRepository
+     */
+    public function __construct(
+        ProductValueRawBuilder $valueBuilder,
+        AttributeRepositoryInterface $attributeRepository,
+        CategoryRepositoryInterface $categoryRepository
+    )
     {
-        $this->valueBuilder = $valueBuilder;
+        $this->valueRawBuilder     = $valueBuilder;
         $this->attributeRepository = $attributeRepository;
-        $this->attributesByFamily = [];
+        $this->categoryRepository  = $categoryRepository;
+        $this->attributesByFamily  = [];
     }
 
     /**
@@ -49,6 +65,7 @@ class ProductRawBuilder
      */
     public function setFakerGenerator(Faker\Generator $faker)
     {
+        $this->valueRawBuilder->setFakerGenerator($faker);
         $this->faker = $faker;
     }
 
@@ -124,6 +141,25 @@ class ProductRawBuilder
     }
 
     /**
+     * Modify the $product to fill in all its required attribute so that it's complete and can be exported.
+     *
+     * @param FamilyInterface $family
+     * @param array           $product
+     * @param array           $forcedAttributes
+     */
+    public function fillInRequiredAttributes(FamilyInterface $family, array &$product, array $forcedAttributes)
+    {
+        foreach ($family->getAttributeRequirements() as $requirement) {
+            if ($requirement->isRequired()) {
+                $attribute = $requirement->getAttribute()->getCode();
+                $attribute = $this->attributesByFamily[$family->getCode()][$attribute];
+                $valueData = $this->generateValue($attribute, $forcedAttributes);
+                $product   = array_merge($product, $valueData);
+            }
+        }
+    }
+
+    /**
      * Modify the $product to fill in some random categories.
      *
      * @param array $product
@@ -148,7 +184,7 @@ class ProductRawBuilder
             return [$attribute->getCode() => $forceProperties[$attribute->getCode()]];
         }
 
-        return $this->valueBuilder->build($attribute);
+        return $this->valueRawBuilder->build($attribute);
     }
 
     /**

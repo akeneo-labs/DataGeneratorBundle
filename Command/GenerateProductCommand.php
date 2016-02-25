@@ -39,7 +39,9 @@ class GenerateProductCommand extends AbstractGenerateCommand
         $configFile = $input->getArgument('configuration-file');
         $globalConfig = $this->getConfiguration($configFile, new ProductGeneratorConfiguration());
 
-        $generator = $this->getContainer()->get('pim_data_generator.generator.product');
+        $outputDir = $globalConfig['output_dir'];
+
+        $productGenerator = $this->getContainer()->get('pim_data_generator.generator.product');
 
         // TODO: is it wrong????
         $totalCount = $this->getTotalCount($globalConfig);
@@ -47,14 +49,15 @@ class GenerateProductCommand extends AbstractGenerateCommand
         $output->writeln(sprintf('<info>Generating <comment>%d</comment> products', $totalCount));
         $progress = $this->getHelperSet()->get('progress');
         $progress->start($output, $totalCount);
-        $generator->generate($globalConfig, $globalConfig['entities']['products'], $progress);
+        $productGenerator->generate($globalConfig, $globalConfig['entities']['products'], $progress);
         $progress->finish();
 
         if (isset($globalConfig['entities']['product_drafts'])) {
+            $draftGenerator = $this->getContainer()->get('pim_data_generator.generator.product_draft');
             $output->writeln(sprintf('<info>Generating <comment>%d</comment> product drafts', $totalCount));
             $progress = $this->getHelperSet()->get('progress');
             $progress->start($output, $totalCount);
-            $generator->generate($globalConfig, $globalConfig['entities']['product_drafts'], $progress);
+            $draftGenerator->generate($globalConfig, $globalConfig['entities']['product_drafts'], $progress);
             $progress->finish();
         }
     }

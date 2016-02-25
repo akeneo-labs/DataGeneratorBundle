@@ -84,11 +84,8 @@ services:
     pim_data_generator.generator.product:
         class: %pim_data_generator.generator.product.class%
         arguments:
-            - '@pim_data_generator.product.product_value_raw_builder'
             - '@pim_data_generator.product.product_raw_builder'
             - '@pim_catalog.repository.family'
-            - '@pim_catalog.repository.attribute'
-            - '@pim_catalog.repository.category'
             - '@pim_catalog.repository.group'
 
     pim_data_generator.generator.asset_category:
@@ -118,6 +115,5 @@ services:
     pim_data_generator.generator.product_draft:
         class: %pim_data_generator.generator.product_draft.class%
         arguments:
-            - '@pim_data_generator.product.product_value_raw_builder'
-            - '@pim_catalog.repository.attribute'
-            - '@pim_user.repository.user'
+            - '@pim_data_generator.product.product_raw_builder'
+            - '@pim_catalog.repository.family'

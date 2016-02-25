@@ -2,111 +2,58 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Box\Spout\Reader\ReaderFactory;
-use Box\Spout\Common\Type;
-use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
-use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductValueRawBuilder;
-use Pim\Bundle\UserBundle\Entity\Repository\UserRepositoryInterface;
+use Faker;
+use Pim\Bundle\DataGeneratorBundle\Generator\Product\AbstractProductGenerator;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
-class ProductDraftGenerator
+
+/**
+ * Generate native CSV file for product drafts
+ *
+ * @author    Benoit Jacquemont <benoit@akeneo.com>
+ * @copyright 2014 Akeneo SAS (http://www.akeneo.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+class ProductDraftGenerator extends AbstractProductGenerator implements GeneratorInterface
 {
-    /** @var ProductValueRawBuilder */
-    private $valueRawBuilder;
-
-    /** @var AttributeRepositoryInterface */
-    private $attributeRepository;
-
-    /** @var UserRepositoryInterface */
-    private $userRepository;
-
-//    /** @var AttributeInterface[] */
-//    private $attributes;
-
-
-    public function __construct(
-        ProductValueRawBuilder $valueRawBuilder,
-        AttributeRepositoryInterface $attributeRepository,
-        UserRepositoryInterface $userRepository
-    ) {
-        $this->valueRawBuilder     = $valueRawBuilder;
-        $this->attributeRepository = $attributeRepository;
-        $this->userRepository      = $userRepository;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
-        $productFile = $this->getCsvProductFilename($globalConfig, $config);
-        $reader      = ReaderFactory::create(Type::CSV);
-        $reader->setFieldDelimiter(';');
-        $reader->open($productFile);
+        $tmpFile = tempnam(sys_get_temp_dir(), 'data-gene');
+        $outputFile = $globalConfig['output_dir'] . DIRECTORY_SEPARATOR . trim($config['filename']);
 
-        foreach ($reader->getSheetIterator() as $sheet) {
-            foreach ($sheet->getRowIterator() as $product) {
-                foreach ($this->userRepository->findAll() as $user) {
-                    $updatedRow = $this->setRandomValuesToProduct($product, $config);
-                }
-            }
-        }
+        $seed                = $globalConfig['seed'];
+        $count               = (int) $config['count'];
+        $nbAttrBase          = (int) $config['filled_attributes_count'];
+        $nbAttrDeviation     = (int) $config['filled_attributes_standard_deviation'];
+        $startIndex          = (int) $config['start_index'];
+        $mandatoryAttributes = $config['mandatory_attributes'];
+        $forcedValues        = $config['force_values'];
+        $delimiter           = $config['delimiter'];
 
-        $reader->close();
-    }
+        $faker = $this->initFaker($seed);
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    private function getLockedValuesCodes(array $config)
-    {
-        $lockedValues[] = $this->attributeRepository->getIdentifierCode();
-        if (isset($config['products']['force_values'])) {
-            $lockedValues = array_merge(
-                $lockedValues,
-                array_keys($config['products']['force_values'])
+        for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
+
+            $product = $this->buildRawProduct(
+                $faker,
+                $forcedValues,
+                $mandatoryAttributes,
+                self::IDENTIFIER_PREFIX . $i,
+                $nbAttrBase,
+                $nbAttrDeviation,
+                0
             );
+
+            $this->bufferizeProduct($product, $tmpFile);
+            $progress->advance();
         }
 
-        return $lockedValues;
-    }
+        $this->writeCsvFile($this->headers, $outputFile, $tmpFile, $delimiter);
+        unlink($tmpFile);
 
-    /**
-     * @param array $globalConfig
-     * @param array $config
-     *
-     * @return string
-     */
-    private function getCsvProductFilename(array $globalConfig, array $config)
-    {
-        if (!empty($config['products']['filename'])) {
-            return $globalConfig['output_dir'] . DIRECTORY_SEPARATOR . trim($config['products']['filename']);
-        }
-
-        return $globalConfig['output_dir'] . DIRECTORY_SEPARATOR . ProductGenerator::DEFAULT_FILENAME;
-    }
-
-    /**
-     * @param array $product
-     * @param array $config
-     *
-     * @return array
-     */
-    private function setRandomValuesToProduct(array $product, array $config)
-    {
-        $lockedValues = $this->getLockedValuesCodes($config);
-
-        foreach ($product as $code => $value) {
-            if (!in_array($code, $lockedValues)) {
-                $newValue = $this->valueRawBuilder->build(
-                    $this->attributeRepository->findOneByIdentifier($code)
-                );
-                $product[$code] = $newValue;
-            }
-        }
-
-       return $product;
+        return $this;
     }
 }

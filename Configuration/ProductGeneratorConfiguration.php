@@ -56,7 +56,7 @@ class ProductGeneratorConfiguration implements ConfigurationInterface
         $node = new ArrayNodeDefinition($name);
         $node
             ->children()
-                ->scalarNode('filename')->info('Output filename of the CSV that will be generated')->end()
+                ->scalarNode('filename')->isRequired()->info('Output filename of the CSV that will be generated')->end()
                 ->integerNode('count')->min(1)->isRequired()->info('Number of items that will be generated')->end()
                 ->integerNode('filled_attributes_count')->min(1)->isRequired()->info('Mean number of attributes that will be filled in the item')->end()
                 ->integerNode('filled_attributes_standard_deviation')->min(1)->defaultValue(10)->info('Deviation of the mean number of attributes that will be filled in the item')->end()

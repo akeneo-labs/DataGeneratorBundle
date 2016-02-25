@@ -11,3 +11,4 @@ services:
         arguments:
             - '@pim_data_generator.product.product_value_raw_builder'
             - '@pim_catalog.repository.attribute'
+            - '@pim_catalog.repository.category'
