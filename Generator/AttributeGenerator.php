@@ -192,6 +192,24 @@ class AttributeGenerator implements GeneratorInterface
     }
 
     /**
+     * Return the generated media attribute codes
+     *
+     * @return array
+     */
+    public function getMediaAttributeCodes()
+    {
+        $codes = [];
+
+        foreach ($this->attributes as $code => $attribute) {
+            if (in_array($attribute['type'], [AttributeTypes::IMAGE, AttributeTypes::FILE])) {
+                $codes[] = $code;
+            }
+        }
+
+        return $codes;
+    }
+
+    /**
      * Get a random non-identifier attribute type
      *
      * @return string

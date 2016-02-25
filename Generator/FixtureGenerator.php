@@ -231,6 +231,7 @@ class FixtureGenerator implements GeneratorInterface
                 'channels'   => $channels,
                 'locales'    => $locales,
                 'attributes' => $attributes,
+                'media_attribute_codes' => $this->attributeGenerator->getMediaAttributeCodes()
             ]);
         }
 
