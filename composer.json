@@ -26,7 +26,8 @@
         "php": ">=5.4.4",
         "akeneo/pim-community-dev": "~1.4.0",
         "doctrine/migrations": "1.0.*@dev",
-        "fzaninotto/faker": "1.4.0"
+        "fzaninotto/faker": "1.4.0",
+        "box/spout": "^2.4"
     },
     "require-dev": {
         "phpspec/phpspec": "~2.1"

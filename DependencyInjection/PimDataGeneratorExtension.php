@@ -21,5 +21,6 @@ class PimDataGeneratorExtension extends Extension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('generators.yml');
+        $loader->load('services.yml');
     }
 }

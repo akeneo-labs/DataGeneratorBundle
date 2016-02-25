@@ -37,24 +37,28 @@ class GenerateProductCommand extends AbstractGenerateCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $configFile = $input->getArgument('configuration-file');
+        $globalConfig = $this->getConfiguration($configFile, new ProductGeneratorConfiguration());
 
-        $config = $this->getConfiguration($configFile, new ProductGeneratorConfiguration());
+        $outputDir = $globalConfig['output_dir'];
+        $this->checkOutputDirExists($outputDir);
 
-        $generator = $this->getContainer()->get('pim_data_generator.generator.product');
+        $productGenerator = $this->getContainer()->get('pim_data_generator.generator.product');
 
-        $totalCount = $this->getTotalCount($config);
-
-        $outputDir = $config['output_dir'];
-
-        $output->writeln(
-            sprintf('<info>Generating <comment>%d</comment> products', $totalCount)
-        );
-
+        $count = $globalConfig['entities']['products']['count'];
+        $output->writeln(sprintf('<info>Generating <comment>%d</comment> products', $count));
         $progress = $this->getHelperSet()->get('progress');
-        $progress->start($output, $totalCount);
-
-        $generator->generate($config, $config['entities']['products'], $progress);
-
+        $progress->start($output, $count);
+        $productGenerator->generate($globalConfig, $globalConfig['entities']['products'], $progress);
         $progress->finish();
+
+        if (isset($globalConfig['entities']['product_drafts'])) {
+            $count = $globalConfig['entities']['product_drafts']['count'];
+            $draftGenerator = $this->getContainer()->get('pim_data_generator.generator.product_draft');
+            $output->writeln(sprintf('<info>Generating <comment>%d</comment> product drafts', $count));
+            $progress = $this->getHelperSet()->get('progress');
+            $progress->start($output, $count);
+            $draftGenerator->generate($globalConfig, $globalConfig['entities']['product_drafts'], $progress);
+            $progress->finish();
+        }
     }
 }

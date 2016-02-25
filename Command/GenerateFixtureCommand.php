@@ -45,6 +45,7 @@ class GenerateFixtureCommand extends AbstractGenerateCommand
         $totalCount = $this->getTotalCount($config);
 
         $outputDir = $config['output_dir'];
+        $this->checkOutputDirExists($outputDir);
 
         $output->writeln(
             sprintf(

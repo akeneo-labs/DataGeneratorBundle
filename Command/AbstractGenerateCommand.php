@@ -5,6 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -58,5 +59,18 @@ abstract class AbstractGenerateCommand extends ContainerAwareCommand
         }
 
         return $totalCount;
+    }
+
+    /**
+    * Checks if the output directory exists
+    *
+    * @param string $outputDir
+    */
+    protected function checkOutputDirExists($outputDir)
+    {
+        $fs = new Filesystem();
+        if (!$fs->exists($outputDir)) {
+            throw new \RuntimeException(sprintf('The output directory "%s" does not exist!', $outputDir));
+        }
     }
 }
