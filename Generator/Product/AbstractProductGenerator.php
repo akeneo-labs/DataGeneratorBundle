@@ -12,7 +12,7 @@ use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
  * Abstract generator for product and drafts
  *
  * @author    Julien Janvier <jjanvier@akeneo.com>
- * @copyright 2014 Akeneo SAS (http://www.akeneo.com)
+ * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class AbstractProductGenerator
@@ -153,11 +153,11 @@ class AbstractProductGenerator
     /**
      * Get a random family
      *
-     * @param mixed $faker
+     * @param Faker\Generator $faker
      *
      * @return FamilyInterface
      */
-    private function getRandomFamily($faker)
+    private function getRandomFamily(Faker\Generator $faker)
     {
         return $this->getRandomItem($faker, $this->familyRepository, $this->families);
     }

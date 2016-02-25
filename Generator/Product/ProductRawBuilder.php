@@ -11,9 +11,8 @@ use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 
 /**
  * Build a raw product (ie: as an array) with random data.
- *
  * @author    Julien Janvier <jjanvier@akeneo.com>
- * @copyright 2014 Akeneo SAS (http://www.akeneo.com)
+ * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class ProductRawBuilder
@@ -52,8 +51,7 @@ class ProductRawBuilder
         ProductValueRawBuilder $valueBuilder,
         AttributeRepositoryInterface $attributeRepository,
         CategoryRepositoryInterface $categoryRepository
-    )
-    {
+    ) {
         $this->valueRawBuilder     = $valueBuilder;
         $this->attributeRepository = $attributeRepository;
         $this->categoryRepository  = $categoryRepository;
@@ -80,10 +78,10 @@ class ProductRawBuilder
      */
     public function buildBaseProduct(FamilyInterface $family, $id, $groups)
     {
-        $product = [];
+        $product                             = [];
         $product[$this->getIdentifierCode()] = $id;
-        $product['family'] = $family->getCode();
-        $product['groups'] = $groups;
+        $product['family']                   = $family->getCode();
+        $product['groups']                   = $groups;
 
         return $product;
     }
@@ -92,10 +90,10 @@ class ProductRawBuilder
      * Modify the $product to fill some random attributes
      *
      * @param FamilyInterface $family
-     * @param array     $product
-     * @param array     $forcedAttributes
-     * @param int       $nbAttr
-     * @param int       $nbAttrDeviation
+     * @param array           $product
+     * @param array           $forcedAttributes
+     * @param int             $nbAttr
+     * @param int             $nbAttrDeviation
      */
     public function fillInRandomAttributes(
         FamilyInterface $family,
@@ -109,7 +107,7 @@ class ProductRawBuilder
             $nbAttr,
             $nbAttrDeviation
         );
-        $attributes = $this->getRandomAttributesFromFamily($family, $randomNbAttr);
+        $attributes   = $this->getRandomAttributesFromFamily($family, $randomNbAttr);
 
         foreach ($attributes as $attribute) {
             $valueData = $this->generateValue($attribute, $forcedAttributes);
@@ -121,9 +119,9 @@ class ProductRawBuilder
      * Modify the $product to fill in its mandatory attributes.
      *
      * @param FamilyInterface $family
-     * @param array     $product
-     * @param array     $forcedAttributes
-     * @param array     $mandatoryAttributes
+     * @param array           $product
+     * @param array           $forcedAttributes
+     * @param array           $mandatoryAttributes
      */
     public function fillInMandatoryAttributes(
         FamilyInterface $family,
@@ -257,14 +255,13 @@ class ProductRawBuilder
 
     /**
      * Get all categories that are not root
-     *
      * @return string[]
      */
     private function getCategoryCodes()
     {
         if (null === $this->categoryCodes) {
             $this->categoryCodes = [];
-            $categories = $this->categoryRepository->findAll();
+            $categories          = $this->categoryRepository->findAll();
             foreach ($categories as $category) {
                 if (null !== $category->getParent()) {
                     $this->categoryCodes[] = $category->getCode();
