@@ -116,7 +116,7 @@ class ProductRawBuilder
     }
 
     /**
-     * Modify the $product to fill in its mandatory attributes.
+     * Modify the $product to fill in all attributes that has been defined as mandatory by the user in the config.
      *
      * @param FamilyInterface $family
      * @param array           $product
@@ -129,6 +129,8 @@ class ProductRawBuilder
         array $forcedAttributes,
         array $mandatoryAttributes
     ) {
+        $this->getAttributesFromFamily($family);
+
         foreach ($mandatoryAttributes as $attribute) {
             if (isset($this->attributesByFamily[$family->getCode()][$attribute])) {
                 $attribute = $this->attributesByFamily[$family->getCode()][$attribute];
@@ -139,18 +141,20 @@ class ProductRawBuilder
     }
 
     /**
-     * Modify the $product to fill in all its required attribute so that it's complete and can be exported.
+     * Modify the $product to fill in all its required attributes so that it's complete and can be exported.
      *
      * @param FamilyInterface $family
      * @param array           $product
      * @param array           $forcedAttributes
      */
-    public function fillInRequiredAttributes(FamilyInterface $family, array &$product, array $forcedAttributes)
+    public function fillInAllRequirementAttributes(FamilyInterface $family, array &$product, array $forcedAttributes)
     {
+        $this->getAttributesFromFamily($family);
+
         foreach ($family->getAttributeRequirements() as $requirement) {
-            if ($requirement->isRequired()) {
-                $attribute = $requirement->getAttribute()->getCode();
-                $attribute = $this->attributesByFamily[$family->getCode()][$attribute];
+            $attributeCode = $requirement->getAttributeCode();
+            if ($requirement->isRequired() && $attributeCode !== $this->getIdentifierCode()) {
+                $attribute = $this->attributesByFamily[$family->getCode()][$attributeCode];
                 $valueData = $this->generateValue($attribute, $forcedAttributes);
                 $product   = array_merge($product, $valueData);
             }
@@ -242,8 +246,7 @@ class ProductRawBuilder
         if (!isset($this->attributesByFamily[$familyCode])) {
             $this->attributesByFamily[$familyCode] = [];
 
-            $attributes = $family->getAttributes();
-            foreach ($attributes as $attribute) {
+            foreach ($family->getAttributes() as $attribute) {
                 if ($attribute->getCode() !== $this->getIdentifierCode()) {
                     $this->attributesByFamily[$familyCode][$attribute->getCode()] = $attribute;
                 }
