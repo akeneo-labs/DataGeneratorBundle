@@ -76,6 +76,30 @@ class AbstractProductGenerator
     }
 
     /**
+     * @param Faker\Generator $faker
+     * @param array           $forcedValues
+     * @param int             $id
+     * @param int             $nbCategories
+     *
+     * @return array
+     */
+    protected function buildCompleteRawProduct(
+        Faker\Generator $faker,
+        array $forcedValues,
+        $id,
+        $nbCategories
+    ) {
+        $family = $this->getRandomFamily($faker);
+        $product = $this->productRawBuilder->buildBaseProduct($family, $id, '');
+
+        $this->productRawBuilder->fillInRandomCategories($product, $nbCategories);
+        $this->productRawBuilder->fillInAllRequirementAttributes($family, $product, $forcedValues);
+
+        return $product;
+    }
+
+
+    /**
      * Write the CSV file from data coming from the buffer
      *
      * @param array  $headers

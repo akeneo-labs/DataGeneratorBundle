@@ -58,6 +58,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         $mandatoryAttributes = $config['mandatory_attributes'];
         $forcedValues        = $config['force_values'];
         $delimiter           = $config['delimiter'];
+        $percentageComplete  = $config['percentage_complete'];
 
         if ($variantGroupCount > 0) {
             foreach ($this->groupRepository->getAllVariantGroups() as $variantGroup) {
@@ -79,6 +80,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
 
+            $isComplete = (bool)($faker->numberBetween(0, 100) < $percentageComplete);
             $variantGroupDataProvider = $this->getNextVariantGroupProvider($faker);
             $variantGroupAttributes = [];
 
@@ -87,15 +89,24 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
                 $product['groups'] = $variantGroupDataProvider->getCode();
             }
 
-            $product = $this->buildRawProduct(
-                $faker,
-                $forcedValues,
-                $mandatoryAttributes,
-                self::IDENTIFIER_PREFIX . $i,
-                $nbAttrBase - count($variantGroupAttributes),
-                $nbAttrDeviation,
-                $categoriesCount
-            );
+            if (!$isComplete) {
+                $product = $this->buildRawProduct(
+                    $faker,
+                    $forcedValues,
+                    $mandatoryAttributes,
+                    self::IDENTIFIER_PREFIX . $i,
+                    $nbAttrBase - count($variantGroupAttributes),
+                    $nbAttrDeviation,
+                    $categoriesCount
+                );
+            } else {
+                $product = $this->buildCompleteRawProduct(
+                    $faker,
+                    $forcedValues,
+                    self::IDENTIFIER_PREFIX . $i,
+                    $categoriesCount
+                );
+            }
 
             if (null !== $variantGroupDataProvider) {
                 $product = array_merge($product, $variantGroupDataProvider->getData());
