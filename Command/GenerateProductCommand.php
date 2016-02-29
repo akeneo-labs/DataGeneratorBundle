@@ -3,9 +3,12 @@
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
 use Pim\Bundle\DataGeneratorBundle\Configuration\ProductGeneratorConfiguration;
+use Pim\Bundle\DataGeneratorBundle\DummyJobRepository;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 
 /**
  * Generates CSV products file
@@ -37,28 +40,35 @@ class GenerateProductCommand extends AbstractGenerateCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $configFile = $input->getArgument('configuration-file');
-        $globalConfig = $this->getConfiguration($configFile, new ProductGeneratorConfiguration());
+        $config = $this->getConfiguration($configFile, new ProductGeneratorConfiguration());
 
-        $outputDir = $globalConfig['output_dir'];
+        $outputDir = $config['output_dir'];
         $this->checkOutputDirExists($outputDir);
 
-        $productGenerator = $this->getContainer()->get('pim_data_generator.generator.product');
+        $productStep = $this->getContainer()->get('pim_data_generator.step.generate_product');
+        $productReader = $this->getContainer()->get('pim_data_generator.reader.generated_product');
+        $productWriter = $this->getContainer()->get('pim_base_connector.writer.file.csv_product');
+        $productProcessor = $this->getContainer()->get('pim_base_connector.processor.product_to_flat_array');
 
-        $count = $globalConfig['entities']['products']['count'];
+        $jobExecution = new JobExecution();
+        $stepExecution = new StepExecution("generate_products", $jobExecution);
+
+        $productStep->setEventDispatcher($this->getContainer()->get('event_dispatcher'));
+        $productStep->setJobRepository(new DummyJobRepository());
+
+        $count = $config['entities']['products']['count'];
+
+        $productReader->setItemCount($count);
+        $productWriter->setFilePath($config['output_dir'].'/products.csv');
+
+        $productProcessor->setChannel('ecommerce');
+
         $output->writeln(sprintf('<info>Generating <comment>%d</comment> products', $count));
         $progress = $this->getHelperSet()->get('progress');
         $progress->start($output, $count);
-        $productGenerator->generate($globalConfig, $globalConfig['entities']['products'], $progress);
-        $progress->finish();
 
-        if (isset($globalConfig['entities']['product_drafts'])) {
-            $count = $globalConfig['entities']['product_drafts']['count'];
-            $draftGenerator = $this->getContainer()->get('pim_data_generator.generator.product_draft');
-            $output->writeln(sprintf('<info>Generating <comment>%d</comment> product drafts', $count));
-            $progress = $this->getHelperSet()->get('progress');
-            $progress->start($output, $count);
-            $draftGenerator->generate($globalConfig, $globalConfig['entities']['product_drafts'], $progress);
-            $progress->finish();
-        }
+        $productStep->execute($stepExecution);
+
+        $progress->finish();
     }
 }

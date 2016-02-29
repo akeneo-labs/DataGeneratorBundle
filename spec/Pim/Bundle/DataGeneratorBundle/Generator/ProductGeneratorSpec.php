@@ -34,13 +34,48 @@ class ProductGeneratorSpec extends ObjectBehavior
         );
     }
 
-    function it_is_initializable()
-    {
-        $this->shouldHaveType('Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator');
-    }
-
     function it_is_a_generator()
     {
         $this->shouldImplement('Pim\Bundle\DataGeneratorBundle\Generator\GeneratorInterface');
+    }
+
+    function it_generates_a_product()
+    {
+        $this->generate()->shouldImplement('Pim\Component\Catalog\Model\ProductInterface');
+    }
+
+    function it_generates_a_product_with_an_identifier()
+    {
+        $this->generate()->getIdentifier()->shouldReturn('sku-001');
+    }
+
+    function it_generates_a_product_with_15_product_values()
+    {
+        $config = [
+            "filled_attributes_count"              => 15,
+            "filled_attributes_standard_deviation" => 0
+        ];
+
+        $this->generate($config)->getValues()->getCount()->shouldReturn(15);
+    }
+
+    function it_does_not_generates_a_product_with_15_product_values_when_the_family_has_10_attributes()
+    {
+        $config = [
+            "filled_attributes_count"              => 15,
+            "filled_attributes_standard_deviation" => 0
+        ];
+
+        $this->generate($config)->getValues()->shouldHaveCount(15);
+    }
+
+    function it_generates_a_product_with_10_attributes_when_15_requested_when_family_has_10()
+    {
+        $config = [
+            "filled_attributes_count"              => 15,
+            "filled_attributes_standard_deviation" => 0
+        ];
+
+        $this->generate($config)->getValues()->getCount()->shouldReturn(10);
     }
 }

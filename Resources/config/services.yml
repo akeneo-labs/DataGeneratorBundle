@@ -12,3 +12,17 @@ services:
             - '@pim_data_generator.product.product_value_raw_builder'
             - '@pim_catalog.repository.attribute'
             - '@pim_catalog.repository.category'
+
+    pim_data_generator.reader.generated_product:
+        class: 'Pim\Bundle\DataGeneratorBundle\Reader\GeneratedProductReader'
+        arguments:
+            - '@pim_data_generator.generator.product'
+
+    pim_data_generator.step.generate_product:
+        class: 'Akeneo\Bundle\BatchBundle\Step\ItemStep'
+        arguments:
+            - "generate_product"
+        calls:
+            - [setReader, ['@pim_data_generator.reader.generated_product']]
+            - [setProcessor, ['@pim_base_connector.processor.product_to_flat_array']]
+            - [setWriter, ['@pim_base_connector.writer.file.csv_product']]
