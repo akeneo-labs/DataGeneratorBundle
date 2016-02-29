@@ -5,8 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Faker;
 use Pim\Bundle\CatalogBundle\Entity\AttributeGroup;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
-use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -37,7 +36,7 @@ class AttributeGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 

@@ -21,6 +21,7 @@ parameters:
     pim_data_generator.generator.association_type.class:        Pim\Bundle\DataGeneratorBundle\Generator\AssociationTypeGenerator
     pim_data_generator.generator.group_type.class:              Pim\Bundle\DataGeneratorBundle\Generator\GroupTypeGenerator
     pim_data_generator.generator.product_draft.class:           Pim\Bundle\DataGeneratorBundle\Generator\ProductDraftGenerator
+    pim_data_generator.generator.asset.class:                   Pim\Bundle\DataGeneratorBundle\Generator\AssetGenerator
 
 services:
     pim_data_generator.fixture_generator:
@@ -45,6 +46,7 @@ services:
             - @pim_data_generator.generator.association_type
             - @pim_data_generator.generator.group_type
             - @pim_data_generator.generator.variant_group
+            - @pim_data_generator.generator.asset
 
     pim_data_generator.generator.channel:
         class: %pim_data_generator.generator.channel.class%
@@ -117,3 +119,6 @@ services:
         arguments:
             - '@pim_data_generator.product.product_raw_builder'
             - '@pim_catalog.repository.family'
+
+    pim_data_generator.generator.asset:
+        class: %pim_data_generator.generator.asset.class%

@@ -3,7 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -20,7 +20,7 @@ class UserGroupGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         $groups = $this->generateGroups($config);
 

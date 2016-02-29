@@ -3,7 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -43,7 +43,7 @@ class AttributeOptionGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         $this->locales    = $options['locales'];
         $this->attributes = $options['attributes'];

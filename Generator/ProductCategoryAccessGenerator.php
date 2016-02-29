@@ -4,7 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\Category;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -29,7 +29,7 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         $this->groups     = $options['groups'];
         $this->categories = $options['categories'];

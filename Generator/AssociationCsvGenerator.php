@@ -8,7 +8,7 @@ use Pim\Bundle\CatalogBundle\Entity\Family;
 use Pim\Bundle\CatalogBundle\Model\AbstractAttribute;
 use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\ProductRepositoryInterface;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generate native CSV file for association
@@ -54,7 +54,7 @@ class AssociationCsvGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         if (!empty($config['filename'])) {
             $this->outputFile = $globalConfig['output_dir'].'/'.trim($config['filename']);

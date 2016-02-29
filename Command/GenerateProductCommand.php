@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
 use Pim\Bundle\DataGeneratorBundle\Configuration\ProductGeneratorConfiguration;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,8 +47,8 @@ class GenerateProductCommand extends AbstractGenerateCommand
 
         $count = $globalConfig['entities']['products']['count'];
         $output->writeln(sprintf('<info>Generating <comment>%d</comment> products', $count));
-        $progress = $this->getHelperSet()->get('progress');
-        $progress->start($output, $count);
+        $progress = new ProgressBar($output, $count);
+        $progress->start();
         $productGenerator->generate($globalConfig, $globalConfig['entities']['products'], $progress);
         $progress->finish();
 
@@ -55,8 +56,8 @@ class GenerateProductCommand extends AbstractGenerateCommand
             $count = $globalConfig['entities']['product_drafts']['count'];
             $draftGenerator = $this->getContainer()->get('pim_data_generator.generator.product_draft');
             $output->writeln(sprintf('<info>Generating <comment>%d</comment> product drafts', $count));
-            $progress = $this->getHelperSet()->get('progress');
-            $progress->start($output, $count);
+            $progress = new ProgressBar($output, $count);
+            $progress->start();
             $draftGenerator->generate($globalConfig, $globalConfig['entities']['product_drafts'], $progress);
             $progress->finish();
         }
