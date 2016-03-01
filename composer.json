@@ -16,26 +16,18 @@
         {
             "type": "vcs",
             "url": "https://github.com/akeneo/pim-community-dev.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/akeneo/platform.git"
         }
     ],
+    "minimum-stability": "stable",
     "require": {
         "php": ">=5.4.4",
         "akeneo/pim-community-dev": "~1.4.0",
-        "bheller/images-generator": "~1.0",
+        "bheller/images-generator": "~1.0.0",
         "box/spout": "^2.4",
-        "doctrine/migrations": "1.0.*@dev",
         "fzaninotto/faker": "1.4.0"
     },
     "require-dev": {
         "phpspec/phpspec": "~2.1"
-    },
-    "suggest": {
-        "doctrine/mongodb-odm": "1.0.0-beta10@dev",
-        "doctrine/mongodb-odm-bundle": "v3.0.0-BETA6@dev"
     },
     "config": {
         "bin-dir": "bin"
@@ -43,6 +35,5 @@
     "autoload": {
         "psr-0": {"Pim\\Bundle\\DataGeneratorBundle\\": ""}
     },
-    "minimum-stability": "stable",
     "target-dir": "Pim/Bundle/DataGeneratorBundle"
 }

@@ -31,7 +31,7 @@ class AssetGenerator implements GeneratorInterface
 
         $assetDirectory = $config['asset_directory'];
         if (!is_dir($assetDirectory)) {
-            mkdir($assetDirectory);
+            mkdir($assetDirectory, 0777, true);
         }
 
         $assetCount = $config['count'];

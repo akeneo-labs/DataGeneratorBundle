@@ -85,8 +85,8 @@ data_generator:
         asset_categories: ~
         asset_category_accesses: ~
         asset:
-            count: 2000
-            asset_directory: /tmp/pim/file_storage
+            count: 10000
+            asset_directory: /tmp/pim/file_storage/admin
         attribute_groups_accesses: ~
         job_profiles_accesses: ~
         locales_accesses: ~
