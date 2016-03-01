@@ -29,7 +29,7 @@ class AssetGenerator implements GeneratorInterface
 
         $faker->addProvider(new ImagesGeneratorProvider($faker));
 
-        $assetDirectory = $globalConfig['output_dir'] . '/' . $config['asset_directory'];
+        $assetDirectory = $config['asset_directory'];
         if (!is_dir($assetDirectory)) {
             mkdir($assetDirectory);
         }
@@ -38,13 +38,15 @@ class AssetGenerator implements GeneratorInterface
         $images = [];
 
         for ($index = 1; $index <= $assetCount; $index++) {
-            $imagePath = $faker->imageGenerator($assetDirectory,
+            $imagePath = $faker->imageGenerator(
+                $assetDirectory,
                 $faker->numberBetween(600, 800),
                 $faker->numberBetween(400, 600),
                 'jpg',
                 true,
                 $faker->word,
-                $faker->hexColor, $faker->hexColor
+                $faker->hexColor,
+                $faker->hexColor
             );
             $images[] = $imagePath;
             $progress->advance();

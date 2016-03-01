@@ -82,6 +82,3 @@ data_generator:
             count: 10
             axes_count: 3
             attributes_count: 3
-        asset:
-            count: 2000
-            asset_directory: assets
