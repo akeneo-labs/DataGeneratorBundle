@@ -1,0 +1,6 @@
+parameters:
+    pim_data_generator.faker_factory.seeded.class: Pim\Bundle\DataGeneratorBundle\Faker\SeededFakerFactory;
+
+services:
+    pim_data_generator.faker_factory.seeded:
+        class: %pim_data_generator.faker_factory.seeded.class%

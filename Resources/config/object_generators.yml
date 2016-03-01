@@ -1,0 +1,21 @@
+parameters:
+    pim_data_generator.object_generator.fake.product_value.class: Pim\Bundle\DataGeneratorBundle\ObjectGenerator\FakeProductValueGenerator
+    pim_data_generator.object_generator.fake.product.class:       Pim\Bundle\DataGeneratorBundle\ObjectGenerator\FakeProductGenerator
+
+services:
+    pim_data_generator.object_generator.fake.product_value:
+        class: %pim_data_generator.object_generator.fake.product_value.class%
+        arguments:
+            - '@pim_data_generator.value_data_generator.registry'
+            - '@pim_catalog.builder.product'
+
+    pim_data_generator.object_generator.fake.product:
+        class: %pim_data_generator.object_generator.fake.product.class%
+        arguments:
+            - '@pim_data_generator.provider.fake.value_provider'
+            - '@pim_data_generator.provider.random.family'
+            - '@pim_data_generator.provider.random.category'
+            - '@pim_data_generator.provider.random.variant_group'
+            - '@pim_data_generator.provider.random.group'
+            - '@pim_data_generator.provider.fake.association'
+            - '@pim_catalog.builder.product'

@@ -1,0 +1,30 @@
+parameters:
+    pim_data_generator.provider.fake.product_value.class: Pim\Bundle\DataGeneratorBundle\Provider\FakeProductValueProvider
+    pim_data_generator.provider.random.category.class:    Pim\Bundle\DataGeneratorBundle\Provider\RandomCategoryProvider
+
+services:
+    pim_data_generator.provider.fake.product_value:
+        class: %pim_data_generator.provider.fake.product_value.class%
+        arguments:
+            - '@pim_data_generator.object_generator.fake.product_value'
+            - '@pim_catalog.repository.channel'
+            - '@pim_catalog.repository.locale'
+            - '@pim_data_generator.faker_factory.seeded'
+
+    pim_data_generator.provider.random.category:
+        class: %pim_data_generator.provider.random.category.class%
+        arguments:
+            - '@pim_catalog.repository.category'
+            - '@pim_data_generator.faker_factory.seeded'
+
+    pim_data_generator.provider.random.group:
+        class: %pim_data_generator.provider.random.group.class%
+        arguments:
+            - '@pim_catalog.repository.group'
+            - '@pim_data_generator.faker_factory.seeded'
+
+    pim_data_generator.provider.random.variant_group:
+        class: %pim_data_generator.provider.random.variant_group.class%
+        arguments:
+            - '@pim_catalog.repository.group'
+            - '@pim_data_generator.faker_factory.seeded'
