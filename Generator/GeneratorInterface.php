@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Data generator interface
@@ -18,10 +18,10 @@ interface GeneratorInterface
      *
      * @param array          $globalConfig
      * @param array          $generatorConfig
-     * @param ProgressHelper $progress
+     * @param ProgressBar $progress
      * @param array          $options
      *
      * @return $this
      */
-    public function generate(array $globalConfig, array $generatorConfig, ProgressHelper $progress, array $options = []);
+    public function generate(array $globalConfig, array $generatorConfig, ProgressBar $progress, array $options = []);
 }

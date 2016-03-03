@@ -6,7 +6,7 @@ use Faker;
 use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypeRegistry;
 use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -61,7 +61,7 @@ class AttributeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         $this->locales         = $options['locales'];
         $this->attributeGroups = $options['attribute_groups'];

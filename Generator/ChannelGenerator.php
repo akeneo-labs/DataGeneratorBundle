@@ -5,7 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Currency;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -41,7 +41,7 @@ class ChannelGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         $this->channelsFilePath  = $globalConfig['output_dir'] . '/' . static::CHANNEL_FILENAME;
         $this->currenciesFilePath = $globalConfig['output_dir'] . '/' . static::CURRENCY_FILENAME;

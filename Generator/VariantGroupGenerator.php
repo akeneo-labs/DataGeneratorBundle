@@ -14,7 +14,7 @@ use Pim\Bundle\CatalogBundle\Model\LocaleInterface;
 use Pim\Bundle\CatalogBundle\Model\ProductValue;
 use Pim\Bundle\CatalogBundle\Model\ProductValueInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generate native CSV file for variant groups.
@@ -45,7 +45,7 @@ class VariantGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         $this->setAttributes($options['attributes']);
         $this->setGroupTypes($options['group_types']);

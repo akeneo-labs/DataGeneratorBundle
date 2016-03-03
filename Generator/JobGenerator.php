@@ -3,7 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -22,7 +22,7 @@ class JobGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = [])
     {
         $jobs = $this->generateJobs($config);
 

@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Fixture generator that will dispatch generation to specialized generator
@@ -70,6 +70,9 @@ class FixtureGenerator implements GeneratorInterface
     /** @var VariantGroupGenerator */
     protected $variantGroupGenerator;
 
+    /** @var AssetGenerator */
+    protected $assetGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -90,63 +93,66 @@ class FixtureGenerator implements GeneratorInterface
      * @param AssociationTypeGenerator       $associationTypeGenerator
      * @param GroupTypeGenerator             $groupTypeGenerator
      * @param VariantGroupGenerator          $variantGroupGenerator
+     * @param AssetGenerator                 $assetGenerator
      */
     public function __construct(
-        ChannelGenerator               $channelGenerator,
-        UserRoleGenerator              $userRoleGenerator,
-        UserGroupGenerator             $userGroupGenerator,
-        UserGenerator                  $userGenerator,
-        AttributeGenerator             $attributeGenerator,
-        FamilyGenerator                $familyGenerator,
-        CategoryGenerator              $categoryGenerator,
-        AttributeGroupGenerator        $attrGroupGenerator,
-        AttributeOptionGenerator       $attributeOptionGenerator,
-        JobGenerator                   $jobGenerator,
-        AssetCategoryGenerator         $assetCategoryGenerator,
-        AssetCategoryAccessGenerator   $assetCategoryAccessGenerator,
+        ChannelGenerator $channelGenerator,
+        UserRoleGenerator $userRoleGenerator,
+        UserGroupGenerator $userGroupGenerator,
+        UserGenerator $userGenerator,
+        AttributeGenerator $attributeGenerator,
+        FamilyGenerator $familyGenerator,
+        CategoryGenerator $categoryGenerator,
+        AttributeGroupGenerator $attrGroupGenerator,
+        AttributeOptionGenerator $attributeOptionGenerator,
+        JobGenerator $jobGenerator,
+        AssetCategoryGenerator $assetCategoryGenerator,
+        AssetCategoryAccessGenerator $assetCategoryAccessGenerator,
         AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator,
-        JobProfilesAccessGenerator     $jobProfilesAccessGenerator,
-        LocalesAccessGenerator         $localesAccessGenerator,
+        JobProfilesAccessGenerator $jobProfilesAccessGenerator,
+        LocalesAccessGenerator $localesAccessGenerator,
         ProductCategoryAccessGenerator $productCategoryAccessGenerator,
-        AssociationTypeGenerator       $associationTypeGenerator,
-        GroupTypeGenerator             $groupTypeGenerator,
-        VariantGroupGenerator          $variantGroupGenerator
+        AssociationTypeGenerator $associationTypeGenerator,
+        GroupTypeGenerator $groupTypeGenerator,
+        VariantGroupGenerator $variantGroupGenerator,
+        AssetGenerator $assetGenerator
     ) {
-        $this->channelGenerator               = $channelGenerator;
-        $this->userRoleGenerator              = $userRoleGenerator;
-        $this->userGroupGenerator             = $userGroupGenerator;
-        $this->userGenerator                  = $userGenerator;
-        $this->attributeGenerator             = $attributeGenerator;
-        $this->familyGenerator                = $familyGenerator;
-        $this->categoryGenerator              = $categoryGenerator;
-        $this->attrGroupGenerator             = $attrGroupGenerator;
-        $this->attributeOptionGenerator       = $attributeOptionGenerator;
-        $this->jobGenerator                   = $jobGenerator;
-        $this->assetCategoryGenerator         = $assetCategoryGenerator;
-        $this->assetCategoryAccessGenerator   = $assetCategoryAccessGenerator;
+        $this->channelGenerator = $channelGenerator;
+        $this->userRoleGenerator = $userRoleGenerator;
+        $this->userGroupGenerator = $userGroupGenerator;
+        $this->userGenerator = $userGenerator;
+        $this->attributeGenerator = $attributeGenerator;
+        $this->familyGenerator = $familyGenerator;
+        $this->categoryGenerator = $categoryGenerator;
+        $this->attrGroupGenerator = $attrGroupGenerator;
+        $this->attributeOptionGenerator = $attributeOptionGenerator;
+        $this->jobGenerator = $jobGenerator;
+        $this->assetCategoryGenerator = $assetCategoryGenerator;
+        $this->assetCategoryAccessGenerator = $assetCategoryAccessGenerator;
         $this->attributeGroupsAccessGenerator = $attributeGroupsAccessGenerator;
-        $this->jobProfilesAccessGenerator     = $jobProfilesAccessGenerator;
-        $this->localesAccessGenerator         = $localesAccessGenerator;
+        $this->jobProfilesAccessGenerator = $jobProfilesAccessGenerator;
+        $this->localesAccessGenerator = $localesAccessGenerator;
         $this->productCategoryAccessGenerator = $productCategoryAccessGenerator;
-        $this->associationTypeGenerator       = $associationTypeGenerator;
-        $this->groupTypeGenerator             = $groupTypeGenerator;
-        $this->variantGroupGenerator          = $variantGroupGenerator;
+        $this->associationTypeGenerator = $associationTypeGenerator;
+        $this->groupTypeGenerator = $groupTypeGenerator;
+        $this->variantGroupGenerator = $variantGroupGenerator;
+        $this->assetGenerator = $assetGenerator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = null)
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = null)
     {
-        $locales            = [];
-        $channels           = [];
-        $userRoles          = [];
-        $userGroups         = [];
-        $categories         = [];
-        $attributeGroups    = [];
-        $attributes         = [];
+        $locales = [];
+        $channels = [];
+        $userRoles = [];
+        $userGroups = [];
+        $categories = [];
+        $attributeGroups = [];
+        $attributes = [];
         $assetCategoryCodes = [];
-        $jobs               = [];
+        $jobs = [];
 
         $config = $globalConfig;
         unset($globalConfig['entities']);
@@ -154,8 +160,8 @@ class FixtureGenerator implements GeneratorInterface
         if (isset($config['entities']['channels'])) {
             $channelConfig = $config['entities']['channels'];
             $this->channelGenerator->generate($globalConfig, $channelConfig, $progress);
-            $locales    = $this->channelGenerator->getLocales();
-            $channels   = $this->channelGenerator->getChannels();
+            $locales = $this->channelGenerator->getLocales();
+            $channels = $this->channelGenerator->getChannels();
         }
 
         if (isset($config['entities']['associations'])) {
@@ -228,9 +234,9 @@ class FixtureGenerator implements GeneratorInterface
         if (isset($config['entities']['families'])) {
             $familyConfig = $config['entities']['families'];
             $this->familyGenerator->generate($globalConfig, $familyConfig, $progress, [
-                'channels'   => $channels,
-                'locales'    => $locales,
-                'attributes' => $attributes,
+                'channels'              => $channels,
+                'locales'               => $locales,
+                'attributes'            => $attributes,
                 'media_attribute_codes' => $this->attributeGenerator->getMediaAttributeCodes()
             ]);
         }
@@ -296,6 +302,17 @@ class FixtureGenerator implements GeneratorInterface
                 'groups'     => $userGroups,
                 'categories' => $categories,
             ]);
+        }
+
+        if (isset($config['entities']['asset'])) {
+            $this->assetGenerator->generate(
+                $globalConfig,
+                [
+                    'count' => $config['entities']['asset']['count'],
+                    'asset_directory' => $config['entities']['asset']['asset_directory'],
+                ],
+                $progress
+            );
         }
     }
 }
