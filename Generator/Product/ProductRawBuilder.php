@@ -5,9 +5,9 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator\Product;
 
 use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
 use Faker;
-use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
-use Pim\Bundle\CatalogBundle\Model\FamilyInterface;
-use Pim\Bundle\CatalogBundle\Repository\AttributeRepositoryInterface;
+use Pim\Component\Catalog\Model\AttributeInterface;
+use Pim\Component\Catalog\Model\FamilyInterface;
+use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
 
 /**
  * Build a raw product (ie: as an array) with random data.

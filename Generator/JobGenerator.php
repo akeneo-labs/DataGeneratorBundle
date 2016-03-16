@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
+use Akeneo\Component\Batch\Model\JobInstance;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
