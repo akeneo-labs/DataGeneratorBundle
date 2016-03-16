@@ -3,9 +3,9 @@
 namespace Pim\Bundle\DataGeneratorBundle;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
-use Pim\Bundle\CatalogBundle\Model\AttributeOptionInterface;
-use Pim\Bundle\CatalogBundle\Model\GroupInterface;
+use Pim\Component\Catalog\Model\AttributeInterface;
+use Pim\Component\Catalog\Model\AttributeOptionInterface;
+use Pim\Component\Catalog\Model\GroupInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**

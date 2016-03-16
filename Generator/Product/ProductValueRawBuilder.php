@@ -3,14 +3,14 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator\Product;
 
 use Faker;
-use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
-use Pim\Bundle\CatalogBundle\Model\AttributeOptionInterface;
-use Pim\Bundle\CatalogBundle\Model\ChannelInterface;
-use Pim\Bundle\CatalogBundle\Model\CurrencyInterface;
-use Pim\Bundle\CatalogBundle\Model\LocaleInterface;
-use Pim\Bundle\CatalogBundle\Repository\ChannelRepositoryInterface;
+use Pim\Component\Catalog\Model\AttributeInterface;
+use Pim\Component\Catalog\Model\AttributeOptionInterface;
+use Pim\Component\Catalog\Model\ChannelInterface;
+use Pim\Component\Catalog\Model\CurrencyInterface;
+use Pim\Component\Catalog\Model\LocaleInterface;
+use Pim\Component\Catalog\Repository\ChannelRepositoryInterface;
 use Pim\Bundle\CatalogBundle\Repository\CurrencyRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\LocaleRepositoryInterface;
+use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
 
 /**
  * Build a raw product value (ie: as an array) with random data.

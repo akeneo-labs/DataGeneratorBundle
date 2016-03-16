@@ -7,12 +7,12 @@ use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
 use Pim\Bundle\CatalogBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\GroupTranslation;
 use Pim\Bundle\CatalogBundle\Entity\ProductTemplate;
-use Pim\Bundle\CatalogBundle\Model\AttributeInterface;
-use Pim\Bundle\CatalogBundle\Model\GroupInterface;
-use Pim\Bundle\CatalogBundle\Model\GroupTypeInterface;
-use Pim\Bundle\CatalogBundle\Model\LocaleInterface;
-use Pim\Bundle\CatalogBundle\Model\ProductValue;
-use Pim\Bundle\CatalogBundle\Model\ProductValueInterface;
+use Pim\Component\Catalog\Model\AttributeInterface;
+use Pim\Component\Catalog\Model\GroupInterface;
+use Pim\Component\Catalog\Model\GroupTypeInterface;
+use Pim\Component\Catalog\Model\LocaleInterface;
+use Pim\Component\Catalog\Model\ProductValue;
+use Pim\Component\Catalog\Model\ProductValueInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
