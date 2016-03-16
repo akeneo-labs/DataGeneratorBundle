@@ -60,7 +60,7 @@ class VariantGroupGenerator implements GeneratorInterface
         $data          = [];
 
         for ($i = 0; $i < $config['count']; $i++) {
-            $variantGroup = $this->generateVariantGroup($globalConfig, $config, $i);
+            $variantGroup = $this->generateVariantGroup($config, $i);
             $variantGroups[] = $variantGroup;
             $data[] = $this->normalizeVariantGroup($variantGroup);
 
@@ -75,20 +75,19 @@ class VariantGroupGenerator implements GeneratorInterface
     }
 
     /**
-     * @param array $globalConfig
      * @param array $config
      * @param int   $index
      *
      * @return GroupInterface
      */
-    protected function generateVariantGroup(array $globalConfig, array $config, $index)
+    protected function generateVariantGroup(array $config, $index)
     {
         $group = new Group();
         $group->setType($this->variantGroupType);
         $group->setCode(sprintf('variant_group_%s', $index));
 
-        $group->setAxisAttributes($this->getAxes($config['axes_count'], $globalConfig['seed']));
-        $group->setProductTemplate($this->getProductTemplate($config['attributes_count'], $globalConfig['seed']));
+        $group->setAxisAttributes($this->getAxes($config['axes_count']));
+        $group->setProductTemplate($this->getProductTemplate($config['attributes_count']));
 
         foreach ($this->locales as $locale) {
             $translation = new GroupTranslation();
@@ -137,21 +136,16 @@ class VariantGroupGenerator implements GeneratorInterface
      * Return a random set of axes for a variant group.
      *
      * @param int $count
-     * @param int $seed
      *
      * @return AttributeInterface[]
      */
-    protected function getAxes($count, $seed = null)
+    protected function getAxes($count)
     {
-        $attributesFaker = Faker\Factory::create();
-        if (null !== $seed) {
-            $attributesFaker->seed($seed);
-        }
         $axes = [];
 
         for ($i = 0; $i < $count; $i++) {
             try {
-                $axis = $attributesFaker->unique()->randomElement($this->availableAxes);
+                $axis = $this->faker->unique()->randomElement($this->availableAxes);
             } catch (\OverflowException $e) {
                 throw new Exception(sprintf(
                     'There is only %s attributes available for variant group axes, %s needed.',
@@ -169,22 +163,16 @@ class VariantGroupGenerator implements GeneratorInterface
      * Returns a product template containing product values for a variant group.
      *
      * @param int $count
-     * @param int $seed
      *
      * @return ProductTemplate
      */
-    protected function getProductTemplate($count, $seed = null)
+    protected function getProductTemplate($count)
     {
-        $attributesFaker = Faker\Factory::create();
-        if (null !== $seed) {
-            $attributesFaker->seed($seed);
-        }
-
         $valuesData = [];
 
         for ($i = 0; $i < $count; $i++) {
             try {
-                $attribute = $attributesFaker->unique($i == 0)->randomElement($this->availableAttributes);
+                $attribute = $this->faker->unique($i == 0)->randomElement($this->availableAttributes);
             } catch (\OverflowException $e) {
                 throw new Exception(sprintf(
                     'There is only %s attributes available for variant group attribute, %s needed.',
