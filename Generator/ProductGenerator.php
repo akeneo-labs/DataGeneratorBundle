@@ -3,11 +3,11 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
-use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\GroupRepositoryInterface;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\AbstractProductGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
 use Pim\Bundle\DataGeneratorBundle\VariantGroupDataProvider;
+use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
+use Pim\Component\Catalog\Repository\GroupRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
 /**
@@ -36,6 +36,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         GroupRepositoryInterface $groupRepository
     ) {
         parent::__construct($productRawBuilder, $familyRepository);
+
         $this->groupRepository = $groupRepository;
         $this->variantGroupDataProviders = [];
     }

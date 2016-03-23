@@ -6,7 +6,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator\Product;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Faker;
 use Pim\Component\Catalog\Model\FamilyInterface;
-use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
+use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
 
 /**
  * Abstract generator for product and drafts

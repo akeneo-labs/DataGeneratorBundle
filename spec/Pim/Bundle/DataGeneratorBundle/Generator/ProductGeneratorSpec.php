@@ -2,34 +2,22 @@
 
 namespace spec\Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
 use PhpSpec\ObjectBehavior;
-use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
-use Pim\Component\Catalog\Repository\ChannelRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\CurrencyRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\GroupRepositoryInterface;
-use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
+use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
+use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
+use Pim\Component\Catalog\Repository\GroupRepositoryInterface;
 use Prophecy\Argument;
 
 class ProductGeneratorSpec extends ObjectBehavior
 {
     function let(
+        ProductRawBuilder $builder,
         FamilyRepositoryInterface $familyRepository,
-        AttributeRepositoryInterface $attributeRepository,
-        ChannelRepositoryInterface $channelRepository,
-        LocaleRepositoryInterface $localeRepository,
-        CurrencyRepositoryInterface $currencyRepository,
-        CategoryRepositoryInterface $categoryRepository,
         GroupRepositoryInterface $groupRepository
     ) {
         $this->beConstructedWith(
+            $builder,
             $familyRepository,
-            $attributeRepository,
-            $channelRepository,
-            $localeRepository,
-            $currencyRepository,
-            $categoryRepository,
             $groupRepository
         );
     }

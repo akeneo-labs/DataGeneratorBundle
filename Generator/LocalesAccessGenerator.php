@@ -2,7 +2,6 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Akeneo\Component\Batch\Model\JobInstance;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Symfony\Component\Console\Helper\ProgressHelper;
