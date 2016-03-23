@@ -29,7 +29,7 @@ class ChannelGenerator implements GeneratorInterface
     /** @var string */
     protected $currenciesFilePath;
 
-    /** @var Channels[] */
+    /** @var Channel[] */
     protected $channels;
 
     /** @var Currency[] */

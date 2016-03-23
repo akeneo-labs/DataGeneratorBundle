@@ -7,7 +7,7 @@ use Faker;
 use Pim\Bundle\CatalogBundle\Entity\Family;
 use Pim\Component\Catalog\Model\AbstractAttribute;
 use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\ProductRepositoryInterface;
+use Pim\Component\Catalog\Repository\ProductRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
 /**
