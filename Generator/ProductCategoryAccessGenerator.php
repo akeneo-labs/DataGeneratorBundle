@@ -2,13 +2,14 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
+use Akeneo\Component\Classification\Model\CategoryInterface;
 use Oro\Bundle\UserBundle\Entity\Group;
-use Pim\Bundle\CatalogBundle\Entity\Category;
+use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
 /**
- * Generate native YAML file for product categories accesses. It gives all rights for every group in every category.
+ * Generate native CSV file for product categories accesses. It gives all rights for every group in every category.
  *
  * @author    Pierre Allard <pierre.allard@akeneo.com>
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
@@ -16,56 +17,39 @@ use Symfony\Component\Yaml;
  */
 class ProductCategoryAccessGenerator implements GeneratorInterface
 {
-    const PRODUCT_CATEGORY_ACCESSES_FILENAME = 'product_category_accesses.yml';
+    const PRODUCT_CATEGORY_ACCESSES_FILENAME = 'product_category_accesses.csv';
 
     const PRODUCT_CATEGORY_ACCESSES = 'product_category_accesses';
-
-    /** @var Group[] */
-    protected $groups;
-
-    /** @var Category[] */
-    protected $categories;
 
     /**
      * {@inheritdoc}
      */
     public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
-        $this->groups     = $options['groups'];
-        $this->categories = $options['categories'];
+        $groups     = $options['groups'];
+        $categories = $options['categories'];
 
-        $data = [];
-        foreach ($this->categories as $category) {
-            $categoryCode = $category->getCode();
-            $data[$categoryCode] = [];
-            foreach (['viewItems', 'editItems', 'ownItems'] as $access) {
-                $data[$categoryCode][$access] = [];
-                foreach ($this->groups as $group) {
-                    if ('all' !== $group->getName()) {
-                        $data[$categoryCode][$access][] = $group->getName();
-                    }
-                }
+        $groupNames = [];
+        /** @var Group $group */
+        foreach ($groups as $group) {
+            if (User::GROUP_DEFAULT !== $group->getName()) {
+                $groupNames[] = $group->getName();
             }
         }
 
-        $assetCategoryAccesses = [self::PRODUCT_CATEGORY_ACCESSES => $data];
-
+        $data = [];
+        /** @var CategoryInterface $category */
+        foreach ($categories as $category) {
+            $data[] = [
+                'category'   => $category->getCode(),
+                'view_items' => implode(',', $groupNames),
+                'edit_items' => implode(',', $groupNames),
+                'own_items'  => implode(',', $groupNames),
+            ];
+        }
         $progress->advance();
 
-        $this->writeYamlFile($assetCategoryAccesses, $globalConfig['output_dir']);
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $outputDir
-     */
-    protected function writeYamlFile(array $data, $outputDir)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 3, 0, true, true);
-
-        file_put_contents($outputDir.'/'.self::PRODUCT_CATEGORY_ACCESSES_FILENAME, $yamlData);
+        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::PRODUCT_CATEGORY_ACCESSES_FILENAME, $data);
+        $csvWriter->write();
     }
 }

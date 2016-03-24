@@ -3,10 +3,10 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
-use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
 use Pim\Bundle\CatalogBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\GroupTranslation;
 use Pim\Bundle\CatalogBundle\Entity\ProductTemplate;
+use Pim\Component\Catalog\AttributeTypes;
 use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\GroupInterface;
 use Pim\Component\Catalog\Model\GroupTypeInterface;
@@ -67,9 +67,8 @@ class VariantGroupGenerator implements GeneratorInterface
             $progress->advance();
         }
 
-        if (count($variantGroups) > 0) {
-            $this->writeCsvFile($data, $this->getHeader($data), $globalConfig['output_dir']);
-        }
+        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::VARIANT_GROUPS_FILENAME, $data);
+        $csvWriter->write();
 
         return $variantGroups;
     }
@@ -246,48 +245,5 @@ class VariantGroupGenerator implements GeneratorInterface
 
         throw new Exception('There is no VARIANT group. ' .
             'Please add "group_types: ~" into your fixtures configuration file.');
-    }
-
-    /**
-     * Get the header of the CSV.
-     *
-     * @param array $variantGroups
-     *
-     * @return array
-     */
-    protected function getHeader(array $variantGroups)
-    {
-        $header = [];
-
-        foreach ($variantGroups as $variantGroup) {
-            foreach ($variantGroup as $key => $value) {
-                if (!in_array($key, $header)) {
-                    $header[] = $key;
-                }
-            }
-        }
-
-        return $header;
-    }
-
-    /**
-     * Write the CSV file from variant groups and headers
-     *
-     * @param array  $variantGroups
-     * @param array  $headers
-     * @param string $outputDir
-     */
-    protected function writeCsvFile(array $variantGroups, array $headers, $outputDir)
-    {
-        $csvFile = fopen($outputDir.'/'.self::VARIANT_GROUPS_FILENAME, 'w');
-
-        fputcsv($csvFile, $headers, ';');
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($variantGroups as $variantGroup) {
-            $productData = array_merge($headersAsKeys, $variantGroup);
-            fputcsv($csvFile, $productData, ';');
-        }
-        fclose($csvFile);
     }
 }

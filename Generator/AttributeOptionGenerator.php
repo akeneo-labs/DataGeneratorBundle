@@ -19,12 +19,6 @@ class AttributeOptionGenerator implements GeneratorInterface
 
     const ATTRIBUTE_OPTIONS_FILENAME = 'attribute_options.csv';
 
-    /** @var string */
-    protected $outputFile;
-
-    /** @var string */
-    protected $delimiter;
-
     /** @var array */
     protected $locales;
 
@@ -54,9 +48,6 @@ class AttributeOptionGenerator implements GeneratorInterface
         }
 
         $countPerAttribute = (int) $config['count_per_attribute'];
-        $this->delimiter   = $config['delimiter'];
-
-        $this->attributeOptionsFile =  $globalConfig['output_dir'].'/'.static::ATTRIBUTE_OPTIONS_FILENAME;
 
         foreach ($this->getSelectAttributes() as $attribute) {
             for ($i = 0; $i < $countPerAttribute; $i++) {
@@ -73,9 +64,11 @@ class AttributeOptionGenerator implements GeneratorInterface
             };
         }
 
-        $headers = $this->getAllKeys($this->attributeOptions);
-
-        $this->writeCsvFile($this->attributeOptions, $headers);
+        $csvWriter = new CsvWriter(
+            $globalConfig['output_dir'].'/'.static::ATTRIBUTE_OPTIONS_FILENAME,
+            $this->attributeOptions
+        );
+        $csvWriter->write();
 
         $progress->advance();
 
@@ -124,44 +117,5 @@ class AttributeOptionGenerator implements GeneratorInterface
         }
 
         return $this->selectAttributes;
-    }
-
-    /**
-     * Write the CSV file from attributeOptions
-     *
-     * @param array $attributeOptions
-     * @param array $headers
-     */
-    protected function writeCsvFile(array $attributeOptions, array $headers)
-    {
-        $csvFile = fopen($this->attributeOptionsFile, 'w');
-
-        fputcsv($csvFile, $headers, $this->delimiter);
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($attributeOptions as $attributeOption) {
-            $attributeOptionData = array_merge($headersAsKeys, $attributeOption);
-            fputcsv($csvFile, $attributeOptionData, $this->delimiter);
-        }
-        fclose($csvFile);
-    }
-
-    /**
-     * Get a set of all keys inside arrays
-     *
-     * @param array $items
-     *
-     * @return array
-     */
-    protected function getAllKeys(array $items)
-    {
-        $keys = [];
-
-        foreach ($items as $item) {
-            $keys = array_merge($keys, array_keys($item));
-            $keys = array_unique($keys);
-        }
-
-        return $keys;
     }
 }

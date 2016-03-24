@@ -151,6 +151,8 @@ class FixtureGenerator implements GeneratorInterface
         $config = $globalConfig;
         unset($globalConfig['entities']);
 
+        copy(dirname(__FILE__) . '/../Resources/config/locales.csv', $globalConfig['output_dir'] . '/locales.csv');
+
         if (isset($config['entities']['channels'])) {
             $channelConfig = $config['entities']['channels'];
             $this->channelGenerator->generate($globalConfig, $channelConfig, $progress);

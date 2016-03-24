@@ -2,10 +2,10 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
+use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\AttributeGroup;
-use Pim\Bundle\CatalogBundle\Entity\Locale;
-use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
+use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -20,18 +20,15 @@ class AttributeGroupGenerator implements GeneratorInterface
 {
     const ATTR_GROUP_CODE_PREFIX = 'attr_gr_';
 
-    const ATTRIBUTE_GROUP_FILENAME = 'attribute_groups.yml';
+    const ATTRIBUTE_GROUP_FILENAME = 'attribute_groups.csv';
 
     /** @var array */
     protected $attributeGroups;
 
-    /** @var string */
-    protected $attributeGroupsFile;
-
-    /** @var Faker\Generator */
+    /** @var Generator */
     protected $faker;
 
-    /** @var Locale[] */
+    /** @var LocaleInterface[] */
     protected $locales;
 
     /**
@@ -40,12 +37,9 @@ class AttributeGroupGenerator implements GeneratorInterface
     public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
         $this->locales = $options['locales'];
+        $count         = (int)$config['count'];
 
-        $this->attributeGroupsFile = $globalConfig['output_dir'] . '/' . static::ATTRIBUTE_GROUP_FILENAME;
-
-        $count = (int) $config['count'];
-
-        $this->faker = Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
@@ -54,15 +48,23 @@ class AttributeGroupGenerator implements GeneratorInterface
 
         for ($i = 0; $i < $count; $i++) {
             $attributeGroup = [];
+            $code = self::ATTR_GROUP_CODE_PREFIX.$i;
 
+            $attributeGroup['code']      = $code;
             $attributeGroup['sortOrder'] = $this->faker->numberBetween(1, 10);
-            $attributeGroup['labels'] = $this->getLocalizedRandomLabels();
+            $attributeGroup['labels']    = $this->getLocalizedRandomLabels();
 
-            $this->attributeGroups[self::ATTR_GROUP_CODE_PREFIX.$i] = $attributeGroup;
+            $this->attributeGroups[$code] = $attributeGroup;
             $progress->advance();
         }
 
-        $this->writeYamlFile(['attribute_groups' => $this->attributeGroups], $this->attributeGroupsFile);
+        $normalizedGroups = $this->normalizeAttributeGroups($this->attributeGroups);
+
+        $csvWriter = new CsvWriter(
+            $globalConfig['output_dir'] . '/' . static::ATTRIBUTE_GROUP_FILENAME,
+            $normalizedGroups
+        );
+        $csvWriter->write();
 
         return $this;
     }
@@ -103,17 +105,21 @@ class AttributeGroupGenerator implements GeneratorInterface
         return $labels;
     }
 
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $filename
-     */
-    protected function writeYamlFile(array $data, $filename)
+    protected function normalizeAttributeGroups($groups)
     {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
+        $result = [];
 
-        file_put_contents($filename, $yamlData);
+        foreach ($groups as $group) {
+            $normalizedGroup = [
+                'code'       => $group['code'],
+                'sort_order' => $group['sortOrder'],
+            ];
+            foreach ($group['labels'] as $locale => $label) {
+                $normalizedGroup[sprintf('label-%s', $locale)] = $label;
+            }
+            $result[] = $normalizedGroup;
+        }
+
+        return $result;
     }
 }

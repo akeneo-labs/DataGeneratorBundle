@@ -3,12 +3,13 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
-use Pim\Bundle\CatalogBundle\Entity\AttributeGroup;
+use Pim\Bundle\UserBundle\Entity\User;
+use Pim\Component\Catalog\Model\AttributeGroupInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
 /**
- * Generate native YAML file for attribute groups accesses. It gives all rights for every group in every attribute
+ * Generate native CSV file for attribute groups accesses. It gives all rights for every group in every attribute
  * group.
  *
  * @author    Pierre Allard <pierre.allard@akeneo.com>
@@ -17,56 +18,38 @@ use Symfony\Component\Yaml;
  */
 class AttributeGroupsAccessGenerator implements GeneratorInterface
 {
-    const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_groups_accesses.yml';
+    const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_groups_accesses.csv';
 
     const ATTRIBUTE_GROUPS_ACCESSES = 'attribute_groups_accesses';
-
-    /** @var Group[] */
-    protected $groups;
-
-    /** @var AttributeGroup[] */
-    protected $attributeGroups;
 
     /**
      * {@inheritdoc}
      */
     public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
-        $this->groups          = $options['groups'];
-        $this->attributeGroups = $options['attribute_groups'];
+        $groups          = $options['groups'];
+        $attributeGroups = $options['attribute_groups'];
 
         $data = [];
-        foreach ($this->attributeGroups as $attributeGroup) {
-            $attributeGroupCode = $attributeGroup->getCode();
-            $data[$attributeGroupCode] = [];
-            foreach (['viewAttributes', 'editAttributes'] as $access) {
-                $data[$attributeGroupCode][$access] = [];
-                foreach ($this->groups as $group) {
-                    if ('all' !== $group->getName()) {
-                        $data[$attributeGroupCode][$access][] = $group->getName();
-                    }
-                }
+        $groupNames = [];
+        /** @var Group $group */
+        foreach ($groups as $group) {
+            if (User::GROUP_DEFAULT !== $group->getName()) {
+                $groupNames[] = $group->getName();
             }
         }
 
-        $attributeGroupsAccesses = [self::ATTRIBUTE_GROUPS_ACCESSES => $data];
-
+        /** @var AttributeGroupInterface $attributeGroup */
+        foreach ($attributeGroups as $attributeGroup) {
+            $assetCategoryAccess = ['attribute_group' => $attributeGroup->getCode()];
+            foreach (['view_attributes', 'edit_attributes'] as $access) {
+                $assetCategoryAccess[$access] = implode(',', $groupNames);
+            }
+            $data[] = $assetCategoryAccess;
+        }
         $progress->advance();
 
-        $this->writeYamlFile($attributeGroupsAccesses, $globalConfig['output_dir']);
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $outputDir
-     */
-    protected function writeYamlFile(array $data, $outputDir)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 3, 0, true, true);
-
-        file_put_contents($outputDir.'/'.self::ASSET_CATEGORY_ACCESSES_FILENAME, $yamlData);
+        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::ASSET_CATEGORY_ACCESSES_FILENAME, $data);
+        $csvWriter->write();
     }
 }

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
 /**
- * Generate native YAML file for group types. No configuration allowed, it generates VARIANT and RELATED group types.
+ * Generate native CSV file for group types. No configuration allowed, it generates VARIANT and RELATED group types.
  *
  * @author    Pierre Allard <pierre.allard@akeneo.com>
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
@@ -16,7 +16,7 @@ use Symfony\Component\Yaml;
  */
 class GroupTypeGenerator implements GeneratorInterface
 {
-    const GROUP_TYPES_FILENAME = 'group_types.yml';
+    const GROUP_TYPES_FILENAME = 'group_types.csv';
 
     /**
      * {@inheritdoc}
@@ -33,15 +33,15 @@ class GroupTypeGenerator implements GeneratorInterface
 
         $groupTypes = [$variantGroupType, $relatedGroupType];
 
-        $data = ['group_types' => []];
-
+        $data = [];
         foreach ($groupTypes as $groupType) {
-            $data['group_types'] = array_merge($data['group_types'], $this->normalizeGroupType($groupType));
+            $data[] = $this->normalizeGroupType($groupType);
         }
 
         $progress->advance();
 
-        $this->writeYamlFile($data, $globalConfig['output_dir']);
+        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::GROUP_TYPES_FILENAME, $data);
+        $csvWriter->write();
 
         return $groupTypes;
     }
@@ -54,23 +54,8 @@ class GroupTypeGenerator implements GeneratorInterface
     public function normalizeGroupType(GroupTypeInterface $groupType)
     {
         return [
-            $groupType->getCode() => [
-                'variant' => $groupType->isVariant() ? 1 : 0
-            ]
+            'code'       => $groupType->getCode(),
+            'is_variant' => $groupType->isVariant() ? 1 : 0
         ];
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $outputDir
-     */
-    protected function writeYamlFile(array $data, $outputDir)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 3, 0, true, true);
-
-        file_put_contents($outputDir.'/'.self::GROUP_TYPES_FILENAME, $yamlData);
     }
 }

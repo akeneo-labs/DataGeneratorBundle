@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
@@ -33,7 +33,7 @@ class AssetCategoryGenerator implements GeneratorInterface
     {
         $this->locales = $options['locales'];
 
-        $faker = \Faker\Factory::create();
+        $faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $faker->seed($globalConfig['seed']);
         }
@@ -46,33 +46,14 @@ class AssetCategoryGenerator implements GeneratorInterface
             $assetCategories[0][$key] = implode(' ', $faker->words(3));
         }
 
-        $headers = array_keys($assetCategories[0]);
-
-        $this->writeCsvFile($assetCategories, $headers, $globalConfig['output_dir']);
+        $csvWriter = new CsvWriter(
+            $globalConfig['output_dir'] . '/' . self::ASSET_CATEGORIES_FILENAME,
+            $assetCategories
+        );
+        $csvWriter->write();
 
         $progress->advance();
 
         return [ self::ASSET_MAIN_CATALOG ];
-    }
-
-    /**
-     * Write the CSV file from products and headers
-     *
-     * @param array  $assetCategories
-     * @param array  $headers
-     * @param string $outputDir
-     */
-    protected function writeCsvFile(array $assetCategories, array $headers, $outputDir)
-    {
-        $csvFile = fopen($outputDir.'/'.self::ASSET_CATEGORIES_FILENAME, 'w');
-
-        fputcsv($csvFile, $headers, ';');
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($assetCategories as $assetCategory) {
-            $productData = array_merge($headersAsKeys, $assetCategory);
-            fputcsv($csvFile, $productData, ';');
-        }
-        fclose($csvFile);
     }
 }

@@ -15,7 +15,7 @@ use Symfony\Component\Yaml;
  */
 class UserRoleGenerator
 {
-    const ROLES_FILENAME = 'user_roles.yml';
+    const ROLES_FILENAME = 'user_roles.csv';
 
     /**
      * {@inheritdoc}
@@ -26,10 +26,8 @@ class UserRoleGenerator
 
         $normalizedRoles = $this->normalizeRoles($roles);
 
-        $this->writeYamlFile(
-            $normalizedRoles,
-            $globalConfig['output_dir'] . "/" . static::ROLES_FILENAME
-        );
+        $csvWriter = new CsvWriter($globalConfig['output_dir'] . "/" . static::ROLES_FILENAME, $normalizedRoles);
+        $csvWriter->write();
 
         $progress->advance();
 
@@ -57,7 +55,7 @@ class UserRoleGenerator
      * Generate a role object from the data provided
      *
      * @param string $key
-     * @param array $config
+     * @param array  $roleConfig
      *
      * @return Role
      */
@@ -73,7 +71,7 @@ class UserRoleGenerator
     /**
      * Normalize roles objects into a structured array
      *
-     * @param Role[]
+     * @param Role[] $roles
      *
      * @return array
      */
@@ -82,36 +80,24 @@ class UserRoleGenerator
         $normalizedRoles = [];
 
         foreach ($roles as $role) {
-            $normalizedRoles[$role->getRole()] = $this->normalizeRole($role);
+            $normalizedRoles[] = $this->normalizeRole($role);
         }
 
-        return [ "user_roles" => $normalizedRoles ];
+        return $normalizedRoles;
     }
 
     /**
      * Normalize role object into a structured array
      *
-     * @param Role
+     * @param Role $role
      *
      * @return array
      */
     public function normalizeRole(Role $role)
     {
         return [
-            "label" => $role->getLabel()
+            'label' => $role->getLabel(),
+            'role'  => $role->getRole(),
         ];
-    }
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $filename
-     */
-    protected function writeYamlFile(array $data, $filename)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
-
-        file_put_contents($filename, $yamlData);
     }
 }

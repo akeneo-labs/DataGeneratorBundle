@@ -3,6 +3,8 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
+use Pim\Bundle\UserBundle\Entity\User;
+use Pim\Component\Catalog\Model\GroupInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -15,7 +17,7 @@ use Symfony\Component\Yaml;
  */
 class UserGroupGenerator
 {
-    const GROUPS_FILENAME = 'user_groups.yml';
+    const GROUPS_FILENAME = 'user_groups.csv';
 
     /**
      * {@inheritdoc}
@@ -24,12 +26,10 @@ class UserGroupGenerator
     {
         $groups = $this->generateGroups($config);
 
-        $normalizedGroups = $this->normalizeGroups($groups);
+        $normalizedGroups = $this->normalizeGroups(array_values($groups));
 
-        $this->writeYamlFile(
-            $normalizedGroups,
-            $globalConfig['output_dir'] . "/" . static::GROUPS_FILENAME
-        );
+        $csvWriter = new CsvWriter($globalConfig['output_dir'] . "/" . static::GROUPS_FILENAME, $normalizedGroups);
+        $csvWriter->write();
 
         $progress->advance();
 
@@ -41,18 +41,17 @@ class UserGroupGenerator
      *
      * @param array $groupsConfig
      *
-     * @return Group[]
+     * @return GroupInterface[]
      */
     protected function generateGroups(array $groupsConfig)
     {
+        $allGroup = $this->generateGroup(['name' => User::GROUP_DEFAULT]);
+        $groups = [User::GROUP_DEFAULT => $allGroup];
+
         foreach ($groupsConfig as $groupConfig) {
             $group = $this->generateGroup($groupConfig);
             $groups[$group->getName()] = $group;
         }
-
-        $allGroup = $this->generateGroup(['name' => 'all']);
-
-        $groups[$allGroup->getName()] = $allGroup;
 
         return $groups;
     }
@@ -82,12 +81,11 @@ class UserGroupGenerator
     protected function normalizeGroups(array $groups)
     {
         $normalizedGroups = [];
-
         foreach ($groups as $group) {
             $normalizedGroups[] = $this->normalizeGroup($group);
         }
 
-        return ['user_groups' => $normalizedGroups];
+        return $normalizedGroups;
     }
 
     /**
@@ -100,19 +98,5 @@ class UserGroupGenerator
     protected function normalizeGroup(Group $group)
     {
         return ['name' => $group->getName()];
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $filename
-     */
-    protected function writeYamlFile(array $data, $filename)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
-
-        file_put_contents($filename, $yamlData);
     }
 }

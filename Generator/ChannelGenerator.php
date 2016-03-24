@@ -5,6 +5,9 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Currency;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Component\Catalog\Model\ChannelInterface;
+use Pim\Component\Catalog\Model\CurrencyInterface;
+use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -17,9 +20,9 @@ use Symfony\Component\Yaml;
  */
 class ChannelGenerator implements GeneratorInterface
 {
-    const CHANNEL_FILENAME = 'channels.yml';
+    const CHANNEL_FILENAME = 'channels.csv';
 
-    const CURRENCY_FILENAME = 'currencies.yml';
+    const CURRENCY_FILENAME = 'currencies.csv';
 
     const DEFAULT_TREE = 'master';
 
@@ -29,13 +32,13 @@ class ChannelGenerator implements GeneratorInterface
     /** @var string */
     protected $currenciesFilePath;
 
-    /** @var Channels[] */
+    /** @var ChannelInterface[] */
     protected $channels;
 
-    /** @var Currency[] */
+    /** @var CurrencyInterface[] */
     protected $currencies;
 
-    /** @var Locale[] */
+    /** @var LocaleInterface[] */
     protected $locales;
 
     /**
@@ -66,7 +69,7 @@ class ChannelGenerator implements GeneratorInterface
      *
      * @param array $channelsConfig
      *
-     * @return Locale[]
+     * @return LocaleInterface[]
      */
     protected function generateLocales(array $channelsConfig)
     {
@@ -89,16 +92,25 @@ class ChannelGenerator implements GeneratorInterface
         return $locales;
     }
 
+    /**
+     * @return LocaleInterface[]
+     */
     public function getLocales()
     {
         return $this->locales;
     }
 
+    /**
+     * @return CurrencyInterface[]
+     */
     public function getCurrencies()
     {
         return $this->currencies;
     }
 
+    /**
+     * @return ChannelInterface[]
+     */
     public function getChannels()
     {
         return $this->channels;
@@ -109,7 +121,7 @@ class ChannelGenerator implements GeneratorInterface
      *
      * @param array $channelsConfig
      *
-     * @return Currency[]
+     * @return CurrencyInterface[]
      */
     protected function generateCurrencies(array $channelsConfig)
     {
@@ -138,7 +150,7 @@ class ChannelGenerator implements GeneratorInterface
      *
      * @param array $channelsConfig
      *
-     * @return Channel[]
+     * @return ChannelInterface[]
      */
     protected function generateChannels(array $channelsConfig)
     {
@@ -173,16 +185,16 @@ class ChannelGenerator implements GeneratorInterface
      */
     protected function writeCurrenciesFile()
     {
-        $currencyData = [ 'currencies' => [] ];
+        $data = [];
         foreach ($this->currencies as $currency) {
-            $currencyData['currencies'][] = $currency->getCode();
+            $data[] = [
+                'code'      => $currency->getCode(),
+                'activated' => 1
+            ];
         }
-        $currencyData["removed_currencies"] = [];
 
-        $yamlDumper = new Yaml\Dumper();
-        $yamlCurrencies = $yamlDumper->dump($currencyData, 5, 0, true, true);
-
-        file_put_contents($this->currenciesFilePath, $yamlCurrencies);
+        $csvWriter = new CsvWriter($this->currenciesFilePath, $data);
+        $csvWriter->write();
     }
 
     /**
@@ -190,7 +202,7 @@ class ChannelGenerator implements GeneratorInterface
      */
     protected function writeChannelsFile()
     {
-        $channelData = [ 'channels' => [] ];
+        $data = [];
         foreach ($this->channels as $channel) {
             $localeCodes   = [];
             $currencyCodes = [];
@@ -203,20 +215,16 @@ class ChannelGenerator implements GeneratorInterface
                 $currencyCodes[] = $currency->getCode();
             }
 
-            $channelData['channels'][$channel->getCode()] =
-                [
-                    'code'       => $channel->getCode(),
-                    'label'      => $channel->getLabel(),
-                    'tree'       => static::DEFAULT_TREE,
-                    'locales'    => $localeCodes,
-                    'currencies' => $currencyCodes,
-                    'color'      => $channel->getColor()
-                ];
+            $data[] = [
+                'code' => $channel->getCode(),
+                'label'      => $channel->getLabel(),
+                'tree'       => static::DEFAULT_TREE,
+                'locales'    => implode(',', $localeCodes),
+                'currencies' => implode(',', $currencyCodes),
+            ];
         }
 
-        $yamlDumper = new Yaml\Dumper();
-        $yamlChannels = $yamlDumper->dump($channelData, 5, 0, true, true);
-
-        file_put_contents($this->channelsFilePath, $yamlChannels);
+        $csvWriter = new CsvWriter($this->channelsFilePath, $data);
+        $csvWriter->write();
     }
 }

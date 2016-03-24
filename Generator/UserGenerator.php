@@ -7,6 +7,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\UserBundle\Entity\UserInterface;
 use Pim\Component\Catalog\Model\CategoryInterface;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -21,7 +22,7 @@ use Symfony\Component\Yaml;
  */
 class UserGenerator
 {
-    const USERS_FILENAME = 'users.yml';
+    const USERS_FILENAME = 'users.csv';
 
     /** @var Channel[] */
     protected $channels;
@@ -64,10 +65,8 @@ class UserGenerator
 
         $normalizedUsers = $this->normalizeUsers($users);
 
-        $this->writeYamlFile(
-            $normalizedUsers,
-            $globalConfig['output_dir']. "/" . static::USERS_FILENAME
-        );
+        $csvWriter = new CsvWriter($globalConfig['output_dir']. "/" . self::USERS_FILENAME, $normalizedUsers);
+        $csvWriter->write();
 
         $progress->advance();
 
@@ -79,7 +78,7 @@ class UserGenerator
      *
      * @param array $usersConfig
      *
-     * @return User[]
+     * @return UserInterface[]
      */
     protected function generateUsers(array $usersConfig)
     {
@@ -96,7 +95,7 @@ class UserGenerator
      *
      * @param array $userConfig
      *
-     * @return User
+     * @return UserInterface
      */
     protected function generateUser(array $userConfig)
     {
@@ -143,29 +142,28 @@ class UserGenerator
     /**
      * Normalize users objects into a structured array
      *
-     * @param User[] $users
+     * @param UserInterface[] $users
      *
      * @return array
      */
     protected function normalizeUsers(array $users)
     {
         $normalizedUsers = [];
-
         foreach ($users as $user) {
             $normalizedUsers[] = $this->normalizeUser($user);
         }
 
-        return [ "users" => $normalizedUsers ];
+        return $normalizedUsers;
     }
 
     /**
      * Normalize user object into a structured array
      *
-     * @param User $user
+     * @param UserInterface $user
      *
      * @return array
      */
-    protected function normalizeUser(User $user)
+    protected function normalizeUser(UserInterface $user)
     {
         $userGroupCodes = [];
         foreach ($user->getGroups() as $userGroup) {
@@ -178,17 +176,18 @@ class UserGenerator
         }
 
         $result = [
-            "username"       => $user->getUsername(),
-            "password"       => $user->getPassword(),
-            "email"          => $user->getEmail(),
-            "firstname"      => $user->getFirstname(),
-            "lastname"       => $user->getLastname(),
-            "catalog_locale" => $user->getCatalogLocale()->getCode(),
-            "catalog_scope"  => $user->getCatalogScope()->getCode(),
-            "default_tree"   => $user->getDefaultTree()->getCode(),
-            "roles"          => $userRoleCodes,
-            "groups"         => $userGroupCodes,
-            "enable"         => $user->isEnabled()
+            'username'       => $user->getUsername(),
+            'password'       => $user->getPassword(),
+            'email'          => $user->getEmail(),
+            'first_name'     => $user->getFirstname(),
+            'last_name'      => $user->getLastname(),
+            'catalog_locale' => $user->getCatalogLocale()->getCode(),
+            'catalog_scope'  => $user->getCatalogScope()->getCode(),
+            'default_tree'   => $user->getDefaultTree()->getCode(),
+            'roles'          => implode(',', $userRoleCodes),
+            'groups'         => implode(',', $userGroupCodes),
+            'enabled'        => $user->isEnabled() ? '1' : '0',
+            'user_locale'    => 'en_US',
         ];
 
         if (count($this->assetCategoryCodes) > 0) {
@@ -196,19 +195,5 @@ class UserGenerator
         }
 
         return $result;
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $filename
-     */
-    protected function writeYamlFile(array $data, $filename)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
-
-        file_put_contents($filename, $yamlData);
     }
 }

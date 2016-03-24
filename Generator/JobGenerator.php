@@ -64,7 +64,7 @@ class JobGenerator
      * Generate a job object from the data provided
      *
      * @param string $code
-     * @param array  $config
+     * @param array  $jobConfig
      *
      * @return JobInstance
      */
@@ -84,7 +84,7 @@ class JobGenerator
     /**
      * Normalize jobs objects into a structured array
      *
-     * @param Job[]
+     * @param JobInstance[] $jobs
      *
      * @return array
      */
@@ -102,7 +102,7 @@ class JobGenerator
     /**
      * Normalize job object into a structured array
      *
-     * @param JobInstance
+     * @param JobInstance $job
      *
      * @return array
      */
