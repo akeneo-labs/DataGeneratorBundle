@@ -6,13 +6,14 @@ use Faker\Factory;
 use Faker\Generator;
 use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypeRegistry;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Component\Catalog\AttributeTypes;
 use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
 /**
- * Generate native YML file for attributes useable as fixtures
+ * Generate native CSV file for attributes useable as fixtures
  *
  * @author    Benoit Jacquemont <benoit@akeneo.com>
  * @copyright 2014 Akeneo SAS (http://www.akeneo.com)
@@ -23,6 +24,9 @@ class AttributeGenerator implements GeneratorInterface
     const ATTRIBUTES_FILENAME = 'attributes.csv';
 
     const ATTRIBUTE_CODE_PREFIX = 'attr_';
+
+    /** @var WriterInterface */
+    protected $writer;
 
     /** @var array */
     protected $attributeGroups;
@@ -46,11 +50,14 @@ class AttributeGenerator implements GeneratorInterface
     protected $attributes;
 
     /**
+     * @param WriterInterface       $writer
      * @param AttributeTypeRegistry $typeRegistry
      */
     public function __construct(
+        WriterInterface $writer,
         AttributeTypeRegistry $typeRegistry
     ) {
+        $this->writer       = $writer;
         $this->typeRegistry = $typeRegistry;
     }
 
@@ -146,8 +153,10 @@ class AttributeGenerator implements GeneratorInterface
             }
         }
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::ATTRIBUTES_FILENAME, $this->attributes);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . '/' . self::ATTRIBUTES_FILENAME)
+            ->setData($this->attributes)
+            ->write();
     }
 
     /**

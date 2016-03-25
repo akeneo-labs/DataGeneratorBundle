@@ -3,6 +3,8 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -19,6 +21,9 @@ class AttributeOptionGenerator implements GeneratorInterface
 
     const ATTRIBUTE_OPTIONS_FILENAME = 'attribute_options.csv';
 
+    /** @var WriterInterface */
+    protected $writer;
+
     /** @var array */
     protected $locales;
 
@@ -33,6 +38,14 @@ class AttributeOptionGenerator implements GeneratorInterface
 
     /** @var Faker\Generator */
     protected $faker;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -64,11 +77,10 @@ class AttributeOptionGenerator implements GeneratorInterface
             };
         }
 
-        $csvWriter = new CsvWriter(
-            $globalConfig['output_dir'].'/'.static::ATTRIBUTE_OPTIONS_FILENAME,
-            $this->attributeOptions
-        );
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'].'/'.static::ATTRIBUTE_OPTIONS_FILENAME)
+            ->setData($this->attributeOptions)
+            ->write();
 
         $progress->advance();
 
@@ -78,7 +90,7 @@ class AttributeOptionGenerator implements GeneratorInterface
     /**
      * Get localized random labels
      *
-     * @return Locale[]
+     * @return LocaleInterface[]
      */
     protected function getLocalizedRandomLabels()
     {

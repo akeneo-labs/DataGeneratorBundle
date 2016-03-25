@@ -4,6 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker\Factory;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
 /**
@@ -20,6 +21,14 @@ class AssetCategoryGenerator implements GeneratorInterface
     const ASSET_CATEGORIES_FILENAME = 'asset_categories.csv';
 
     const ASSET_MAIN_CATALOG = 'asset_main_catalog';
+
+    /** @var WriterInterface */
+    protected $writer;
+
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /** @var Locale[] */
     protected $locales;
@@ -46,11 +55,10 @@ class AssetCategoryGenerator implements GeneratorInterface
             $assetCategories[0][$key] = implode(' ', $faker->words(3));
         }
 
-        $csvWriter = new CsvWriter(
-            $globalConfig['output_dir'] . '/' . self::ASSET_CATEGORIES_FILENAME,
-            $assetCategories
-        );
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . '/' . self::ASSET_CATEGORIES_FILENAME)
+            ->setData($assetCategories)
+            ->write();
 
         $progress->advance();
 

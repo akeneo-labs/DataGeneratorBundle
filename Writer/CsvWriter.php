@@ -1,8 +1,15 @@
 <?php
 
-namespace Pim\Bundle\DataGeneratorBundle\Generator;
+namespace Pim\Bundle\DataGeneratorBundle\Writer;
 
-class CsvWriter
+/**
+ * Write CSV files
+ *
+ * @author    Pierre Allard <pierre.allard@akeneo.com>
+ * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+class CsvWriter implements WriterInterface
 {
     /** @var string */
     protected $outputFile;
@@ -10,10 +17,24 @@ class CsvWriter
     /** @var array */
     protected $data;
 
-    public function __construct($outputFile, $data)
+    /**
+     * {@inheritdoc}
+     */
+    public function setFilename($filename)
     {
-        $this->outputFile = $outputFile;
-        $this->data       = $data;
+        $this->outputFile = $filename;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
     }
 
     /**

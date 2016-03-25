@@ -6,6 +6,7 @@ use Faker;
 use Pim\Bundle\CatalogBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\GroupTranslation;
 use Pim\Bundle\CatalogBundle\Entity\ProductTemplate;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Component\Catalog\AttributeTypes;
 use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\GroupInterface;
@@ -27,6 +28,9 @@ class VariantGroupGenerator implements GeneratorInterface
 {
     const VARIANT_GROUPS_FILENAME = 'variant_groups.csv';
 
+    /** @var WriterInterface */
+    protected $writer;
+
     /** @var LocaleInterface[] */
     protected $locales;
 
@@ -41,6 +45,14 @@ class VariantGroupGenerator implements GeneratorInterface
 
     /** @var Faker\Generator */
     protected $faker;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -67,8 +79,10 @@ class VariantGroupGenerator implements GeneratorInterface
             $progress->advance();
         }
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::VARIANT_GROUPS_FILENAME, $data);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . '/' . self::VARIANT_GROUPS_FILENAME)
+            ->setData($data)
+            ->write();
 
         return $variantGroups;
     }

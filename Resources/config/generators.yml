@@ -48,38 +48,59 @@ services:
 
     pim_data_generator.generator.channel:
         class: %pim_data_generator.generator.channel.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.category:
         class: %pim_data_generator.generator.category.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.user_role:
         class: %pim_data_generator.generator.user_role.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.user_group:
         class: %pim_data_generator.generator.user_group.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.user:
         class: %pim_data_generator.generator.user.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.attribute:
         class: %pim_data_generator.generator.attribute.class%
         arguments:
+            - '@pim_data_generator.writer.csv_writer'
             - '@pim_catalog.registry.attribute_type'
 
     pim_data_generator.generator.family:
         class: %pim_data_generator.generator.family.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.attribute_option:
         class: %pim_data_generator.generator.attribute_option.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.attribute_group:
         class: %pim_data_generator.generator.attribute_group.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.job:
         class: %pim_data_generator.generator.job.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.variant_group:
         class: %pim_data_generator.generator.variant_group.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.product:
         class: %pim_data_generator.generator.product.class%
@@ -90,27 +111,43 @@ services:
 
     pim_data_generator.generator.asset_category:
         class: %pim_data_generator.generator.asset_category.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.asset_category_access:
         class: %pim_data_generator.generator.asset_category_access.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.attribute_groups_access:
         class: %pim_data_generator.generator.attribute_groups_access.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.job_profiles_access:
         class: %pim_data_generator.generator.job_profiles_access.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.locales_access:
         class: %pim_data_generator.generator.locales_access.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.product_category_access:
         class: %pim_data_generator.generator.product_category_access.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.association_type:
         class: %pim_data_generator.generator.association_type.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.group_type:
         class: %pim_data_generator.generator.group_type.class%
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
 
     pim_data_generator.generator.product_draft:
         class: %pim_data_generator.generator.product_draft.class%

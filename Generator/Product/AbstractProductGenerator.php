@@ -38,8 +38,10 @@ class AbstractProductGenerator
      * @param ProductRawBuilder         $productRawBuilder
      * @param FamilyRepositoryInterface $familyRepository
      */
-    public function __construct(ProductRawBuilder $productRawBuilder, FamilyRepositoryInterface $familyRepository)
-    {
+    public function __construct(
+        ProductRawBuilder $productRawBuilder,
+        FamilyRepositoryInterface $familyRepository
+    ) {
         $this->productRawBuilder = $productRawBuilder;
         $this->familyRepository = $familyRepository;
         $this->headers = [];

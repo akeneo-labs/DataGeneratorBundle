@@ -5,6 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Faker\Factory;
 use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Family;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -22,6 +23,9 @@ class FamilyGenerator implements GeneratorInterface
     const FAMILY_CODE_PREFIX = 'fam_';
 
     const ATTRIBUTE_DELIMITER = ',';
+
+    /** @var WriterInterface */
+    protected $writer;
 
     /** @var string */
     protected $identifierAttribute;
@@ -46,6 +50,11 @@ class FamilyGenerator implements GeneratorInterface
 
     /** @var array */
     protected $filteredAttrCodes;
+
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -100,8 +109,10 @@ class FamilyGenerator implements GeneratorInterface
 
         $this->families = $families;
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'].'/'.self::FAMILIES_FILENAME, $families);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'].'/'.self::FAMILIES_FILENAME)
+            ->setData($families)
+            ->write();
 
         return $this;
     }

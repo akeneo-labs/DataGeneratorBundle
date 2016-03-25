@@ -4,6 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Akeneo\Component\Classification\Model\CategoryInterface;
 use Oro\Bundle\UserBundle\Entity\Group;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -20,6 +21,17 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
     const PRODUCT_CATEGORY_ACCESSES_FILENAME = 'product_category_accesses.csv';
 
     const PRODUCT_CATEGORY_ACCESSES = 'product_category_accesses';
+
+    /** @var WriterInterface */
+    protected $writer;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -49,7 +61,9 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
         }
         $progress->advance();
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::PRODUCT_CATEGORY_ACCESSES_FILENAME, $data);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . '/' . self::PRODUCT_CATEGORY_ACCESSES_FILENAME)
+            ->setData($data)
+            ->write();
     }
 }

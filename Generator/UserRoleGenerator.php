@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Role;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -13,9 +14,20 @@ use Symfony\Component\Yaml;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class UserRoleGenerator
+class UserRoleGenerator implements GeneratorInterface
 {
     const ROLES_FILENAME = 'user_roles.csv';
+
+    /** @var WriterInterface */
+    protected $writer;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -26,8 +38,10 @@ class UserRoleGenerator
 
         $normalizedRoles = $this->normalizeRoles($roles);
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'] . "/" . static::ROLES_FILENAME, $normalizedRoles);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . "/" . static::ROLES_FILENAME)
+            ->setData($normalizedRoles)
+            ->write();
 
         $progress->advance();
 

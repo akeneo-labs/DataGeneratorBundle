@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Bundle\UserBundle\Entity\User;
 use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -20,6 +21,17 @@ class LocalesAccessGenerator implements GeneratorInterface
     const LOCALE_ACCESSES_FILENAME = 'locale_accesses.csv';
 
     const LOCALE_ACCESSES = 'locale_accesses';
+
+    /** @var WriterInterfacee */
+    protected $writer;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -48,7 +60,9 @@ class LocalesAccessGenerator implements GeneratorInterface
         }
         $progress->advance();
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::LOCALE_ACCESSES_FILENAME, $data);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . '/' . self::LOCALE_ACCESSES_FILENAME)
+            ->setData($data)
+            ->write();
     }
 }

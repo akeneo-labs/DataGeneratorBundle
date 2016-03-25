@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Bundle\UserBundle\Entity\User;
 use Pim\Component\Catalog\Model\AttributeGroupInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -21,6 +22,17 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
     const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_groups_accesses.csv';
 
     const ATTRIBUTE_GROUPS_ACCESSES = 'attribute_groups_accesses';
+
+    /** @var WriterInterface */
+    protected $writer;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -49,7 +61,9 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
         }
         $progress->advance();
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::ASSET_CATEGORY_ACCESSES_FILENAME, $data);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . '/' . self::ASSET_CATEGORY_ACCESSES_FILENAME)
+            ->setData($data)
+            ->write();
     }
 }

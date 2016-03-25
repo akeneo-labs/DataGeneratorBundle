@@ -28,7 +28,7 @@ class JobGenerator
 
         $normalizedJobs = $this->normalizeJobs($jobs);
 
-        $normaizedJobs['jobs'] = array_merge(
+        $normalizedJobs['jobs'] = array_merge(
             $normalizedJobs['jobs'],
             $this->getInternalJobs()
         );
@@ -40,7 +40,7 @@ class JobGenerator
 
         $progress->advance();
 
-        return $jobs;
+        return array_keys($normalizedJobs['jobs']);
     }
 
     /**
@@ -127,7 +127,7 @@ class JobGenerator
         $internalJobsPath = __DIR__.'/../'.static::INTERNAL_JOBS_FILE;
         $yamlParser = new Yaml\Parser();
 
-        return $yamlParser->parse(file_get_contents($internalJobsPath));
+        return $yamlParser->parse(file_get_contents($internalJobsPath))['jobs'];
     }
 
     /**

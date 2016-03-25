@@ -7,6 +7,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Bundle\UserBundle\Entity\UserInterface;
 use Pim\Component\Catalog\Model\CategoryInterface;
 use Pim\Bundle\UserBundle\Entity\User;
@@ -20,9 +21,12 @@ use Symfony\Component\Yaml;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class UserGenerator
+class UserGenerator implements GeneratorInterface
 {
     const USERS_FILENAME = 'users.csv';
+
+    /** @var WriterInterface */
+    protected $writer;
 
     /** @var Channel[] */
     protected $channels;
@@ -46,6 +50,14 @@ class UserGenerator
     protected $faker;
 
     /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
@@ -65,8 +77,10 @@ class UserGenerator
 
         $normalizedUsers = $this->normalizeUsers($users);
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir']. "/" . self::USERS_FILENAME, $normalizedUsers);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir']. "/" . self::USERS_FILENAME)
+            ->setData($normalizedUsers)
+            ->write();
 
         $progress->advance();
 

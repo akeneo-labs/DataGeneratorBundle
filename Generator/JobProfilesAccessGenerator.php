@@ -4,6 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Akeneo\Component\Batch\Model\JobInstance;
 use Oro\Bundle\UserBundle\Entity\Group;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -21,13 +22,24 @@ class JobProfilesAccessGenerator implements GeneratorInterface
 
     const JOB_PROFILE_ACCESSES = 'job_profile_accesses';
 
+    /** @var WriterInterface */
+    protected $writer;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
-        $groups = $options['groups'];
-        $jobs   = $options['jobs'];
+        $groups   = $options['groups'];
+        $jobCodes = $options['jobCodes'];
 
         $groupNames = [];
         /** @var Group $group */
@@ -39,9 +51,9 @@ class JobProfilesAccessGenerator implements GeneratorInterface
 
         $data = [];
         /** @var JobInstance $job */
-        foreach ($jobs as $job) {
+        foreach ($jobCodes as $jobCode) {
             $data[] = [
-                'job_profile'         => $job->getCode(),
+                'job_profile'         => $jobCode,
                 'execute_job_profile' => implode(',', $groupNames),
                 'edit_job_profile'    => implode(',', $groupNames),
             ];
@@ -49,7 +61,9 @@ class JobProfilesAccessGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'] . '/' . self::JOB_PROFILE_ACCESSES_FILENAME, $data);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . '/' . self::JOB_PROFILE_ACCESSES_FILENAME)
+            ->setData($data)
+            ->write();
     }
 }

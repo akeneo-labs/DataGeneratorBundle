@@ -6,6 +6,7 @@ use Faker\Factory;
 use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Category;
 use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
@@ -16,7 +17,7 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class CategoryGenerator
+class CategoryGenerator implements GeneratorInterface
 {
     const CATEGORIES_FILENAME = 'categories.csv';
 
@@ -24,11 +25,22 @@ class CategoryGenerator
 
     const LABEL_LENGTH = 2;
 
+    /** @var WriterInterface */
+    protected $writer;
+
     /** @var LocaleInterface[] */
     protected $locales;
 
     /** @var Generator */
     protected $faker;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -52,11 +64,10 @@ class CategoryGenerator
 
         $normalizedCategories = $this->normalizeCategories($categories);
 
-        $csvWriter = new CsvWriter(
-            $globalConfig['output_dir'].'/'.self::CATEGORIES_FILENAME,
-            $normalizedCategories
-        );
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'].'/'.self::CATEGORIES_FILENAME)
+            ->setData($normalizedCategories)
+            ->write();
 
         $progress->advance($count);
 

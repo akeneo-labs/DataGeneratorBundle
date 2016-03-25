@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
+use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
 use Pim\Bundle\UserBundle\Entity\User;
 use Pim\Component\Catalog\Model\GroupInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -15,9 +16,20 @@ use Symfony\Component\Yaml;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class UserGroupGenerator
+class UserGroupGenerator implements GeneratorInterface
 {
     const GROUPS_FILENAME = 'user_groups.csv';
+
+    /** @var WriterInterface */
+    protected $writer;
+
+    /**
+     * @param WriterInterface $writer
+     */
+    public function __construct(WriterInterface $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -28,8 +40,10 @@ class UserGroupGenerator
 
         $normalizedGroups = $this->normalizeGroups(array_values($groups));
 
-        $csvWriter = new CsvWriter($globalConfig['output_dir'] . "/" . static::GROUPS_FILENAME, $normalizedGroups);
-        $csvWriter->write();
+        $this->writer
+            ->setFilename($globalConfig['output_dir'] . "/" . static::GROUPS_FILENAME)
+            ->setData($normalizedGroups)
+            ->write();
 
         $progress->advance();
 

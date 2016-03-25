@@ -146,7 +146,7 @@ class FixtureGenerator implements GeneratorInterface
         $attributeGroups    = [];
         $attributes         = [];
         $assetCategoryCodes = [];
-        $jobs               = [];
+        $jobCodes           = [];
 
         $config = $globalConfig;
         unset($globalConfig['entities']);
@@ -239,7 +239,7 @@ class FixtureGenerator implements GeneratorInterface
 
         if (isset($config['entities']['jobs'])) {
             $jobConfig = $config['entities']['jobs'];
-            $jobs = $this->jobGenerator->generate($globalConfig, $jobConfig, $progress);
+            $jobCodes  = $this->jobGenerator->generate($globalConfig, $jobConfig, $progress);
         }
 
         if (isset($config['entities']['attribute_options'])) {
@@ -281,8 +281,8 @@ class FixtureGenerator implements GeneratorInterface
 
         if (isset($config['entities']['job_profiles_accesses'])) {
             $this->jobProfilesAccessGenerator->generate($globalConfig, [], $progress, [
-                'groups' => $userGroups,
-                'jobs'   => $jobs,
+                'groups'   => $userGroups,
+                'jobCodes' => $jobCodes,
             ]);
         }
 
