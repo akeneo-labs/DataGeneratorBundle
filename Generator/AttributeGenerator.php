@@ -143,7 +143,7 @@ class AttributeGenerator implements GeneratorInterface
         }
 
         foreach ($this->attributes as $code => $attribute) {
-            foreach ($this->getLocalizedRandomLabels($type) as $localeCode => $label) {
+            foreach ($this->getLocalizedRandomLabels($attribute['type']) as $localeCode => $label) {
                 $this->attributes[$code]['label-' . $localeCode] = $label;
             }
 
@@ -278,10 +278,11 @@ class AttributeGenerator implements GeneratorInterface
     protected function getLocalizedRandomLabels($type)
     {
         $labels = [];
+        $smallType = str_replace('pim_catalog_', '', $type);
 
         /** @var LocaleInterface $locale */
         foreach ($this->locales as $locale) {
-            $labels[$locale->getCode()] = sprintf("%s %s", $type, implode(' ', $this->faker->words(2)));
+            $labels[$locale->getCode()] = sprintf("%s %s", $smallType, implode(' ', $this->faker->words(2)));
         }
 
         return $labels;
