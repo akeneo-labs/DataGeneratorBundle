@@ -70,6 +70,9 @@ class FixtureGenerator implements GeneratorInterface
     /** @var VariantGroupGenerator */
     protected $variantGroupGenerator;
 
+    /** @var LocaleGenerator */
+    protected $localeGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -90,6 +93,7 @@ class FixtureGenerator implements GeneratorInterface
      * @param AssociationTypeGenerator       $associationTypeGenerator
      * @param GroupTypeGenerator             $groupTypeGenerator
      * @param VariantGroupGenerator          $variantGroupGenerator
+     * @param LocaleGenerator                $localeGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -110,7 +114,8 @@ class FixtureGenerator implements GeneratorInterface
         ProductCategoryAccessGenerator $productCategoryAccessGenerator,
         AssociationTypeGenerator       $associationTypeGenerator,
         GroupTypeGenerator             $groupTypeGenerator,
-        VariantGroupGenerator          $variantGroupGenerator
+        VariantGroupGenerator          $variantGroupGenerator,
+        LocaleGenerator                $localeGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -131,6 +136,7 @@ class FixtureGenerator implements GeneratorInterface
         $this->associationTypeGenerator       = $associationTypeGenerator;
         $this->groupTypeGenerator             = $groupTypeGenerator;
         $this->variantGroupGenerator          = $variantGroupGenerator;
+        $this->localeGenerator                = $localeGenerator;
     }
 
     /**
@@ -151,7 +157,7 @@ class FixtureGenerator implements GeneratorInterface
         $config = $globalConfig;
         unset($globalConfig['entities']);
 
-        copy(dirname(__FILE__) . '/../Resources/config/locales.csv', $globalConfig['output_dir'] . '/locales.csv');
+        $this->localeGenerator->generate($globalConfig, [], $progress);
 
         if (isset($config['entities']['channels'])) {
             $channelConfig = $config['entities']['channels'];
