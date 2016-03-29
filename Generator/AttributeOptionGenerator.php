@@ -2,9 +2,12 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Generator;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
+use Pim\Component\Catalog\AttributeTypes;
+use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\LocaleInterface;
+use SebastianBergmann\Comparator\Factory;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -25,18 +28,18 @@ class AttributeOptionGenerator implements GeneratorInterface
     protected $writer;
 
     /** @var array */
-    protected $locales;
+    protected $locales = [];
 
     /** @var array */
     protected $attributeOptions = [];
 
     /** @var array */
-    protected $attributes;
+    protected $attributes = [];
 
     /** @var array */
     protected $selectAttributes;
 
-    /** @var Faker\Generator */
+    /** @var Generator */
     protected $faker;
 
     /**
@@ -55,7 +58,7 @@ class AttributeOptionGenerator implements GeneratorInterface
         $this->locales    = $options['locales'];
         $this->attributes = $options['attributes'];
 
-        $this->faker = Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
@@ -105,7 +108,7 @@ class AttributeOptionGenerator implements GeneratorInterface
     /**
      * Get attributes that can have options
      *
-     * @return Attributes[]
+     * @return AttributeInterface[]
      *
      * @throw \LogicException
      */
@@ -119,9 +122,10 @@ class AttributeOptionGenerator implements GeneratorInterface
             }
 
             foreach ($this->attributes as $attribute) {
-                if ('pim_catalog_simpleselect' === $attribute->getAttributeType() ||
-                    'pim_catalog_multiselect' === $attribute->getAttributeType()
-                 ) {
+                if (in_array($attribute->getAttributeType(), [
+                    AttributeTypes::OPTION_SIMPLE_SELECT,
+                    AttributeTypes::OPTION_MULTI_SELECT
+                ])) {
                     $this->selectAttributes[$attribute->getCode()] = $attribute;
                 }
             }

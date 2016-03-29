@@ -2,7 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
+use Faker\Generator;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
@@ -29,24 +30,24 @@ class UserGenerator implements GeneratorInterface
     protected $writer;
 
     /** @var Channel[] */
-    protected $channels;
+    protected $channels = [];
 
     /** @var Locale[] */
-    protected $locales;
+    protected $locales = [];
 
     /** @var Group[] */
-    protected $userGroups;
+    protected $userGroups = [];
 
     /** @var Role[] */
-    protected $userRoles;
+    protected $userRoles = [];
 
     /** @var string[] */
-    protected $assetCategoryCodes;
+    protected $assetCategoryCodes = [];
 
     /** @var CategoryInterface[] */
-    protected $categories;
+    protected $categories = [];
 
-    /** @var Faker\Generator */
+    /** @var Generator */
     protected $faker;
 
     /**
@@ -69,7 +70,7 @@ class UserGenerator implements GeneratorInterface
         $this->userGroups         = $options['user_groups'];
         $this->assetCategoryCodes = $options['asset_category_codes'];
 
-        $this->faker = Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }

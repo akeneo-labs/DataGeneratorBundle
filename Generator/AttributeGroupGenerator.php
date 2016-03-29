@@ -27,13 +27,13 @@ class AttributeGroupGenerator implements GeneratorInterface
     protected $writer;
 
     /** @var array */
-    protected $attributeGroups;
+    protected $attributeGroups = [];
 
     /** @var Generator */
     protected $faker;
 
     /** @var LocaleInterface[] */
-    protected $locales;
+    protected $locales = [];
 
     /**
      * @param CsvWriter $writer

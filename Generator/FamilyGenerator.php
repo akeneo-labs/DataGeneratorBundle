@@ -34,19 +34,19 @@ class FamilyGenerator implements GeneratorInterface
     protected $labelAttribute;
 
     /** @var array */
-    protected $locales;
+    protected $locales = [];
 
     /** @var array */
-    protected $channels;
+    protected $channels = [];
 
     /** @var Generator */
     protected $faker;
 
     /** @var array */
-    protected $families;
+    protected $families = [];
 
     /** @var array */
-    protected $attributes;
+    protected $attributes = [];
 
     /** @var array */
     protected $filteredAttrCodes;

@@ -29,7 +29,7 @@ class AssociationTypeGenerator implements GeneratorInterface
     protected $writer;
 
     /** @var Locale[] */
-    protected $locales;
+    protected $locales = [];
 
     /** @var Generator */
     protected $faker;

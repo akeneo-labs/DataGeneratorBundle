@@ -23,7 +23,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
     private $groupRepository;
 
     /** @var VariantGroupDataProvider[] */
-    private $variantGroupDataProviders;
+    private $variantGroupDataProviders = [];
 
     /**
      * @param ProductRawBuilder            $productRawBuilder

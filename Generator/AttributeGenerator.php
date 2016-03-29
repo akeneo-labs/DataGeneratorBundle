@@ -29,25 +29,25 @@ class AttributeGenerator implements GeneratorInterface
     protected $writer;
 
     /** @var array */
-    protected $attributeGroups;
+    protected $attributeGroups = [];
 
     /** @var array */
-    protected $attributeGroupCodes;
+    protected $attributeGroupCodes = [];
 
     /** @var array */
-    protected $locales;
+    protected $locales = [];
 
     /** @var AttributeTypeRegistry */
     protected $typeRegistry;
 
     /** @var array */
-    protected $groupCodes;
+    protected $groupCodes = [];
 
     /** @var Generator */
     protected $faker;
 
     /** @var array */
-    protected $attributes;
+    protected $attributes = [];
 
     /**
      * @param CsvWriter             $writer

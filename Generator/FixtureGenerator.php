@@ -236,9 +236,9 @@ class FixtureGenerator implements GeneratorInterface
         if (isset($config['entities']['families'])) {
             $familyConfig = $config['entities']['families'];
             $this->familyGenerator->generate($globalConfig, $familyConfig, $progress, [
-                'channels'   => $channels,
-                'locales'    => $locales,
-                'attributes' => $attributes,
+                'channels'              => $channels,
+                'locales'               => $locales,
+                'attributes'            => $attributes,
                 'media_attribute_codes' => $this->attributeGenerator->getMediaAttributeCodes()
             ]);
         }

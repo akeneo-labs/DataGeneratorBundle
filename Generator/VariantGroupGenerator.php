@@ -2,7 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
+use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\GroupTranslation;
 use Pim\Bundle\CatalogBundle\Entity\ProductTemplate;
@@ -32,18 +33,18 @@ class VariantGroupGenerator implements GeneratorInterface
     protected $writer;
 
     /** @var LocaleInterface[] */
-    protected $locales;
+    protected $locales = [];
 
     /** @var AttributeInterface[] */
-    protected $availableAxes;
+    protected $availableAxes = [];
 
     /** @var AttributeInterface[] */
-    protected $availableAttributes;
+    protected $availableAttributes = [];
 
     /** @var GroupTypeInterface */
     protected $variantGroupType;
 
-    /** @var Faker\Generator */
+    /** @var Generator */
     protected $faker;
 
     /**
@@ -63,7 +64,7 @@ class VariantGroupGenerator implements GeneratorInterface
         $this->setGroupTypes($options['group_types']);
         $this->locales = $options['locales'];
 
-        $this->faker = Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
@@ -155,7 +156,7 @@ class VariantGroupGenerator implements GeneratorInterface
      */
     protected function getAxes($count, $seed = null)
     {
-        $attributesFaker = Faker\Factory::create();
+        $attributesFaker = Factory::create();
         if (null !== $seed) {
             $attributesFaker->seed($seed);
         }
@@ -187,7 +188,7 @@ class VariantGroupGenerator implements GeneratorInterface
      */
     protected function getProductTemplate($count, $seed = null)
     {
-        $attributesFaker = Faker\Factory::create();
+        $attributesFaker = Factory::create();
         if (null !== $seed) {
             $attributesFaker->seed($seed);
         }

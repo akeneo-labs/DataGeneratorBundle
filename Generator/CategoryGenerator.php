@@ -29,7 +29,7 @@ class CategoryGenerator implements GeneratorInterface
     protected $writer;
 
     /** @var LocaleInterface[] */
-    protected $locales;
+    protected $locales = [];
 
     /** @var Generator */
     protected $faker;
