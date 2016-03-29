@@ -3,7 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Role;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -18,13 +18,13 @@ class UserRoleGenerator implements GeneratorInterface
 {
     const ROLES_FILENAME = 'user_roles.csv';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -40,8 +40,7 @@ class UserRoleGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'] . "/" . static::ROLES_FILENAME)
-            ->setData($normalizedRoles)
-            ->write();
+            ->write($normalizedRoles);
 
         $progress->advance();
 

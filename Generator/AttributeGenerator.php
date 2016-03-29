@@ -6,7 +6,7 @@ use Faker\Factory;
 use Faker\Generator;
 use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypeRegistry;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\AttributeTypes;
 use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -25,7 +25,7 @@ class AttributeGenerator implements GeneratorInterface
 
     const ATTRIBUTE_CODE_PREFIX = 'attr_';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /** @var array */
@@ -50,11 +50,11 @@ class AttributeGenerator implements GeneratorInterface
     protected $attributes;
 
     /**
-     * @param WriterInterface       $writer
+     * @param CsvWriter             $writer
      * @param AttributeTypeRegistry $typeRegistry
      */
     public function __construct(
-        WriterInterface $writer,
+        CsvWriter $writer,
         AttributeTypeRegistry $typeRegistry
     ) {
         $this->writer       = $writer;
@@ -155,8 +155,7 @@ class AttributeGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'] . '/' . self::ATTRIBUTES_FILENAME)
-            ->setData($this->attributes)
-            ->write();
+            ->write($this->attributes);
     }
 
     /**

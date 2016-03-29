@@ -7,7 +7,7 @@ use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\AssociationType;
 use Pim\Bundle\CatalogBundle\Entity\AssociationTypeTranslation;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\AssociationTypeInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -25,7 +25,7 @@ class AssociationTypeGenerator implements GeneratorInterface
 
     const ASSOCIATIONS = 'associations';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /** @var Locale[] */
@@ -35,9 +35,9 @@ class AssociationTypeGenerator implements GeneratorInterface
     protected $faker;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -64,8 +64,7 @@ class AssociationTypeGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'] . '/' . self::ASSOCIATION_TYPES_FILENAME)
-            ->setData($data)
-            ->write();
+            ->write($data);
 
         $progress->advance();
 

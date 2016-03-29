@@ -2,6 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Writer;
 
+use Akeneo\Component\Batch\Item\ItemWriterInterface;
+
 /**
  * Write CSV files
  *
@@ -9,16 +11,17 @@ namespace Pim\Bundle\DataGeneratorBundle\Writer;
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class CsvWriter implements WriterInterface
+class CsvWriter implements ItemWriterInterface
 {
     /** @var string */
     protected $outputFile;
 
-    /** @var array */
-    protected $data;
-
     /**
-     * {@inheritdoc}
+     * Set filename
+     *
+     * @param string $filename
+     *
+     * @return CsvWriter
      */
     public function setFilename($filename)
     {
@@ -28,32 +31,24 @@ class CsvWriter implements WriterInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
      * Write the CSV file from products and headers
+     *
+     * @param array $data
      */
-    public function write()
+    public function write(array $data)
     {
-        if (0 === count($this->data)) {
+        if (0 === count($data)) {
             return;
         }
 
         $csvFile = fopen($this->outputFile, 'w');
 
-        $headers = $this->getHeaders();
+        $headers = $this->getHeaders($data);
         fputcsv($csvFile, $headers, ';');
 
         $headersAsKeys = array_fill_keys($headers, '');
 
-        foreach ($this->data as $item) {
+        foreach ($data as $item) {
             $filledItem = array_merge($headersAsKeys, $item);
             fputcsv($csvFile, $filledItem, ';');
         }
@@ -62,12 +57,15 @@ class CsvWriter implements WriterInterface
 
     /**
      * Return the headers for CSV generation.
+     *
+     * @param array $data
+     *
      * @return array
      */
-    protected function getHeaders()
+    protected function getHeaders(array $data)
     {
         $headers = [];
-        foreach ($this->data as $item) {
+        foreach ($data as $item) {
             foreach ($item as $key => $value) {
                 if (!in_array($key, $headers)) {
                     $headers[] = $key;

@@ -5,7 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Faker\Factory;
 use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\AttributeGroup;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -23,7 +23,7 @@ class AttributeGroupGenerator implements GeneratorInterface
 
     const ATTRIBUTE_GROUP_FILENAME = 'attribute_groups.csv';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /** @var array */
@@ -36,9 +36,9 @@ class AttributeGroupGenerator implements GeneratorInterface
     protected $locales;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -74,8 +74,7 @@ class AttributeGroupGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'] . '/' . static::ATTRIBUTE_GROUP_FILENAME)
-            ->setData($normalizedGroups)
-            ->write();
+            ->write($normalizedGroups);
 
         return $this;
     }

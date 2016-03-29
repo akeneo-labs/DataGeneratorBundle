@@ -4,7 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Akeneo\Component\Batch\Model\JobInstance;
 use Oro\Bundle\UserBundle\Entity\Group;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -22,13 +22,13 @@ class JobProfilesAccessGenerator implements GeneratorInterface
 
     const JOB_PROFILE_ACCESSES = 'job_profile_accesses';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -63,7 +63,6 @@ class JobProfilesAccessGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'] . '/' . self::JOB_PROFILE_ACCESSES_FILENAME)
-            ->setData($data)
-            ->write();
+            ->write($data);
     }
 }

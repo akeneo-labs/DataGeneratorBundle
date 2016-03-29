@@ -3,7 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -21,7 +21,7 @@ class AttributeOptionGenerator implements GeneratorInterface
 
     const ATTRIBUTE_OPTIONS_FILENAME = 'attribute_options.csv';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /** @var array */
@@ -40,9 +40,9 @@ class AttributeOptionGenerator implements GeneratorInterface
     protected $faker;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -79,8 +79,7 @@ class AttributeOptionGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'].'/'.static::ATTRIBUTE_OPTIONS_FILENAME)
-            ->setData($this->attributeOptions)
-            ->write();
+            ->write($this->attributeOptions);
 
         $progress->advance();
 

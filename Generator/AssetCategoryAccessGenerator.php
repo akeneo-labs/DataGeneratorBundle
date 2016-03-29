@@ -3,7 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
@@ -18,10 +18,10 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
 {
     const ASSET_CATEGORY_ACCESSES_FILENAME = 'asset_category_accesses.csv';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -54,7 +54,6 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'] . '/' . self::ASSET_CATEGORY_ACCESSES_FILENAME)
-            ->setData($data)
-            ->write();
+            ->write($data);
     }
 }

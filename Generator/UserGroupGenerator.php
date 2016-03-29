@@ -3,7 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Group;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
 use Pim\Component\Catalog\Model\GroupInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -20,13 +20,13 @@ class UserGroupGenerator implements GeneratorInterface
 {
     const GROUPS_FILENAME = 'user_groups.csv';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -42,8 +42,7 @@ class UserGroupGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'] . "/" . static::GROUPS_FILENAME)
-            ->setData($normalizedGroups)
-            ->write();
+            ->write($normalizedGroups);
 
         $progress->advance();
 

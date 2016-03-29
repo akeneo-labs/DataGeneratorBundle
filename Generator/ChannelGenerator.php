@@ -5,7 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Currency;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\ChannelInterface;
 use Pim\Component\Catalog\Model\CurrencyInterface;
 use Pim\Component\Catalog\Model\LocaleInterface;
@@ -27,7 +27,7 @@ class ChannelGenerator implements GeneratorInterface
 
     const DEFAULT_TREE = 'master';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /** @var string */
@@ -46,9 +46,9 @@ class ChannelGenerator implements GeneratorInterface
     protected $locales;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -207,8 +207,7 @@ class ChannelGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($this->currenciesFilePath)
-            ->setData($data)
-            ->write();
+            ->write($data);
     }
 
     /**
@@ -240,7 +239,6 @@ class ChannelGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($this->channelsFilePath)
-            ->setData($data)
-            ->write();
+            ->write($data);
     }
 }

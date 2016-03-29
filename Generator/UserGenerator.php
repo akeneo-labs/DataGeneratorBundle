@@ -7,7 +7,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\UserInterface;
 use Pim\Component\Catalog\Model\CategoryInterface;
 use Pim\Bundle\UserBundle\Entity\User;
@@ -25,7 +25,7 @@ class UserGenerator implements GeneratorInterface
 {
     const USERS_FILENAME = 'users.csv';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /** @var Channel[] */
@@ -50,9 +50,9 @@ class UserGenerator implements GeneratorInterface
     protected $faker;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -79,8 +79,7 @@ class UserGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir']. "/" . self::USERS_FILENAME)
-            ->setData($normalizedUsers)
-            ->write();
+            ->write($normalizedUsers);
 
         $progress->advance();
 

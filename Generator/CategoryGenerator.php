@@ -6,7 +6,7 @@ use Faker\Factory;
 use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Category;
 use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
@@ -25,7 +25,7 @@ class CategoryGenerator implements GeneratorInterface
 
     const LABEL_LENGTH = 2;
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /** @var LocaleInterface[] */
@@ -35,9 +35,9 @@ class CategoryGenerator implements GeneratorInterface
     protected $faker;
 
     /**
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -66,8 +66,7 @@ class CategoryGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'].'/'.self::CATEGORIES_FILENAME)
-            ->setData($normalizedCategories)
-            ->write();
+            ->write($normalizedCategories);
 
         $progress->advance($count);
 

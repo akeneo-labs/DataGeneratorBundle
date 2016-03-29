@@ -3,7 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Pim\Bundle\CatalogBundle\Entity\GroupType;
-use Pim\Bundle\DataGeneratorBundle\Writer\WriterInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\GroupTypeInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
@@ -19,13 +19,13 @@ class GroupTypeGenerator implements GeneratorInterface
 {
     const GROUP_TYPES_FILENAME = 'group_types.csv';
 
-    /** @var WriterInterface */
+    /** @var CsvWriter */
     protected $writer;
 
     /**.
-     * @param WriterInterface $writer
+     * @param CsvWriter $writer
      */
-    public function __construct(WriterInterface $writer)
+    public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
@@ -54,8 +54,7 @@ class GroupTypeGenerator implements GeneratorInterface
 
         $this->writer
             ->setFilename($globalConfig['output_dir'] . '/' . self::GROUP_TYPES_FILENAME)
-            ->setData($data)
-            ->write();
+            ->write($data);
 
         return $groupTypes;
     }
