@@ -4,7 +4,8 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Akeneo\Component\Batch\Model\JobInstance;
 use Symfony\Component\Console\Helper\ProgressHelper;
-use Symfony\Component\Yaml;
+use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Parser;
 
 /**
  * Job instances fixtures generator.
@@ -125,7 +126,7 @@ class JobGenerator
     protected function getInternalJobs()
     {
         $internalJobsPath = sprintf('%s/../%s', __DIR__, self::INTERNAL_JOBS_FILE);
-        $yamlParser = new Yaml\Parser();
+        $yamlParser = new Parser();
 
         return $yamlParser->parse(file_get_contents($internalJobsPath))['jobs'];
     }
@@ -138,7 +139,7 @@ class JobGenerator
      */
     protected function writeYamlFile(array $data, $filename)
     {
-        $dumper = new Yaml\Dumper();
+        $dumper = new Dumper();
         $yamlData = $dumper->dump($data, 5, 0, true, true);
 
         file_put_contents($filename, $yamlData);

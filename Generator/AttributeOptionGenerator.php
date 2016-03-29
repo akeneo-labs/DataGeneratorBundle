@@ -2,12 +2,12 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
+use Faker\Factory;
 use Faker\Generator;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\AttributeTypes;
 use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\LocaleInterface;
-use SebastianBergmann\Comparator\Factory;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -69,7 +69,7 @@ class AttributeOptionGenerator implements GeneratorInterface
             for ($i = 0; $i < $countPerAttribute; $i++) {
                 $attributeOption = [];
                 $attributeOption['attribute'] = $attribute->getCode();
-                $attributeOption['code'] = static::ATTRIBUTE_OPTION_CODE_PREFIX . $attribute->getCode() . $i;
+                $attributeOption['code'] = self::ATTRIBUTE_OPTION_CODE_PREFIX . $attribute->getCode() . $i;
                 $attributeOption['sort_order'] = $this->faker->numberBetween(1, $countPerAttribute);
 
                 foreach ($this->getLocalizedRandomLabels() as $localeCode => $label) {

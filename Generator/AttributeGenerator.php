@@ -32,7 +32,7 @@ class AttributeGenerator implements GeneratorInterface
     protected $attributeGroups = [];
 
     /** @var array */
-    protected $attributeGroupCodes = [];
+    protected $attributeGroupCodes;
 
     /** @var array */
     protected $locales = [];

@@ -73,7 +73,7 @@ class AttributeGroupGenerator implements GeneratorInterface
         $normalizedGroups = $this->normalizeAttributeGroups($this->attributeGroups);
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], static::ATTRIBUTE_GROUP_FILENAME))
+            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::ATTRIBUTE_GROUP_FILENAME))
             ->write($normalizedGroups);
 
         return $this;

@@ -1,6 +1,7 @@
 <?php
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
+
 use Symfony\Component\Console\Helper\ProgressHelper;
 
 /**

@@ -118,7 +118,7 @@ class CategoryGenerator implements GeneratorInterface
             $translation->setLocale($locale);
 
             if (null === $forcedLabel) {
-                $translation->setLabel($this->faker->sentence(static::LABEL_LENGTH));
+                $translation->setLabel($this->faker->sentence(self::LABEL_LENGTH));
             } else {
                 $translation->setLabel($forcedLabel);
             }

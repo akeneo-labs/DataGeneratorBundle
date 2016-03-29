@@ -96,14 +96,14 @@ class FamilyGenerator implements GeneratorInterface
             $attributes = array_unique(array_merge([$this->identifierAttribute, $this->labelAttribute], $attributes));
             $nonMediaAttributeCodes = array_diff($attributes, $options['media_attribute_codes']);
 
-            $family['attributes'] = implode(static::ATTRIBUTE_DELIMITER, $attributes);
+            $family['attributes'] = implode(self::ATTRIBUTE_DELIMITER, $attributes);
 
             foreach ($this->channels as $channel) {
                 // non media attributes can't be set to required to avoid to have to generate for complete products
                 $attributeReqs = $this->faker->randomElements($nonMediaAttributeCodes, $requirementsCount);
                 $attributeReqs = array_merge([$this->identifierAttribute], $attributeReqs);
 
-                $family['requirements-'.$channel->getCode()] = implode(static::ATTRIBUTE_DELIMITER, $attributeReqs);
+                $family['requirements-'.$channel->getCode()] = implode(self::ATTRIBUTE_DELIMITER, $attributeReqs);
             }
 
             $families[$family['code']] = $family;
