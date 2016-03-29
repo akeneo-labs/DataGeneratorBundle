@@ -39,7 +39,7 @@ class UserRoleGenerator implements GeneratorInterface
         $normalizedRoles = $this->normalizeRoles($roles);
 
         $this->writer
-            ->setFilename($globalConfig['output_dir'] . "/" . static::ROLES_FILENAME)
+            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::ROLES_FILENAME))
             ->write($normalizedRoles);
 
         $progress->advance();

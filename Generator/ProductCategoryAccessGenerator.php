@@ -62,7 +62,7 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
         $progress->advance();
 
         $this->writer
-            ->setFilename($globalConfig['output_dir'] . '/' . self::PRODUCT_CATEGORY_ACCESSES_FILENAME)
+            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::PRODUCT_CATEGORY_ACCESSES_FILENAME))
             ->write($data);
     }
 }

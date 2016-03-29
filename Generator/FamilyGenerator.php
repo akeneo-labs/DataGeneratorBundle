@@ -113,7 +113,7 @@ class FamilyGenerator implements GeneratorInterface
         $this->families = $families;
 
         $this->writer
-            ->setFilename($globalConfig['output_dir'].'/'.self::FAMILIES_FILENAME)
+            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::FAMILIES_FILENAME))
             ->write($families);
 
         return $this;

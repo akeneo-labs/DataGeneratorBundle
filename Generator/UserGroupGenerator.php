@@ -41,7 +41,7 @@ class UserGroupGenerator implements GeneratorInterface
         $normalizedGroups = $this->normalizeGroups(array_values($groups));
 
         $this->writer
-            ->setFilename($globalConfig['output_dir'] . "/" . static::GROUPS_FILENAME)
+            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::GROUPS_FILENAME))
             ->write($normalizedGroups);
 
         $progress->advance();

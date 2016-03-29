@@ -35,7 +35,7 @@ class JobGenerator
 
         $this->writeYamlFile(
             $normalizedJobs,
-            $globalConfig['output_dir'] . "/" . static::JOB_FILENAME
+            sprintf('%s/%s', $globalConfig['output_dir'], self::JOB_FILENAME)
         );
 
         $progress->advance();
@@ -124,7 +124,7 @@ class JobGenerator
      */
     protected function getInternalJobs()
     {
-        $internalJobsPath = __DIR__.'/../'.static::INTERNAL_JOBS_FILE;
+        $internalJobsPath = sprintf('%s/../%s', __DIR__, self::INTERNAL_JOBS_FILE);
         $yamlParser = new Yaml\Parser();
 
         return $yamlParser->parse(file_get_contents($internalJobsPath))['jobs'];

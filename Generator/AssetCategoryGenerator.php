@@ -56,7 +56,7 @@ class AssetCategoryGenerator implements GeneratorInterface
         }
 
         $this->writer
-            ->setFilename($globalConfig['output_dir'] . '/' . self::ASSET_CATEGORIES_FILENAME)
+            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::ASSET_CATEGORIES_FILENAME))
             ->write($assetCategories);
 
         $progress->advance();

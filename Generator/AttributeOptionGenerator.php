@@ -78,7 +78,7 @@ class AttributeOptionGenerator implements GeneratorInterface
         }
 
         $this->writer
-            ->setFilename($globalConfig['output_dir'].'/'.static::ATTRIBUTE_OPTIONS_FILENAME)
+            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::ATTRIBUTE_OPTIONS_FILENAME))
             ->write($this->attributeOptions);
 
         $progress->advance();

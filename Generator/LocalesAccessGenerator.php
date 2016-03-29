@@ -61,7 +61,7 @@ class LocalesAccessGenerator implements GeneratorInterface
         $progress->advance();
 
         $this->writer
-            ->setFilename($globalConfig['output_dir'] . '/' . self::LOCALE_ACCESSES_FILENAME)
+            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::LOCALE_ACCESSES_FILENAME))
             ->write($data);
     }
 }
