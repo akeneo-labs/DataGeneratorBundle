@@ -63,7 +63,12 @@ class AssociationTypeGenerator implements GeneratorInterface
         }
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::ASSOCIATION_TYPES_FILENAME))
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::ASSOCIATION_TYPES_FILENAME
+            ))
             ->write($data);
 
         $progress->advance();

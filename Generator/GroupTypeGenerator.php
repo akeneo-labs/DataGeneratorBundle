@@ -53,7 +53,12 @@ class GroupTypeGenerator implements GeneratorInterface
         $progress->advance();
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::GROUP_TYPES_FILENAME))
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::GROUP_TYPES_FILENAME
+            ))
             ->write($data);
 
         return $groupTypes;

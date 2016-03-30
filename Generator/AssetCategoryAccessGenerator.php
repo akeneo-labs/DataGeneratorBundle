@@ -53,7 +53,12 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
         $progress->advance();
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::ASSET_CATEGORY_ACCESSES_FILENAME))
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::ASSET_CATEGORY_ACCESSES_FILENAME
+            ))
             ->write($data);
     }
 }

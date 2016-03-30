@@ -58,8 +58,18 @@ class ChannelGenerator implements GeneratorInterface
      */
     public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
-        $this->channelsFilePath   = sprintf('%s/%s', $globalConfig['output_dir'], self::CHANNEL_FILENAME);
-        $this->currenciesFilePath = sprintf('%s/%s', $globalConfig['output_dir'], self::CURRENCY_FILENAME);
+        $this->channelsFilePath = sprintf(
+            '%s%s%s',
+            $globalConfig['output_dir'],
+            DIRECTORY_SEPARATOR,
+            self::CHANNEL_FILENAME
+        );
+        $this->currenciesFilePath = sprintf(
+            '%s%s%s',
+            $globalConfig['output_dir'],
+            DIRECTORY_SEPARATOR,
+            self::CURRENCY_FILENAME
+        );
 
         $this->locales = $this->generateLocales($config);
 

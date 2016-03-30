@@ -23,8 +23,19 @@ class LocaleGenerator implements GeneratorInterface
     public function generate(array $globalConfig, array $generatorConfig, ProgressHelper $progress, array $options = [])
     {
         copy(
-            sprintf('%s/../%s', dirname(__FILE__), self::INTERNAL_LOCALES_FILE),
-            sprintf('%s/%s', $globalConfig['output_dir'], self::LOCALES_FILENAME)
+            sprintf(
+                '%s%s..%s%s',
+                dirname(__FILE__),
+                DIRECTORY_SEPARATOR,
+                DIRECTORY_SEPARATOR,
+                self::INTERNAL_LOCALES_FILE
+            ),
+            sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::LOCALES_FILENAME
+            )
         );
 
         $progress->advance();

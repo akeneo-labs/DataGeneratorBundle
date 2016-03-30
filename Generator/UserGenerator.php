@@ -79,7 +79,12 @@ class UserGenerator implements GeneratorInterface
         $normalizedUsers = $this->normalizeUsers($users);
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::USERS_FILENAME))
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::USERS_FILENAME
+            ))
             ->write($normalizedUsers);
 
         $progress->advance();

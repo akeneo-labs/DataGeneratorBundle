@@ -81,7 +81,12 @@ class VariantGroupGenerator implements GeneratorInterface
         }
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::VARIANT_GROUPS_FILENAME))
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::VARIANT_GROUPS_FILENAME
+            ))
             ->write($data);
 
         return $variantGroups;

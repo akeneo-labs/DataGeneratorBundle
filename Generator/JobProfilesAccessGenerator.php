@@ -62,7 +62,12 @@ class JobProfilesAccessGenerator implements GeneratorInterface
         $progress->advance();
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::JOB_PROFILE_ACCESSES_FILENAME))
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::JOB_PROFILE_ACCESSES_FILENAME
+            ))
             ->write($data);
     }
 }

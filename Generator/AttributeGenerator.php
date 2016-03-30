@@ -154,7 +154,12 @@ class AttributeGenerator implements GeneratorInterface
         }
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::ATTRIBUTES_FILENAME))
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::ATTRIBUTES_FILENAME
+            ))
             ->write($this->attributes);
     }
 

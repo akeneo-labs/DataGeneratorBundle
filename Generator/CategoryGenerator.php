@@ -65,7 +65,12 @@ class CategoryGenerator implements GeneratorInterface
         $normalizedCategories = $this->normalizeCategories($categories);
 
         $this->writer
-            ->setFilename(sprintf('%s/%s', $globalConfig['output_dir'], self::CATEGORIES_FILENAME))
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::CATEGORIES_FILENAME
+            ))
             ->write($normalizedCategories);
 
         $progress->advance($count);
