@@ -105,8 +105,16 @@ class VariantGroupGenerator implements GeneratorInterface
         $group->setType($this->variantGroupType);
         $group->setCode(sprintf('variant_group_%s', $index));
 
-        $group->setAxisAttributes($this->getAxes($config['axes_count'], $globalConfig['seed']));
-        $group->setProductTemplate($this->getProductTemplate($config['attributes_count'], $globalConfig['seed']));
+        $group->setAxisAttributes($this->getAxes(
+            $config['axes_count'],
+            $index,
+            $globalConfig['seed']
+        ));
+        $group->setProductTemplate($this->getProductTemplate(
+            $config['attributes_count'],
+            $index,
+            $globalConfig['seed']
+        ));
 
         foreach ($this->locales as $locale) {
             $translation = new GroupTranslation();
@@ -154,18 +162,21 @@ class VariantGroupGenerator implements GeneratorInterface
      * Return a random set of axes for a variant group.
      *
      * @param int $count
+     * @param int $index
      * @param int $seed
      *
      * @return AttributeInterface[]
      */
-    protected function getAxes($count, $seed = null)
+    protected function getAxes($count, $index, $seed = null)
     {
         $attributesFaker = Factory::create();
+        $axeSeed = $index;
         if (null !== $seed) {
-            $attributesFaker->seed($seed);
+            $axeSeed = sprintf('%s%s', $axeSeed, $seed);
         }
-        $axes = [];
+        $attributesFaker->seed($axeSeed);
 
+        $axes = [];
         for ($i = 0; $i < $count; $i++) {
             try {
                 $axis = $attributesFaker->unique()->randomElement($this->availableAxes);
@@ -186,19 +197,21 @@ class VariantGroupGenerator implements GeneratorInterface
      * Returns a product template containing product values for a variant group.
      *
      * @param int $count
+     * @param int $index
      * @param int $seed
      *
      * @return ProductTemplate
      */
-    protected function getProductTemplate($count, $seed = null)
+    protected function getProductTemplate($count, $index, $seed = null)
     {
         $attributesFaker = Factory::create();
+        $axeSeed = $index;
         if (null !== $seed) {
-            $attributesFaker->seed($seed);
+            $axeSeed = sprintf('%s%s', $axeSeed, $seed);
         }
+        $attributesFaker->seed($axeSeed);
 
         $valuesData = [];
-
         for ($i = 0; $i < $count; $i++) {
             try {
                 $attribute = $attributesFaker->unique($i == 0)->randomElement($this->availableAttributes);
