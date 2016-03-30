@@ -50,17 +50,32 @@ data_generator:
             count: 50
             levels: 3
         jobs:
-            csv_product_import:
-                connector: Akeneo CSV Connector
-                alias: csv_product_import
-                label: Demo product import
-                type: import
+            product_import:
+                connector: Akeneo Native Connector
+                alias:     csv_product_import
+                label:     Product import
+                type:      import
                 configuration:
+                    uploadAllowed:      true
+                    delimiter:          ;
+                    enclosure:          '"'
+                    escape:             '\'
+                    enabled:            true
+                    categoriesColumn:   categories
+                    familyColumn:       family
+                    groupsColumn:       groups
+                    realTimeVersioning: true
+            product_export:
+                connector: Akeneo Native Connector
+                alias:     csv_product_export
+                label:     Product export
+                type:      export
+                configuration:
+                    channel:    ecommerce
+                    delimiter:  ;
+                    enclosure:  '"'
+                    withHeader: true
                     filePath: /tmp/product.csv
-                    delimiter: ;
-                    enclosure: '"'
-                    escape: '\'
-                    enabled: true
         user_groups:
             it_support:
                 name: IT support

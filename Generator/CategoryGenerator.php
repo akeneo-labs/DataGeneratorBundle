@@ -2,12 +2,13 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
+use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Category;
 use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation;
-use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
+use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
-use Symfony\Component\Yaml;
 
 /**
  * Generate categories fixtures
@@ -16,17 +17,30 @@ use Symfony\Component\Yaml;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class CategoryGenerator
+class CategoryGenerator implements GeneratorInterface
 {
     const CATEGORIES_FILENAME = 'categories.csv';
+
     const CATEGORIES_CODE_PREFIX = 'cat_';
+
     const LABEL_LENGTH = 2;
 
-    /** @var Locale[] */
-    protected $locales;
+    /** @var CsvWriter */
+    protected $writer;
 
-    /** @var Faker\Generator */
+    /** @var LocaleInterface[] */
+    protected $locales = [];
+
+    /** @var Generator */
     protected $faker;
+
+    /**
+     * @param CsvWriter $writer
+     */
+    public function __construct(CsvWriter $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -35,29 +49,29 @@ class CategoryGenerator
     {
         $this->locales = $options['locales'];
 
-        $this->faker = Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
 
-        $delimiter = $config['delimiter'];
         $count     = (int)$config['count'];
         $levelMax  = (int)$config['levels'];
 
         $countByLevel = $this->calculateNodeCountPerLevel($levelMax, $count);
-
-        $headers = ['code', 'parent'];
-        foreach ($this->locales as $locale) {
-            $headers[] = 'label-'.$locale->getCode();
-        }
 
         $rootCategory = $this->generateCategory('master', 'Master Catalog');
         $categories = $this->generateCategories($rootCategory, 1, $countByLevel, $levelMax);
 
         $normalizedCategories = $this->normalizeCategories($categories);
 
-        $outputFile = $globalConfig['output_dir'].'/'.self::CATEGORIES_FILENAME;
-        $this->writeCsvFile($headers, $normalizedCategories, $outputFile, $delimiter);
+        $this->writer
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::CATEGORIES_FILENAME
+            ))
+            ->write($normalizedCategories);
 
         $progress->advance($count);
 
@@ -109,7 +123,7 @@ class CategoryGenerator
             $translation->setLocale($locale);
 
             if (null === $forcedLabel) {
-                $translation->setLabel($this->faker->sentence(static::LABEL_LENGTH));
+                $translation->setLabel($this->faker->sentence(self::LABEL_LENGTH));
             } else {
                 $translation->setLabel($forcedLabel);
             }
@@ -186,22 +200,6 @@ class CategoryGenerator
 
         return $flatCategories;
     }
-
-    /**
-     * Write the CSV file
-     */
-    protected function writeCsvFile(array $headers, array $normalizedCategories, $outputFile, $delimiter)
-    {
-        $csvFile = fopen($outputFile, 'w');
-
-        fputcsv($csvFile, $headers, $delimiter);
-
-        foreach ($normalizedCategories as $category) {
-            fputcsv($csvFile, $category, $delimiter);
-        }
-        fclose($csvFile);
-    }
-
 
     /**
      * Calculate on approximation for the average number of nodes per level needed from the

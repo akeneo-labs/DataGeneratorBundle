@@ -2,8 +2,9 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Symfony\Component\Console\Helper\ProgressHelper;
 
 /**
@@ -21,6 +22,14 @@ class AssetCategoryGenerator implements GeneratorInterface
 
     const ASSET_MAIN_CATALOG = 'asset_main_catalog';
 
+    /** @var CsvWriter */
+    protected $writer;
+
+    public function __construct(CsvWriter $writer)
+    {
+        $this->writer = $writer;
+    }
+
     /** @var Locale[] */
     protected $locales;
 
@@ -33,46 +42,29 @@ class AssetCategoryGenerator implements GeneratorInterface
     {
         $this->locales = $options['locales'];
 
-        $faker = \Faker\Factory::create();
+        $faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $faker->seed($globalConfig['seed']);
         }
 
         $assetCategories = [['code' => self::ASSET_MAIN_CATALOG, 'parent' => '']];
 
-        /** @var Locale $locale */
         foreach ($this->locales as $locale) {
             $key = sprintf('label-%s', $locale->getCode());
             $assetCategories[0][$key] = implode(' ', $faker->words(3));
         }
 
-        $headers = array_keys($assetCategories[0]);
-
-        $this->writeCsvFile($assetCategories, $headers, $globalConfig['output_dir']);
+        $this->writer
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::ASSET_CATEGORIES_FILENAME
+            ))
+            ->write($assetCategories);
 
         $progress->advance();
 
         return [ self::ASSET_MAIN_CATALOG ];
-    }
-
-    /**
-     * Write the CSV file from products and headers
-     *
-     * @param array  $assetCategories
-     * @param array  $headers
-     * @param string $outputDir
-     */
-    protected function writeCsvFile(array $assetCategories, array $headers, $outputDir)
-    {
-        $csvFile = fopen($outputDir.'/'.self::ASSET_CATEGORIES_FILENAME, 'w');
-
-        fputcsv($csvFile, $headers, ';');
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($assetCategories as $assetCategory) {
-            $productData = array_merge($headersAsKeys, $assetCategory);
-            fputcsv($csvFile, $productData, ';');
-        }
-        fclose($csvFile);
     }
 }

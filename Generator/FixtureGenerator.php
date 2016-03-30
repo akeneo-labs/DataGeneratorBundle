@@ -70,6 +70,9 @@ class FixtureGenerator implements GeneratorInterface
     /** @var VariantGroupGenerator */
     protected $variantGroupGenerator;
 
+    /** @var LocaleGenerator */
+    protected $localeGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -90,6 +93,7 @@ class FixtureGenerator implements GeneratorInterface
      * @param AssociationTypeGenerator       $associationTypeGenerator
      * @param GroupTypeGenerator             $groupTypeGenerator
      * @param VariantGroupGenerator          $variantGroupGenerator
+     * @param LocaleGenerator                $localeGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -110,7 +114,8 @@ class FixtureGenerator implements GeneratorInterface
         ProductCategoryAccessGenerator $productCategoryAccessGenerator,
         AssociationTypeGenerator       $associationTypeGenerator,
         GroupTypeGenerator             $groupTypeGenerator,
-        VariantGroupGenerator          $variantGroupGenerator
+        VariantGroupGenerator          $variantGroupGenerator,
+        LocaleGenerator                $localeGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -131,6 +136,7 @@ class FixtureGenerator implements GeneratorInterface
         $this->associationTypeGenerator       = $associationTypeGenerator;
         $this->groupTypeGenerator             = $groupTypeGenerator;
         $this->variantGroupGenerator          = $variantGroupGenerator;
+        $this->localeGenerator                = $localeGenerator;
     }
 
     /**
@@ -146,10 +152,12 @@ class FixtureGenerator implements GeneratorInterface
         $attributeGroups    = [];
         $attributes         = [];
         $assetCategoryCodes = [];
-        $jobs               = [];
+        $jobCodes           = [];
 
         $config = $globalConfig;
         unset($globalConfig['entities']);
+
+        $this->localeGenerator->generate($globalConfig, [], $progress);
 
         if (isset($config['entities']['channels'])) {
             $channelConfig = $config['entities']['channels'];
@@ -228,16 +236,16 @@ class FixtureGenerator implements GeneratorInterface
         if (isset($config['entities']['families'])) {
             $familyConfig = $config['entities']['families'];
             $this->familyGenerator->generate($globalConfig, $familyConfig, $progress, [
-                'channels'   => $channels,
-                'locales'    => $locales,
-                'attributes' => $attributes,
+                'channels'              => $channels,
+                'locales'               => $locales,
+                'attributes'            => $attributes,
                 'media_attribute_codes' => $this->attributeGenerator->getMediaAttributeCodes()
             ]);
         }
 
         if (isset($config['entities']['jobs'])) {
             $jobConfig = $config['entities']['jobs'];
-            $jobs = $this->jobGenerator->generate($globalConfig, $jobConfig, $progress);
+            $jobCodes  = $this->jobGenerator->generate($globalConfig, $jobConfig, $progress);
         }
 
         if (isset($config['entities']['attribute_options'])) {
@@ -279,8 +287,8 @@ class FixtureGenerator implements GeneratorInterface
 
         if (isset($config['entities']['job_profiles_accesses'])) {
             $this->jobProfilesAccessGenerator->generate($globalConfig, [], $progress, [
-                'groups' => $userGroups,
-                'jobs'   => $jobs,
+                'groups'   => $userGroups,
+                'jobCodes' => $jobCodes,
             ]);
         }
 

@@ -4,7 +4,8 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Akeneo\Component\Batch\Model\JobInstance;
 use Symfony\Component\Console\Helper\ProgressHelper;
-use Symfony\Component\Yaml;
+use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Parser;
 
 /**
  * Job instances fixtures generator.
@@ -28,19 +29,19 @@ class JobGenerator
 
         $normalizedJobs = $this->normalizeJobs($jobs);
 
-        $normaizedJobs['jobs'] = array_merge(
+        $normalizedJobs['jobs'] = array_merge(
             $normalizedJobs['jobs'],
             $this->getInternalJobs()
         );
 
         $this->writeYamlFile(
             $normalizedJobs,
-            $globalConfig['output_dir'] . "/" . static::JOB_FILENAME
+            sprintf('%s%s%s', $globalConfig['output_dir'], DIRECTORY_SEPARATOR, self::JOB_FILENAME)
         );
 
         $progress->advance();
 
-        return $jobs;
+        return array_keys($normalizedJobs['jobs']);
     }
 
     /**
@@ -64,7 +65,7 @@ class JobGenerator
      * Generate a job object from the data provided
      *
      * @param string $code
-     * @param array  $config
+     * @param array  $jobConfig
      *
      * @return JobInstance
      */
@@ -84,7 +85,7 @@ class JobGenerator
     /**
      * Normalize jobs objects into a structured array
      *
-     * @param Job[]
+     * @param JobInstance[] $jobs
      *
      * @return array
      */
@@ -102,7 +103,7 @@ class JobGenerator
     /**
      * Normalize job object into a structured array
      *
-     * @param JobInstance
+     * @param JobInstance $job
      *
      * @return array
      */
@@ -124,10 +125,16 @@ class JobGenerator
      */
     protected function getInternalJobs()
     {
-        $internalJobsPath = __DIR__.'/../'.static::INTERNAL_JOBS_FILE;
-        $yamlParser = new Yaml\Parser();
+        $internalJobsPath = sprintf(
+            '%s%s..%s%s',
+            __DIR__,
+            DIRECTORY_SEPARATOR,
+            DIRECTORY_SEPARATOR,
+            self::INTERNAL_JOBS_FILE
+        );
+        $yamlParser = new Parser();
 
-        return $yamlParser->parse(file_get_contents($internalJobsPath));
+        return $yamlParser->parse(file_get_contents($internalJobsPath))['jobs'];
     }
 
     /**
@@ -138,7 +145,7 @@ class JobGenerator
      */
     protected function writeYamlFile(array $data, $filename)
     {
-        $dumper = new Yaml\Dumper();
+        $dumper = new Dumper();
         $yamlData = $dumper->dump($data, 5, 0, true, true);
 
         file_put_contents($filename, $yamlData);

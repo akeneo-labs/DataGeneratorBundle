@@ -2,10 +2,10 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
+use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Family;
-use Pim\Component\Catalog\Repository\ChannelRepositoryInterface;
-use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -24,11 +24,8 @@ class FamilyGenerator implements GeneratorInterface
 
     const ATTRIBUTE_DELIMITER = ',';
 
-    /** @var string */
-    protected $familiesFile;
-
-    /** @var string */
-    protected $delimiter;
+    /** @var CsvWriter */
+    protected $writer;
 
     /** @var string */
     protected $identifierAttribute;
@@ -37,22 +34,30 @@ class FamilyGenerator implements GeneratorInterface
     protected $labelAttribute;
 
     /** @var array */
-    protected $locales;
+    protected $locales = [];
 
     /** @var array */
-    protected $channels;
+    protected $channels = [];
 
-    /** @var Faker\Generator */
+    /** @var Generator */
     protected $faker;
 
     /** @var array */
-    protected $families;
+    protected $families = [];
 
     /** @var array */
-    protected $attributes;
+    protected $attributes = [];
 
     /** @var array */
     protected $filteredAttrCodes;
+
+    /**
+     * @param CsvWriter $writer
+     */
+    public function __construct(CsvWriter $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -63,17 +68,13 @@ class FamilyGenerator implements GeneratorInterface
         $this->attributes = $options['attributes'];
         $this->channels   = $options['channels'];
 
-        $this->familiesFile = $globalConfig['output_dir'].'/'.self::FAMILIES_FILENAME;
-
-        $this->delimiter = $config['delimiter'];
-
         $count = (int) $config['count'];
         $attributesCount = (int) $config['attributes_count'] - 1;
         $requirementsCount = (int) $config['requirements_count'] - 1;
         $this->identifierAttribute = $config['identifier_attribute'];
         $this->labelAttribute      = $config['label_attribute'];
 
-        $this->faker = Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
@@ -95,14 +96,14 @@ class FamilyGenerator implements GeneratorInterface
             $attributes = array_unique(array_merge([$this->identifierAttribute, $this->labelAttribute], $attributes));
             $nonMediaAttributeCodes = array_diff($attributes, $options['media_attribute_codes']);
 
-            $family['attributes'] = implode(static::ATTRIBUTE_DELIMITER, $attributes);
+            $family['attributes'] = implode(self::ATTRIBUTE_DELIMITER, $attributes);
 
             foreach ($this->channels as $channel) {
                 // non media attributes can't be set to required to avoid to have to generate for complete products
                 $attributeReqs = $this->faker->randomElements($nonMediaAttributeCodes, $requirementsCount);
                 $attributeReqs = array_merge([$this->identifierAttribute], $attributeReqs);
 
-                $family['requirements-'.$channel->getCode()] = implode(static::ATTRIBUTE_DELIMITER, $attributeReqs);
+                $family['requirements-'.$channel->getCode()] = implode(self::ATTRIBUTE_DELIMITER, $attributeReqs);
             }
 
             $families[$family['code']] = $family;
@@ -111,9 +112,14 @@ class FamilyGenerator implements GeneratorInterface
 
         $this->families = $families;
 
-        $headers = $this->getAllKeys($this->families);
-
-        $this->writeCsvFile($this->families, $headers);
+        $this->writer
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::FAMILIES_FILENAME
+            ))
+            ->write($families);
 
         return $this;
     }
@@ -171,44 +177,5 @@ class FamilyGenerator implements GeneratorInterface
         }
 
         return $this->filteredAttrCodes;
-    }
-
-    /**
-     * Write the CSV file from families
-     *
-     * @param array $families
-     * @param array $headers
-     */
-    protected function writeCsvFile(array $families, array $headers)
-    {
-        $csvFile = fopen($this->familiesFile, 'w');
-
-        fputcsv($csvFile, $headers, $this->delimiter);
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($families as $family) {
-            $familyData = array_merge($headersAsKeys, $family);
-            fputcsv($csvFile, $familyData, $this->delimiter);
-        }
-        fclose($csvFile);
-    }
-
-    /**
-     * Get a set of all keys inside arrays
-     *
-     * @param array $items
-     *
-     * @return array
-     */
-    protected function getAllKeys(array $items)
-    {
-        $keys = [];
-
-        foreach ($items as $item) {
-            $keys = array_merge($keys, array_keys($item));
-            $keys = array_unique($keys);
-        }
-
-        return $keys;
     }
 }

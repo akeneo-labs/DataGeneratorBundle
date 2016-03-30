@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Role;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -13,9 +14,20 @@ use Symfony\Component\Yaml;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class UserRoleGenerator
+class UserRoleGenerator implements GeneratorInterface
 {
-    const ROLES_FILENAME = 'user_roles.yml';
+    const ROLES_FILENAME = 'user_roles.csv';
+
+    /** @var CsvWriter */
+    protected $writer;
+
+    /**
+     * @param CsvWriter $writer
+     */
+    public function __construct(CsvWriter $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -26,10 +38,14 @@ class UserRoleGenerator
 
         $normalizedRoles = $this->normalizeRoles($roles);
 
-        $this->writeYamlFile(
-            $normalizedRoles,
-            $globalConfig['output_dir'] . "/" . static::ROLES_FILENAME
-        );
+        $this->writer
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::ROLES_FILENAME
+            ))
+            ->write($normalizedRoles);
 
         $progress->advance();
 
@@ -57,7 +73,7 @@ class UserRoleGenerator
      * Generate a role object from the data provided
      *
      * @param string $key
-     * @param array $config
+     * @param array  $roleConfig
      *
      * @return Role
      */
@@ -73,7 +89,7 @@ class UserRoleGenerator
     /**
      * Normalize roles objects into a structured array
      *
-     * @param Role[]
+     * @param Role[] $roles
      *
      * @return array
      */
@@ -82,36 +98,24 @@ class UserRoleGenerator
         $normalizedRoles = [];
 
         foreach ($roles as $role) {
-            $normalizedRoles[$role->getRole()] = $this->normalizeRole($role);
+            $normalizedRoles[] = $this->normalizeRole($role);
         }
 
-        return [ "user_roles" => $normalizedRoles ];
+        return $normalizedRoles;
     }
 
     /**
      * Normalize role object into a structured array
      *
-     * @param Role
+     * @param Role $role
      *
      * @return array
      */
     public function normalizeRole(Role $role)
     {
         return [
-            "label" => $role->getLabel()
+            'label' => $role->getLabel(),
+            'role'  => $role->getRole(),
         ];
-    }
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $filename
-     */
-    protected function writeYamlFile(array $data, $filename)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
-
-        file_put_contents($filename, $yamlData);
     }
 }

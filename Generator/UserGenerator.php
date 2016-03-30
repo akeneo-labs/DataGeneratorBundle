@@ -2,11 +2,14 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
+use Faker\Generator;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Pim\Bundle\CatalogBundle\Entity\Channel;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
+use Pim\Bundle\UserBundle\Entity\UserInterface;
 use Pim\Component\Catalog\Model\CategoryInterface;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -19,30 +22,41 @@ use Symfony\Component\Yaml;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class UserGenerator
+class UserGenerator implements GeneratorInterface
 {
-    const USERS_FILENAME = 'users.yml';
+    const USERS_FILENAME = 'users.csv';
+
+    /** @var CsvWriter */
+    protected $writer;
 
     /** @var Channel[] */
-    protected $channels;
+    protected $channels = [];
 
     /** @var Locale[] */
-    protected $locales;
+    protected $locales = [];
 
     /** @var Group[] */
-    protected $userGroups;
+    protected $userGroups = [];
 
     /** @var Role[] */
-    protected $userRoles;
+    protected $userRoles = [];
 
     /** @var string[] */
-    protected $assetCategoryCodes;
+    protected $assetCategoryCodes = [];
 
     /** @var CategoryInterface[] */
-    protected $categories;
+    protected $categories = [];
 
-    /** @var Faker\Generator */
+    /** @var Generator */
     protected $faker;
+
+    /**
+     * @param CsvWriter $writer
+     */
+    public function __construct(CsvWriter $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -56,7 +70,7 @@ class UserGenerator
         $this->userGroups         = $options['user_groups'];
         $this->assetCategoryCodes = $options['asset_category_codes'];
 
-        $this->faker = Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
@@ -64,10 +78,14 @@ class UserGenerator
 
         $normalizedUsers = $this->normalizeUsers($users);
 
-        $this->writeYamlFile(
-            $normalizedUsers,
-            $globalConfig['output_dir']. "/" . static::USERS_FILENAME
-        );
+        $this->writer
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::USERS_FILENAME
+            ))
+            ->write($normalizedUsers);
 
         $progress->advance();
 
@@ -79,7 +97,7 @@ class UserGenerator
      *
      * @param array $usersConfig
      *
-     * @return User[]
+     * @return UserInterface[]
      */
     protected function generateUsers(array $usersConfig)
     {
@@ -96,7 +114,7 @@ class UserGenerator
      *
      * @param array $userConfig
      *
-     * @return User
+     * @return UserInterface
      */
     protected function generateUser(array $userConfig)
     {
@@ -143,29 +161,28 @@ class UserGenerator
     /**
      * Normalize users objects into a structured array
      *
-     * @param User[] $users
+     * @param UserInterface[] $users
      *
      * @return array
      */
     protected function normalizeUsers(array $users)
     {
         $normalizedUsers = [];
-
         foreach ($users as $user) {
             $normalizedUsers[] = $this->normalizeUser($user);
         }
 
-        return [ "users" => $normalizedUsers ];
+        return $normalizedUsers;
     }
 
     /**
      * Normalize user object into a structured array
      *
-     * @param User $user
+     * @param UserInterface $user
      *
      * @return array
      */
-    protected function normalizeUser(User $user)
+    protected function normalizeUser(UserInterface $user)
     {
         $userGroupCodes = [];
         foreach ($user->getGroups() as $userGroup) {
@@ -178,17 +195,18 @@ class UserGenerator
         }
 
         $result = [
-            "username"       => $user->getUsername(),
-            "password"       => $user->getPassword(),
-            "email"          => $user->getEmail(),
-            "firstname"      => $user->getFirstname(),
-            "lastname"       => $user->getLastname(),
-            "catalog_locale" => $user->getCatalogLocale()->getCode(),
-            "catalog_scope"  => $user->getCatalogScope()->getCode(),
-            "default_tree"   => $user->getDefaultTree()->getCode(),
-            "roles"          => $userRoleCodes,
-            "groups"         => $userGroupCodes,
-            "enable"         => $user->isEnabled()
+            'username'       => $user->getUsername(),
+            'password'       => $user->getPassword(),
+            'email'          => $user->getEmail(),
+            'first_name'     => $user->getFirstname(),
+            'last_name'      => $user->getLastname(),
+            'catalog_locale' => $user->getCatalogLocale()->getCode(),
+            'catalog_scope'  => $user->getCatalogScope()->getCode(),
+            'default_tree'   => $user->getDefaultTree()->getCode(),
+            'roles'          => implode(',', $userRoleCodes),
+            'groups'         => implode(',', $userGroupCodes),
+            'enabled'        => $user->isEnabled() ? '1' : '0',
+            'user_locale'    => 'en_US',
         ];
 
         if (count($this->assetCategoryCodes) > 0) {
@@ -196,19 +214,5 @@ class UserGenerator
         }
 
         return $result;
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $filename
-     */
-    protected function writeYamlFile(array $data, $filename)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
-
-        file_put_contents($filename, $yamlData);
     }
 }

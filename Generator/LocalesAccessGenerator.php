@@ -2,14 +2,15 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Akeneo\Component\Batch\Model\JobInstance;
 use Oro\Bundle\UserBundle\Entity\Group;
-use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
+use Pim\Bundle\UserBundle\Entity\User;
+use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
 /**
- * Generate native YAML file for locales accesses. It gives all rights for every group in every locale.
+ * Generate native CSV file for locales accesses. It gives all rights for every group in every locale.
  *
  * @author    Pierre Allard <pierre.allard@akeneo.com>
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
@@ -17,56 +18,53 @@ use Symfony\Component\Yaml;
  */
 class LocalesAccessGenerator implements GeneratorInterface
 {
-    const LOCALE_ACCESSES_FILENAME = 'locale_accesses.yml';
+    const LOCALE_ACCESSES_FILENAME = 'locale_accesses.csv';
 
     const LOCALE_ACCESSES = 'locale_accesses';
 
-    /** @var Group[] */
-    protected $groups;
+    /** @var CsvWriter */
+    protected $writer;
 
-    /** @var Locale[] */
-    protected $locales;
+    /**
+     * @param CsvWriter $writer
+     */
+    public function __construct(CsvWriter $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
     {
-        $this->groups  = $options['groups'];
-        $this->locales = $options['locales'];
+        $groups  = $options['groups'];
+        $locales = $options['locales'];
 
-        $data = [];
-        foreach ($this->locales as $locale) {
-            $localeCode = $locale->getCode();
-            $data[$localeCode] = [];
-            foreach (['viewProducts', 'editProducts'] as $access) {
-                $data[$localeCode][$access] = [];
-                foreach ($this->groups as $group) {
-                    if ('all' !== $group->getName()) {
-                        $data[$localeCode][$access][] = $group->getName();
-                    }
-                }
+        $groupNames = [];
+        foreach ($groups as $group) {
+            if (User::GROUP_DEFAULT !== $group->getName()) {
+                $groupNames[] = $group->getName();
             }
         }
 
-        $assetCategoryAccesses = [self::LOCALE_ACCESSES => $data];
-
+        $data = [];
+        foreach ($locales as $locale) {
+            $data[] = [
+                'locale' => $locale->getCode(),
+                'view_products' => implode(',', $groupNames),
+                'edit_products' => implode(',', $groupNames),
+            ];
+        }
         $progress->advance();
 
-        $this->writeYamlFile($assetCategoryAccesses, $globalConfig['output_dir']);
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $outputDir
-     */
-    protected function writeYamlFile(array $data, $outputDir)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 3, 0, true, true);
-
-        file_put_contents($outputDir.'/'.self::LOCALE_ACCESSES_FILENAME, $yamlData);
+        $this->writer
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::LOCALE_ACCESSES_FILENAME
+            ))
+            ->write($data);
     }
 }

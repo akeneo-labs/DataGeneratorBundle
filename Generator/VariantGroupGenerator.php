@@ -2,11 +2,13 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
-use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
+use Faker\Factory;
+use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\GroupTranslation;
 use Pim\Bundle\CatalogBundle\Entity\ProductTemplate;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
+use Pim\Component\Catalog\AttributeTypes;
 use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\GroupInterface;
 use Pim\Component\Catalog\Model\GroupTypeInterface;
@@ -27,20 +29,31 @@ class VariantGroupGenerator implements GeneratorInterface
 {
     const VARIANT_GROUPS_FILENAME = 'variant_groups.csv';
 
+    /** @var CsvWriter */
+    protected $writer;
+
     /** @var LocaleInterface[] */
-    protected $locales;
+    protected $locales = [];
 
     /** @var AttributeInterface[] */
-    protected $availableAxes;
+    protected $availableAxes = [];
 
     /** @var AttributeInterface[] */
-    protected $availableAttributes;
+    protected $availableAttributes = [];
 
     /** @var GroupTypeInterface */
     protected $variantGroupType;
 
-    /** @var Faker\Generator */
+    /** @var Generator */
     protected $faker;
+
+    /**
+     * @param CsvWriter $writer
+     */
+    public function __construct(CsvWriter $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -51,7 +64,7 @@ class VariantGroupGenerator implements GeneratorInterface
         $this->setGroupTypes($options['group_types']);
         $this->locales = $options['locales'];
 
-        $this->faker = Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
@@ -67,9 +80,14 @@ class VariantGroupGenerator implements GeneratorInterface
             $progress->advance();
         }
 
-        if (count($variantGroups) > 0) {
-            $this->writeCsvFile($data, $this->getHeader($data), $globalConfig['output_dir']);
-        }
+        $this->writer
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::VARIANT_GROUPS_FILENAME
+            ))
+            ->write($data);
 
         return $variantGroups;
     }
@@ -87,8 +105,16 @@ class VariantGroupGenerator implements GeneratorInterface
         $group->setType($this->variantGroupType);
         $group->setCode(sprintf('variant_group_%s', $index));
 
-        $group->setAxisAttributes($this->getAxes($config['axes_count'], $globalConfig['seed']));
-        $group->setProductTemplate($this->getProductTemplate($config['attributes_count'], $globalConfig['seed']));
+        $group->setAxisAttributes($this->getAxes(
+            $config['axes_count'],
+            $index,
+            $globalConfig['seed']
+        ));
+        $group->setProductTemplate($this->getProductTemplate(
+            $config['attributes_count'],
+            $index,
+            $globalConfig['seed']
+        ));
 
         foreach ($this->locales as $locale) {
             $translation = new GroupTranslation();
@@ -117,7 +143,6 @@ class VariantGroupGenerator implements GeneratorInterface
             'type' => $variantGroup->getType()->getCode()
         ];
 
-        /** @var GroupTranslation $translation */
         foreach ($variantGroup->getTranslations() as $translation) {
             $result[sprintf('label-%s', $translation->getLocale())] = $translation->getLabel();
         }
@@ -137,18 +162,21 @@ class VariantGroupGenerator implements GeneratorInterface
      * Return a random set of axes for a variant group.
      *
      * @param int $count
+     * @param int $index
      * @param int $seed
      *
      * @return AttributeInterface[]
      */
-    protected function getAxes($count, $seed = null)
+    protected function getAxes($count, $index, $seed = null)
     {
-        $attributesFaker = Faker\Factory::create();
+        $attributesFaker = Factory::create();
+        $axeSeed = $index;
         if (null !== $seed) {
-            $attributesFaker->seed($seed);
+            $axeSeed = sprintf('%s%s', $axeSeed, $seed);
         }
-        $axes = [];
+        $attributesFaker->seed($axeSeed);
 
+        $axes = [];
         for ($i = 0; $i < $count; $i++) {
             try {
                 $axis = $attributesFaker->unique()->randomElement($this->availableAxes);
@@ -169,19 +197,21 @@ class VariantGroupGenerator implements GeneratorInterface
      * Returns a product template containing product values for a variant group.
      *
      * @param int $count
+     * @param int $index
      * @param int $seed
      *
      * @return ProductTemplate
      */
-    protected function getProductTemplate($count, $seed = null)
+    protected function getProductTemplate($count, $index, $seed = null)
     {
-        $attributesFaker = Faker\Factory::create();
+        $attributesFaker = Factory::create();
+        $axeSeed = $index;
         if (null !== $seed) {
-            $attributesFaker->seed($seed);
+            $axeSeed = sprintf('%s%s', $axeSeed, $seed);
         }
+        $attributesFaker->seed($axeSeed);
 
         $valuesData = [];
-
         for ($i = 0; $i < $count; $i++) {
             try {
                 $attribute = $attributesFaker->unique($i == 0)->randomElement($this->availableAttributes);
@@ -213,7 +243,6 @@ class VariantGroupGenerator implements GeneratorInterface
     protected function setAttributes(array $attributes)
     {
         $this->availableAxes = array_filter($attributes, function ($attribute) {
-            /** @var $attribute AttributeInterface */
             return in_array($attribute->getAttributeType(), [
                 AttributeTypes::OPTION_SIMPLE_SELECT,
                 AttributeTypes::REFERENCE_DATA_SIMPLE_SELECT
@@ -221,7 +250,6 @@ class VariantGroupGenerator implements GeneratorInterface
         });
 
         $this->availableAttributes = array_filter($attributes, function ($attribute) {
-            /** @var $attribute AttributeInterface */
             return (($attribute->getAttributeType() == AttributeTypes::TEXT)
                 && !$attribute->isLocalizable()
                 && !$attribute->isScopable()
@@ -246,48 +274,5 @@ class VariantGroupGenerator implements GeneratorInterface
 
         throw new Exception('There is no VARIANT group. ' .
             'Please add "group_types: ~" into your fixtures configuration file.');
-    }
-
-    /**
-     * Get the header of the CSV.
-     *
-     * @param array $variantGroups
-     *
-     * @return array
-     */
-    protected function getHeader(array $variantGroups)
-    {
-        $header = [];
-
-        foreach ($variantGroups as $variantGroup) {
-            foreach ($variantGroup as $key => $value) {
-                if (!in_array($key, $header)) {
-                    $header[] = $key;
-                }
-            }
-        }
-
-        return $header;
-    }
-
-    /**
-     * Write the CSV file from variant groups and headers
-     *
-     * @param array  $variantGroups
-     * @param array  $headers
-     * @param string $outputDir
-     */
-    protected function writeCsvFile(array $variantGroups, array $headers, $outputDir)
-    {
-        $csvFile = fopen($outputDir.'/'.self::VARIANT_GROUPS_FILENAME, 'w');
-
-        fputcsv($csvFile, $headers, ';');
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($variantGroups as $variantGroup) {
-            $productData = array_merge($headersAsKeys, $variantGroup);
-            fputcsv($csvFile, $productData, ';');
-        }
-        fclose($csvFile);
     }
 }

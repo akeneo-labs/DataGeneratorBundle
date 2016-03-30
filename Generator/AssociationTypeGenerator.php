@@ -2,16 +2,18 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Faker;
+use Faker\Factory;
+use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\AssociationType;
 use Pim\Bundle\CatalogBundle\Entity\AssociationTypeTranslation;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
+use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\AssociationTypeInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
 /**
- * Generate native YAML file for association types.
+ * Generate native CSV file for association types.
  *
  * @author    Pierre Allard <pierre.allard@akeneo.com>
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
@@ -19,15 +21,26 @@ use Symfony\Component\Yaml;
  */
 class AssociationTypeGenerator implements GeneratorInterface
 {
-    const ASSOCIATION_TYPES_FILENAME = 'association_types.yml';
+    const ASSOCIATION_TYPES_FILENAME = 'association_types.csv';
 
     const ASSOCIATIONS = 'associations';
 
-    /** @var Locale[] */
-    protected $locales;
+    /** @var CsvWriter */
+    protected $writer;
 
-    /** @var Faker\Generator */
+    /** @var Locale[] */
+    protected $locales = [];
+
+    /** @var Generator */
     protected $faker;
+
+    /**
+     * @param CsvWriter $writer
+     */
+    public function __construct(CsvWriter $writer)
+    {
+        $this->writer = $writer;
+    }
 
     /**
      * {@inheritdoc}
@@ -37,21 +50,26 @@ class AssociationTypeGenerator implements GeneratorInterface
         $this->locales = $options['locales'];
 
         $data = [];
-        $this->faker = \Faker\Factory::create();
+        $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
 
         for ($i = 0; $i < $config['count']; $i++) {
             $associationType = $this->generateAssociationType();
-            $data = array_merge($data, $this->normalizeAssociationType($associationType));
+            $data[] = $this->normalizeAssociationType($associationType);
 
             $progress->advance();
         }
 
-        $data = [self::ASSOCIATIONS => $data];
-
-        $this->writeYamlFile($data, $globalConfig['output_dir']);
+        $this->writer
+            ->setFilename(sprintf(
+                '%s%s%s',
+                $globalConfig['output_dir'],
+                DIRECTORY_SEPARATOR,
+                self::ASSOCIATION_TYPES_FILENAME
+            ))
+            ->write($data);
 
         $progress->advance();
 
@@ -85,32 +103,12 @@ class AssociationTypeGenerator implements GeneratorInterface
      */
     protected function normalizeAssociationType(AssociationTypeInterface $associationType)
     {
-        $code = $associationType->getCode();
-        $result = [
-            $code => [
-                'labels' => []
-            ]
-        ];
+        $result = ['code' => $associationType->getCode()];
 
-        /** @var AssociationTypeTranslation $translation */
         foreach ($associationType->getTranslations() as $translation) {
-            $result[$code]['labels'][$translation->getLocale()] = $translation->getLabel();
+            $result[sprintf('label-%s', $translation->getLocale())] = $translation->getLabel();
         }
 
         return $result;
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $outputDir
-     */
-    protected function writeYamlFile(array $data, $outputDir)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 4, 0, true, true);
-
-        file_put_contents($outputDir.'/'.self::ASSOCIATION_TYPES_FILENAME, $yamlData);
     }
 }

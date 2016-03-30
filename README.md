@@ -90,7 +90,7 @@ must be imported by the import profiles.
 
 Compatibility
 -------------
-This version is only compatible with Akeneo PIM 1.5.
+This version is only compatible with Akeneo PIM with latest builds.
 
 Credits
 -------
