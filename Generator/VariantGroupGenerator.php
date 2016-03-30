@@ -135,7 +135,6 @@ class VariantGroupGenerator implements GeneratorInterface
             'type' => $variantGroup->getType()->getCode()
         ];
 
-        /** @var GroupTranslation $translation */
         foreach ($variantGroup->getTranslations() as $translation) {
             $result[sprintf('label-%s', $translation->getLocale())] = $translation->getLabel();
         }
@@ -231,7 +230,6 @@ class VariantGroupGenerator implements GeneratorInterface
     protected function setAttributes(array $attributes)
     {
         $this->availableAxes = array_filter($attributes, function ($attribute) {
-            /** @var $attribute AttributeInterface */
             return in_array($attribute->getAttributeType(), [
                 AttributeTypes::OPTION_SIMPLE_SELECT,
                 AttributeTypes::REFERENCE_DATA_SIMPLE_SELECT
@@ -239,7 +237,6 @@ class VariantGroupGenerator implements GeneratorInterface
         });
 
         $this->availableAttributes = array_filter($attributes, function ($attribute) {
-            /** @var $attribute AttributeInterface */
             return (($attribute->getAttributeType() == AttributeTypes::TEXT)
                 && !$attribute->isLocalizable()
                 && !$attribute->isScopable()

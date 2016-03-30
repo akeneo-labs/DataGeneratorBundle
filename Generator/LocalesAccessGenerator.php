@@ -42,7 +42,6 @@ class LocalesAccessGenerator implements GeneratorInterface
         $locales = $options['locales'];
 
         $groupNames = [];
-        /** @var Group $group */
         foreach ($groups as $group) {
             if (User::GROUP_DEFAULT !== $group->getName()) {
                 $groupNames[] = $group->getName();
@@ -50,7 +49,6 @@ class LocalesAccessGenerator implements GeneratorInterface
         }
 
         $data = [];
-        /** @var LocaleInterface $locale */
         foreach ($locales as $locale) {
             $data[] = [
                 'locale' => $locale->getCode(),

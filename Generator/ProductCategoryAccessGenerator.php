@@ -42,7 +42,6 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
         $categories = $options['categories'];
 
         $groupNames = [];
-        /** @var Group $group */
         foreach ($groups as $group) {
             if (User::GROUP_DEFAULT !== $group->getName()) {
                 $groupNames[] = $group->getName();
@@ -50,7 +49,6 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
         }
 
         $data = [];
-        /** @var CategoryInterface $category */
         foreach ($categories as $category) {
             $data[] = [
                 'category'   => $category->getCode(),

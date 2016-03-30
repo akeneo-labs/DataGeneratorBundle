@@ -42,7 +42,6 @@ class JobProfilesAccessGenerator implements GeneratorInterface
         $jobCodes = $options['jobCodes'];
 
         $groupNames = [];
-        /** @var Group $group */
         foreach ($groups as $group) {
             if (User::GROUP_DEFAULT !== $group->getName()) {
                 $groupNames[] = $group->getName();
@@ -50,7 +49,6 @@ class JobProfilesAccessGenerator implements GeneratorInterface
         }
 
         $data = [];
-        /** @var JobInstance $job */
         foreach ($jobCodes as $jobCode) {
             $data[] = [
                 'job_profile'         => $jobCode,

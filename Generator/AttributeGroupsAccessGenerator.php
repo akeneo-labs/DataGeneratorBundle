@@ -44,14 +44,12 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
 
         $data = [];
         $groupNames = [];
-        /** @var Group $group */
         foreach ($groups as $group) {
             if (User::GROUP_DEFAULT !== $group->getName()) {
                 $groupNames[] = $group->getName();
             }
         }
 
-        /** @var AttributeGroupInterface $attributeGroup */
         foreach ($attributeGroups as $attributeGroup) {
             $assetCategoryAccess = ['attribute_group' => $attributeGroup->getCode()];
             foreach (['view_attributes', 'edit_attributes'] as $access) {

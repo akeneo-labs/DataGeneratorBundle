@@ -105,7 +105,6 @@ class AssociationTypeGenerator implements GeneratorInterface
     {
         $result = ['code' => $associationType->getCode()];
 
-        /** @var AssociationTypeTranslation $translation */
         foreach ($associationType->getTranslations() as $translation) {
             $result[sprintf('label-%s', $translation->getLocale())] = $translation->getLabel();
         }

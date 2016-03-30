@@ -284,7 +284,6 @@ class AttributeGenerator implements GeneratorInterface
         $labels = [];
         $smallType = str_replace('pim_catalog_', '', $type);
 
-        /** @var LocaleInterface $locale */
         foreach ($this->locales as $locale) {
             $labels[$locale->getCode()] = sprintf("%s %s", $smallType, implode(' ', $this->faker->words(2)));
         }

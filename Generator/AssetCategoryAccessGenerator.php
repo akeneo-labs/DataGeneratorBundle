@@ -36,7 +36,6 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
 
         $data = [];
         $groupNames = [];
-        /** @var Group $group */
         foreach ($groups as $group) {
             if (User::GROUP_DEFAULT !== $group->getName()) {
                 $groupNames[] = $group->getName();

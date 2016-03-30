@@ -49,7 +49,6 @@ class AssetCategoryGenerator implements GeneratorInterface
 
         $assetCategories = [['code' => self::ASSET_MAIN_CATALOG, 'parent' => '']];
 
-        /** @var Locale $locale */
         foreach ($this->locales as $locale) {
             $key = sprintf('label-%s', $locale->getCode());
             $assetCategories[0][$key] = implode(' ', $faker->words(3));
