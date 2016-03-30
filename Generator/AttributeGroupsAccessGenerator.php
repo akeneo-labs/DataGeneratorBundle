@@ -19,9 +19,7 @@ use Symfony\Component\Yaml;
  */
 class AttributeGroupsAccessGenerator implements GeneratorInterface
 {
-    const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_groups_accesses.csv';
-
-    const ATTRIBUTE_GROUPS_ACCESSES = 'attribute_groups_accesses';
+    const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_group_accesses.csv';
 
     /** @var CsvWriter */
     protected $writer;
