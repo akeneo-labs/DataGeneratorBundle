@@ -51,7 +51,7 @@ data_generator:
             levels: 3
         jobs:
             product_import:
-                connector: Akeneo Native Connector
+                connector: Akeneo CSV Connector
                 alias:     csv_product_import
                 label:     Product import
                 type:      import
@@ -66,7 +66,7 @@ data_generator:
                     groupsColumn:       groups
                     realTimeVersioning: true
             product_export:
-                connector: Akeneo Native Connector
+                connector: Akeneo CSV Connector
                 alias:     csv_product_export
                 label:     Product export
                 type:      export
@@ -77,7 +77,7 @@ data_generator:
                     withHeader: true
                     filePath: /tmp/product.csv
             ecommerce_published_product_export:
-                connector: Akeneo Native Connector
+                connector: Akeneo CSV Connector
                 alias:     csv_published_product_export
                 label:     Published product export for ecommerce
                 type:      export
@@ -140,17 +140,17 @@ data_generator:
                     withHeader: true
                     filePath: /tmp/asset-category.csv
             approve_product_draft:
-                connector: Akeneo Native Connector
+                connector: Akeneo CSV Connector
                 alias:     approve_product_draft
                 label:     Mass approve product drafts
                 type:      mass_edit
             refuse_product_draft:
-                connector: Akeneo Native Connector
+                connector: Akeneo CSV Connector
                 alias:     refuse_product_draft
                 label:     Mass reject product drafts
                 type:      mass_edit
             product_proposal_import:
-                connector: Akeneo Native Connector
+                connector: Akeneo CSV Connector
                 alias:     csv_product_proposal_import
                 label:     Demo product draft import
                 type:      import
