@@ -224,6 +224,39 @@ data_generator:
                 alias:     apply_assets_mass_upload
                 label:     Mass approve product drafts
                 type:      mass_upload
+            csv_product_import_with_rules:
+                connector: Akeneo CSV Connector
+                alias:     csv_product_import_with_rules
+                label:     CSV Demo product import with rules
+                type:      import
+                configuration:
+                    filePath:           /tmp/product.csv
+                    uploadAllowed:      true
+                    delimiter:          ;
+                    enclosure:          '"'
+                    escape:             '\'
+                    enabled:            true
+                    categoriesColumn:   categories
+                    familyColumn:       family
+                    groupsColumn:       groups
+                    realTimeVersioning: true
+                    decimalSeparator:   .
+                    dateFormat: yyyy-MM-dd
+            xlsx_clothing_product_import_with_rules:
+                connector: Akeneo XLSX Connector
+                alias:     xlsx_product_import_with_rules
+                label:     XLSX Demo product import with rules
+                type:      import
+                configuration:
+                    filePath:           /tmp/product.csv
+                    uploadAllowed:      true
+                    enabled:            true
+                    categoriesColumn:   categories
+                    familyColumn:       family
+                    groupsColumn:       groups
+                    realTimeVersioning: true
+                    decimalSeparator:   .
+                    dateFormat: yyyy-MM-dd
         user_groups:
             it_support:
                 name: IT support
