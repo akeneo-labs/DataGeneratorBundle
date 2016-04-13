@@ -22,6 +22,7 @@ parameters:
     pim_data_generator.generator.group_type.class:              Pim\Bundle\DataGeneratorBundle\Generator\GroupTypeGenerator
     pim_data_generator.generator.product_draft.class:           Pim\Bundle\DataGeneratorBundle\Generator\ProductDraftGenerator
     pim_data_generator.generator.locale.class:                  Pim\Bundle\DataGeneratorBundle\Generator\LocaleGenerator
+    pim_data_generator.generator.rule.class:                    Pim\Bundle\DataGeneratorBundle\Generator\RuleGenerator
 
 services:
     pim_data_generator.fixture_generator:
@@ -47,6 +48,7 @@ services:
             - @pim_data_generator.generator.group_type
             - @pim_data_generator.generator.variant_group
             - @pim_data_generator.generator.locale
+            - @pim_data_generator.generator.rule
 
     pim_data_generator.generator.channel:
         class: %pim_data_generator.generator.channel.class%
@@ -159,3 +161,6 @@ services:
 
     pim_data_generator.generator.locale:
         class: %pim_data_generator.generator.locale.class%
+
+    pim_data_generator.generator.rule:
+        class: %pim_data_generator.generator.rule.class%

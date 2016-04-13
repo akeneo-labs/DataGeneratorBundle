@@ -284,3 +284,5 @@ data_generator:
         job_profiles_accesses: ~
         locales_accesses: ~
         product_category_accesses: ~
+        rules:
+            count: 10

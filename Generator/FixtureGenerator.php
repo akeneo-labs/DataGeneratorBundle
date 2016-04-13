@@ -73,6 +73,9 @@ class FixtureGenerator implements GeneratorInterface
     /** @var LocaleGenerator */
     protected $localeGenerator;
 
+    /** @var RuleGenerator */
+    protected $ruleGenerator;
+
     /**
      * @param ChannelGenerator               $channelGenerator
      * @param UserRoleGenerator              $userRoleGenerator
@@ -94,6 +97,7 @@ class FixtureGenerator implements GeneratorInterface
      * @param GroupTypeGenerator             $groupTypeGenerator
      * @param VariantGroupGenerator          $variantGroupGenerator
      * @param LocaleGenerator                $localeGenerator
+     * @param RuleGenerator                  $ruleGenerator
      */
     public function __construct(
         ChannelGenerator               $channelGenerator,
@@ -115,7 +119,8 @@ class FixtureGenerator implements GeneratorInterface
         AssociationTypeGenerator       $associationTypeGenerator,
         GroupTypeGenerator             $groupTypeGenerator,
         VariantGroupGenerator          $variantGroupGenerator,
-        LocaleGenerator                $localeGenerator
+        LocaleGenerator                $localeGenerator,
+        RuleGenerator                  $ruleGenerator
     ) {
         $this->channelGenerator               = $channelGenerator;
         $this->userRoleGenerator              = $userRoleGenerator;
@@ -137,6 +142,7 @@ class FixtureGenerator implements GeneratorInterface
         $this->groupTypeGenerator             = $groupTypeGenerator;
         $this->variantGroupGenerator          = $variantGroupGenerator;
         $this->localeGenerator                = $localeGenerator;
+        $this->ruleGenerator                  = $ruleGenerator;
     }
 
     /**
@@ -303,6 +309,15 @@ class FixtureGenerator implements GeneratorInterface
             $this->productCategoryAccessGenerator->generate($globalConfig, [], $progress, [
                 'groups'     => $userGroups,
                 'categories' => $categories,
+            ]);
+        }
+
+        if (isset($config['entities']['rules'])) {
+            $ruleConfig = $config['entities']['rules'];
+            $this->ruleGenerator->generate($globalConfig, $ruleConfig, $progress, [
+                'attributes' => $attributes,
+                'locales'    => $locales,
+                'channels'   => $channels,
             ]);
         }
     }
