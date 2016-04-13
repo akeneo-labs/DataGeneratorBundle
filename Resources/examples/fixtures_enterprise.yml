@@ -257,6 +257,11 @@ data_generator:
                     realTimeVersioning: true
                     decimalSeparator:   .
                     dateFormat: yyyy-MM-dd
+            rule_impacted_product_count:
+                connector: Akeneo Rule Engine Connector
+                alias:     rule_impacted_product_count
+                label:     Calculation of the matching products for the rules
+                type:      mass_edit_rule
         user_groups:
             it_support:
                 name: IT support
