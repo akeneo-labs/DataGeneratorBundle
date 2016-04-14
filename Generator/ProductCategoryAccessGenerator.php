@@ -18,7 +18,7 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
 {
     const TYPE = 'product_category_accesses';
 
-    const PRODUCT_CATEGORY_ACCESSES_FILENAME = 'product_category_accesses.yml';
+    const PRODUCT_CATEGORY_ACCESSES_FILENAME = 'product_category_accesses.csv';
 
     const PRODUCT_CATEGORY_ACCESSES = 'product_category_accesses';
 

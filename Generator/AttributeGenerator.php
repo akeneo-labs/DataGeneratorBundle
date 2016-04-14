@@ -326,45 +326,6 @@ class AttributeGenerator implements GeneratorInterface
     }
 
     /**
-     * Write the CSV file from attributes
-     *
-     * @param array $attributes
-     * @param array $headers
-     */
-    protected function writeCsvFile(array $attributes, array $headers)
-    {
-        $csvFile = fopen($this->attributesFile, 'w');
-
-        fputcsv($csvFile, $headers, $this->delimiter);
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($attributes as $attribute) {
-            $attributeData = array_merge($headersAsKeys, $attribute);
-            fputcsv($csvFile, $attributeData, $this->delimiter);
-        }
-        fclose($csvFile);
-    }
-
-    /**
-     * Get a set of all keys inside arrays
-     *
-     * @param array $items
-     *
-     * @return array
-     */
-    protected function getAllKeys(array $items)
-    {
-        $keys = [];
-
-        foreach ($items as $item) {
-            $keys = array_merge($keys, array_keys($item));
-            $keys = array_unique($keys);
-        }
-
-        return $keys;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function supports($type)

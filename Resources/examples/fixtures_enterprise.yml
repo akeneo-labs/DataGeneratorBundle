@@ -2,6 +2,7 @@ data_generator:
     output_dir: /tmp/fixtures
     seed: 20160218
     entities:
+        locales: ~
         group_types: ~
         channels:
             ecommerce:

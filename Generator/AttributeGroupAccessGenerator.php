@@ -19,7 +19,7 @@ class AttributeGroupAccessGenerator implements GeneratorInterface
 {
     const TYPE = 'attribute_group_accesses';
 
-    const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_group_accesses.yml';
+    const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_group_accesses.csv';
 
     /** @var CsvWriter */
     protected $writer;

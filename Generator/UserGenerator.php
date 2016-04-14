@@ -26,7 +26,7 @@ class UserGenerator implements GeneratorInterface
 {
     const TYPE = 'users';
 
-    const USERS_FILENAME = 'users.yml';
+    const USERS_FILENAME = 'users.csv';
 
     /** @var CsvWriter */
     protected $writer;
@@ -217,20 +217,6 @@ class UserGenerator implements GeneratorInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $filename
-     */
-    protected function writeYamlFile(array $data, $filename)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 5, 0, true, true);
-
-        file_put_contents($filename, $yamlData);
     }
 
     /**

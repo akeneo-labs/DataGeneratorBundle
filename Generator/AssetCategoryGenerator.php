@@ -69,33 +69,4 @@ class AssetCategoryGenerator implements GeneratorInterface
 
         return ['asset_category_codes' => [self::ASSET_MAIN_CATALOG]];
     }
-
-    /**
-     * Write the CSV file from products and headers
-     *
-     * @param array  $assetCategories
-     * @param array  $headers
-     * @param string $outputDir
-     */
-    protected function writeCsvFile(array $assetCategories, array $headers, $outputDir)
-    {
-        $csvFile = fopen($outputDir.'/'.self::ASSET_CATEGORIES_FILENAME, 'w');
-
-        fputcsv($csvFile, $headers, ';');
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($assetCategories as $assetCategory) {
-            $productData = array_merge($headersAsKeys, $assetCategory);
-            fputcsv($csvFile, $productData, ';');
-        }
-        fclose($csvFile);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($type)
-    {
-        return self::TYPE == $type;
-    }
 }

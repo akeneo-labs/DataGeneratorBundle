@@ -41,6 +41,8 @@ class LocaleGenerator implements GeneratorInterface
         );
 
         $progress->advance();
+
+        return [];
     }
 
     /**

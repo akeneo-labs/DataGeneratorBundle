@@ -72,7 +72,7 @@ class FamilyGenerator implements GeneratorInterface
 
         $count                     = (int) $entitiesConfig['count'];
         $attributesCount           = (int) $entitiesConfig['attributes_count'] - 1;
-        $requirementsCount          = (int) $entitiesConfig['requirements_count'] - 1;
+        $requirementsCount         = (int) $entitiesConfig['requirements_count'] - 1;
         $this->identifierAttribute = $entitiesConfig['identifier_attribute'];
         $this->labelAttribute      = $entitiesConfig['label_attribute'];
 
@@ -179,45 +179,6 @@ class FamilyGenerator implements GeneratorInterface
         }
 
         return $this->filteredAttrCodes;
-    }
-
-    /**
-     * Write the CSV file from families
-     *
-     * @param array $families
-     * @param array $headers
-     */
-    protected function writeCsvFile(array $families, array $headers)
-    {
-        $csvFile = fopen($this->familiesFile, 'w');
-
-        fputcsv($csvFile, $headers, $this->delimiter);
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($families as $family) {
-            $familyData = array_merge($headersAsKeys, $family);
-            fputcsv($csvFile, $familyData, $this->delimiter);
-        }
-        fclose($csvFile);
-    }
-
-    /**
-     * Get a set of all keys inside arrays
-     *
-     * @param array $items
-     *
-     * @return array
-     */
-    protected function getAllKeys(array $items)
-    {
-        $keys = [];
-
-        foreach ($items as $item) {
-            $keys = array_merge($keys, array_keys($item));
-            $keys = array_unique($keys);
-        }
-
-        return $keys;
     }
 
     /**

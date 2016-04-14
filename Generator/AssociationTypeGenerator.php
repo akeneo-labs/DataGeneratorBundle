@@ -23,7 +23,7 @@ class AssociationTypeGenerator implements GeneratorInterface
 {
     const TYPE = 'association_types';
 
-    const ASSOCIATION_TYPES_FILENAME = 'association_types.yml';
+    const ASSOCIATION_TYPES_FILENAME = 'association_types.csv';
 
     const ASSOCIATIONS = 'associations';
 
@@ -112,20 +112,6 @@ class AssociationTypeGenerator implements GeneratorInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $outputDir
-     */
-    protected function writeYamlFile(array $data, $outputDir)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 4, 0, true, true);
-
-        file_put_contents($outputDir.'/'.self::ASSOCIATION_TYPES_FILENAME, $yamlData);
     }
 
     /**

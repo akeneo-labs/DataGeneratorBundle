@@ -23,7 +23,7 @@ class ChannelGenerator implements GeneratorInterface
 {
     const TYPE = 'channels';
 
-    const CHANNEL_FILENAME = 'channels.yml';
+    const CHANNEL_FILENAME = 'channels.csv';
 
     const CURRENCY_FILENAME = 'currencies.csv';
 

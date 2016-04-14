@@ -1,5 +1,6 @@
 parameters:
-    pim_data_generator.generator.fixture.class:                 Pim\Bundle\DataGeneratorBundle\Generator\FixtureGenerator
+    pim_data_generator.generator.entities.class:                Pim\Bundle\DataGeneratorBundle\Generator\EntitiesGenerator
+
     pim_data_generator.generator.channel.class:                 Pim\Bundle\DataGeneratorBundle\Generator\ChannelGenerator
     pim_data_generator.generator.product.class:                 Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator
     pim_data_generator.generator.variant_group.class:           Pim\Bundle\DataGeneratorBundle\Generator\VariantGroupGenerator
@@ -14,9 +15,9 @@ parameters:
     pim_data_generator.generator.job.class:                     Pim\Bundle\DataGeneratorBundle\Generator\JobGenerator
     pim_data_generator.generator.asset_category.class:          Pim\Bundle\DataGeneratorBundle\Generator\AssetCategoryGenerator
     pim_data_generator.generator.asset_category_access.class:   Pim\Bundle\DataGeneratorBundle\Generator\AssetCategoryAccessGenerator
-    pim_data_generator.generator.attribute_group_access.class: Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupAccessGenerator
-    pim_data_generator.generator.job_profile_access.class:     Pim\Bundle\DataGeneratorBundle\Generator\JobProfileAccessGenerator
-    pim_data_generator.generator.locale_access.class:          Pim\Bundle\DataGeneratorBundle\Generator\LocaleAccessGenerator
+    pim_data_generator.generator.attribute_group_access.class:  Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupAccessGenerator
+    pim_data_generator.generator.job_profile_access.class:      Pim\Bundle\DataGeneratorBundle\Generator\JobProfileAccessGenerator
+    pim_data_generator.generator.locale_access.class:           Pim\Bundle\DataGeneratorBundle\Generator\LocaleAccessGenerator
     pim_data_generator.generator.product_category_access.class: Pim\Bundle\DataGeneratorBundle\Generator\ProductCategoryAccessGenerator
     pim_data_generator.generator.association_type.class:        Pim\Bundle\DataGeneratorBundle\Generator\AssociationTypeGenerator
     pim_data_generator.generator.group_type.class:              Pim\Bundle\DataGeneratorBundle\Generator\GroupTypeGenerator
@@ -24,8 +25,8 @@ parameters:
     pim_data_generator.generator.locale.class:                  Pim\Bundle\DataGeneratorBundle\Generator\LocaleGenerator
 
 services:
-    pim_data_generator.fixture_generator:
-        class: %pim_data_generator.generator.fixture.class%
+    pim_data_generator.entities_generator:
+        class: %pim_data_generator.generator.entities.class%
         arguments:
             - '@pim_data_generator.generator.registry'
 
@@ -113,6 +114,8 @@ services:
             - '@pim_data_generator.product.product_raw_builder'
             - '@pim_catalog.repository.family'
             - '@pim_catalog.repository.group'
+        tags:
+            - { name: pim_data_generator.generator }
 
     pim_data_generator.generator.asset_category:
         class: %pim_data_generator.generator.asset_category.class%
@@ -175,6 +178,10 @@ services:
         arguments:
             - '@pim_data_generator.product.product_raw_builder'
             - '@pim_catalog.repository.family'
+        tags:
+            - { name: pim_data_generator.generator }
 
     pim_data_generator.generator.locale:
         class: %pim_data_generator.generator.locale.class%
+        tags:
+            - { name: pim_data_generator.generator }

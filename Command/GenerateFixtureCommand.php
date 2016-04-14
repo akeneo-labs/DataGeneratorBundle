@@ -35,35 +35,8 @@ class GenerateFixtureCommand extends AbstractGenerateCommand
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function getGeneratorConfiguration()
     {
-        $configFile = $input->getArgument('configuration-file');
-
-        $config = $this->getConfiguration($configFile, new FixtureGeneratorConfiguration());
-
-        $generator = $this->getContainer()->get('pim_data_generator.fixture_generator');
-
-        $totalCount = $this->getTotalCount($config);
-
-        $outputDir = $config['output_dir'];
-        $this->checkOutputDirExists($outputDir);
-
-        $output->writeln(
-            sprintf(
-                '<info>Generating <comment>%d</comment> entities in the <comment>%s</comment> directory</info>',
-                $totalCount,
-                $outputDir
-            )
-        );
-
-        $progress = new ProgressBar($output, $totalCount);
-        $progress->setFormat(' %current%/%max% [%bar%] %elapsed:6s%/%estimated:-6s% %memory:6s% - %message%');
-        $progress->start();
-        $generator->generate($config, [], $progress);
-        $progress->finish();
-        $output->writeln('');
-        $output->writeln('<info>Entites generated!</info>');
-
-
+        return new FixtureGeneratorConfiguration();
     }
 }

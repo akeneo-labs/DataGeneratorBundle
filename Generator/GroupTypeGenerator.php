@@ -17,19 +17,20 @@ use Symfony\Component\Yaml;
  */
 class GroupTypeGenerator implements GeneratorInterface
 {
+    const TYPE = 'group_types';
+
     const GROUP_TYPES_FILENAME = 'group_types.csv';
 
     /** @var CsvWriter */
     protected $writer;
 
-    /**.
+    /**
      * @param CsvWriter $writer
      */
     public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
-    const TYPE = 'group_types';
 
     /**
      * {@inheritdoc}
