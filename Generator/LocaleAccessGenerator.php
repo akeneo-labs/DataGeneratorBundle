@@ -55,7 +55,7 @@ class LocaleAccessGenerator implements GeneratorInterface
         $data = [];
         foreach ($locales as $locale) {
             $data[] = [
-                'locale' => $locale->getCode(),
+                'locale'        => $locale->getCode(),
                 'view_products' => implode(',', $groupNames),
                 'edit_products' => implode(',', $groupNames),
             ];

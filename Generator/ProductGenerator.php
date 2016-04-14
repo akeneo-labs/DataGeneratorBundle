@@ -3,11 +3,11 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
-use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
-use Pim\Component\Catalog\Repository\GroupRepositoryInterface;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\AbstractProductGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
 use Pim\Bundle\DataGeneratorBundle\VariantGroupDataProvider;
+use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
+use Pim\Component\Catalog\Repository\GroupRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
@@ -81,7 +81,6 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         $faker = $this->initFaker($seed);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
-
             $isComplete = (bool)($faker->numberBetween(0, 100) < $percentageComplete);
             $variantGroupDataProvider = $this->getNextVariantGroupProvider($faker);
             $variantGroupAttributes = [];

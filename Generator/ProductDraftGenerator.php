@@ -6,7 +6,6 @@ use Faker;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\AbstractProductGenerator;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-
 /**
  * Generate native CSV file for product drafts
  *
@@ -38,7 +37,6 @@ class ProductDraftGenerator extends AbstractProductGenerator implements Generato
         $faker = $this->initFaker($seed);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
-
             $product = $this->buildRawProduct(
                 $faker,
                 $forcedValues,
