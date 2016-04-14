@@ -2,8 +2,6 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Akeneo\Component\Classification\Model\CategoryInterface;
-use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -18,7 +16,9 @@ use Symfony\Component\Yaml;
  */
 class ProductCategoryAccessGenerator implements GeneratorInterface
 {
-    const PRODUCT_CATEGORY_ACCESSES_FILENAME = 'product_category_accesses.csv';
+    const TYPE = 'product_category_accesses';
+
+    const PRODUCT_CATEGORY_ACCESSES_FILENAME = 'product_category_accesses.yml';
 
     const PRODUCT_CATEGORY_ACCESSES = 'product_category_accesses';
 
@@ -36,9 +36,9 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
-        $groups     = $options['groups'];
+        $groups     = $options['user_groups'];
         $categories = $options['categories'];
 
         $groupNames = [];
@@ -67,5 +67,15 @@ class ProductCategoryAccessGenerator implements GeneratorInterface
                 self::PRODUCT_CATEGORY_ACCESSES_FILENAME
             ))
             ->write($data);
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

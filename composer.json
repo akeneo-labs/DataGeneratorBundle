@@ -24,14 +24,11 @@
     ],
     "require": {
         "php": ">=5.4.4",
-        "akeneo/pim-community-dev": "dev-master@dev",
         "fzaninotto/faker": "1.4.0"
     },
     "require-dev": {
+        "akeneo/pim-community-dev": "dev-master@dev",
         "phpspec/phpspec": "~2.1"
-    },
-    "suggest": {
-        "doctrine/mongodb-odm-bundle": "3.0.1"
     },
     "config": {
         "bin-dir": "bin"

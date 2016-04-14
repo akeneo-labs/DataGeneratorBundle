@@ -13,6 +13,8 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class LocaleGenerator implements GeneratorInterface
 {
+    const TYPE = 'locales';
+
     const LOCALES_FILENAME = 'locales.csv';
 
     const INTERNAL_LOCALES_FILE = 'Resources/config/locales.csv';
@@ -20,7 +22,7 @@ class LocaleGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $generatorConfig, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         copy(
             sprintf(
@@ -39,5 +41,13 @@ class LocaleGenerator implements GeneratorInterface
         );
 
         $progress->advance();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

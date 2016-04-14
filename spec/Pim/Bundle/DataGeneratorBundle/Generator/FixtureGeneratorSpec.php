@@ -8,15 +8,15 @@ use Pim\Bundle\DataGeneratorBundle\Generator\AssetCategoryGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\AssociationTypeGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupGenerator;
-use Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupsAccessGenerator;
+use Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupAccessGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\ChannelGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\GroupTypeGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\JobGenerator;
-use Pim\Bundle\DataGeneratorBundle\Generator\JobProfilesAccessGenerator;
-use Pim\Bundle\DataGeneratorBundle\Generator\LocalesAccessGenerator;
+use Pim\Bundle\DataGeneratorBundle\Generator\JobProfileAccessGenerator;
+use Pim\Bundle\DataGeneratorBundle\Generator\LocaleAccessGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\ProductCategoryAccessGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\UserGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\UserGroupGenerator;
@@ -39,9 +39,9 @@ class FixtureGeneratorSpec extends ObjectBehavior
         JobGenerator $jobGenerator,
         AssetCategoryGenerator $assetCategoryGenerator,
         AssetCategoryAccessGenerator $assetCategoryAccessGenerator,
-        AttributeGroupsAccessGenerator $attributeGroupsAccessGenerator,
-        JobProfilesAccessGenerator $jobProfilesAccessGenerator,
-        LocalesAccessGenerator $localesAccessGenerator,
+        AttributeGroupAccessGenerator $attributeGroupsAccessGenerator,
+        JobProfileAccessGenerator $jobProfilesAccessGenerator,
+        LocaleAccessGenerator $localesAccessGenerator,
         ProductCategoryAccessGenerator $productCategoryAccessGenerator,
         AssociationTypeGenerator $associationTypeGenerator,
         GroupTypeGenerator $groupTypeGenerator,

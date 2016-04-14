@@ -2,8 +2,6 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Akeneo\Component\Batch\Model\JobInstance;
-use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Helper\ProgressHelper;
@@ -16,9 +14,11 @@ use Symfony\Component\Yaml;
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class JobProfilesAccessGenerator implements GeneratorInterface
+class JobProfileAccessGenerator implements GeneratorInterface
 {
-    const JOB_PROFILE_ACCESSES_FILENAME = 'job_profile_accesses.csv';
+    const TYPE = 'job_profile_accesses';
+
+    const JOB_PROFILE_ACCESSES_FILENAME = 'job_profile_accesses.yml';
 
     const JOB_PROFILE_ACCESSES = 'job_profile_accesses';
 
@@ -36,10 +36,10 @@ class JobProfilesAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
-        $groups   = $options['groups'];
-        $jobCodes = $options['jobCodes'];
+        $groups   = $options['user_groups'];
+        $jobCodes = $options['job_codes'];
 
         $groupNames = [];
         foreach ($groups as $group) {
@@ -67,5 +67,15 @@ class JobProfilesAccessGenerator implements GeneratorInterface
                 self::JOB_PROFILE_ACCESSES_FILENAME
             ))
             ->write($data);
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

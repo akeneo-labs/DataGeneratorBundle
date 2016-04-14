@@ -20,6 +20,8 @@ use Symfony\Component\Yaml;
  */
 class AttributeOptionGenerator implements GeneratorInterface
 {
+    const TYPE = 'attribute_options';
+
     const ATTRIBUTE_OPTION_CODE_PREFIX = 'attr_opt_';
 
     const ATTRIBUTE_OPTIONS_FILENAME = 'attribute_options.csv';
@@ -53,7 +55,7 @@ class AttributeOptionGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $this->locales    = $options['locales'];
         $this->attributes = $options['attributes'];
@@ -63,7 +65,7 @@ class AttributeOptionGenerator implements GeneratorInterface
             $this->faker->seed($globalConfig['seed']);
         }
 
-        $countPerAttribute = (int) $config['count_per_attribute'];
+        $countPerAttribute = (int) $entitiesConfig['count_per_attribute'];
 
         foreach ($this->getSelectAttributes() as $attribute) {
             for ($i = 0; $i < $countPerAttribute; $i++) {
@@ -91,7 +93,7 @@ class AttributeOptionGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return $this;
+        return [];
     }
 
     /**
@@ -137,5 +139,52 @@ class AttributeOptionGenerator implements GeneratorInterface
         }
 
         return $this->selectAttributes;
+    }
+
+    /**
+     * Write the CSV file from attributeOptions
+     *
+     * @param array $attributeOptions
+     * @param array $headers
+     */
+    protected function writeCsvFile(array $attributeOptions, array $headers)
+    {
+        $csvFile = fopen($this->attributeOptionsFile, 'w');
+
+        fputcsv($csvFile, $headers, $this->delimiter);
+        $headersAsKeys = array_fill_keys($headers, "");
+
+        foreach ($attributeOptions as $attributeOption) {
+            $attributeOptionData = array_merge($headersAsKeys, $attributeOption);
+            fputcsv($csvFile, $attributeOptionData, $this->delimiter);
+        }
+        fclose($csvFile);
+    }
+
+    /**
+     * Get a set of all keys inside arrays
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    protected function getAllKeys(array $items)
+    {
+        $keys = [];
+
+        foreach ($items as $item) {
+            $keys = array_merge($keys, array_keys($item));
+            $keys = array_unique($keys);
+        }
+
+        return $keys;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

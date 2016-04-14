@@ -29,11 +29,12 @@ class GroupTypeGenerator implements GeneratorInterface
     {
         $this->writer = $writer;
     }
+    const TYPE = 'group_types';
 
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $variantGroupType = new GroupType();
         $variantGroupType->setVariant(true);
@@ -61,7 +62,7 @@ class GroupTypeGenerator implements GeneratorInterface
             ))
             ->write($data);
 
-        return $groupTypes;
+        return ['group_types' => $groupTypes];
     }
 
     /**
@@ -75,5 +76,13 @@ class GroupTypeGenerator implements GeneratorInterface
             'code'       => $groupType->getCode(),
             'is_variant' => $groupType->isVariant() ? 1 : 0
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }
