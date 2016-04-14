@@ -4,7 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -35,7 +35,7 @@ class AttributeGroupAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $groups          = $options['user_groups'];
         $attributeGroups = $options['attribute_groups'];

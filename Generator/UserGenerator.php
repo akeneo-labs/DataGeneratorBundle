@@ -12,7 +12,7 @@ use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\UserInterface;
 use Pim\Component\Catalog\Model\CategoryInterface;
 use Pim\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -63,7 +63,7 @@ class UserGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->locales            = $options['locales'];
         $this->channels           = $options['channels'];

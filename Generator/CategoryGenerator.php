@@ -8,7 +8,7 @@ use Pim\Bundle\CatalogBundle\Entity\Category;
 use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\LocaleInterface;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generate categories fixtures
@@ -47,7 +47,7 @@ class CategoryGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
