@@ -34,8 +34,8 @@ jobs:
             enclosure:  '"'
             withHeader: true
             filePath:   /tmp/products_export_%locale%_%scope%_%datetime%.csv
-    category_import:
-        connector: Akeneo Native Connector
+    csv_category_import:
+        connector: Akeneo CSV Connector
         alias:     csv_category_import
         label:     Category import
         type:      import
@@ -45,8 +45,8 @@ jobs:
             enclosure:           '"'
             escape:              '\'
             circularRefsChecked: true
-    category_export:
-        connector: Akeneo Native Connector
+    csv_category_export:
+        connector: Akeneo CSV Connector
         alias:     csv_category_export
         label:     Category export
         type:      export
@@ -55,8 +55,8 @@ jobs:
             enclosure:  '"'
             withHeader: true
             filePath: /tmp/category.csv
-    association_type_import:
-        connector: Akeneo Native Connector
+    csv_association_type_import:
+        connector: Akeneo CSV Connector
         alias:     csv_association_type_import
         label:     Association type import
         type:      import
@@ -65,8 +65,8 @@ jobs:
             delimiter:     ;
             enclosure:     '"'
             escape:        '\'
-    association_type_export:
-        connector: Akeneo Native Connector
+    csv_association_type_export:
+        connector: Akeneo CSV Connector
         alias:     csv_association_type_export
         label:     Association type export
         type:      export
@@ -75,8 +75,8 @@ jobs:
             enclosure:  '"'
             withHeader: true
             filePath: /tmp/association-type.csv
-    group_import:
-        connector: Akeneo Native Connector
+    csv_group_import:
+        connector: Akeneo CSV Connector
         alias:     csv_group_import
         label:     Group import
         type:      import
@@ -85,8 +85,8 @@ jobs:
             delimiter:     ;
             enclosure:     '"'
             escape:        '\'
-    group_export:
-        connector: Akeneo Native Connector
+    csv_group_export:
+        connector: Akeneo CSV Connector
         alias:     csv_group_export
         label:     Group export
         type:      export
@@ -95,8 +95,8 @@ jobs:
             enclosure:  '"'
             withHeader: true
             filePath: /tmp/group.csv
-    attribute_import:
-        connector: Akeneo Native Connector
+    csv_attribute_import:
+        connector: Akeneo CSV Connector
         alias:     csv_attribute_import
         label:     Attribute import
         type:      import
@@ -105,8 +105,8 @@ jobs:
             delimiter:     ;
             enclosure:     '"'
             escape:        '\'
-    attribute_export:
-        connector: Akeneo Native Connector
+    csv_attribute_export:
+        connector: Akeneo CSV Connector
         alias:     csv_attribute_export
         label:     Attribute export
         type:      export
@@ -115,8 +115,8 @@ jobs:
             enclosure:  '"'
             withHeader: true
             filePath: /tmp/attribute.csv
-    option_import:
-        connector: Akeneo Native Connector
+    csv_option_import:
+        connector: Akeneo CSV Connector
         alias:     csv_attribute_option_import
         label:     Option import
         type:      import
@@ -125,8 +125,8 @@ jobs:
             delimiter:     ;
             enclosure:     '"'
             escape:        '\'
-    option_export:
-        connector: Akeneo Native Connector
+    csv_option_export:
+        connector: Akeneo CSV Connector
         alias:     csv_attribute_option_export
         label:     Option export
         type:      export
@@ -135,3 +135,88 @@ jobs:
             enclosure:  '"'
             withHeader: true
             filePath: /tmp/attribute-option.csv
+    xlsx_product_quick_export:
+        connector: Akeneo Mass Edit Connector
+        alias: xlsx_product_quick_export
+        label: XLSX product quick export
+        type: quick_export
+        configuration:
+            withHeader: true
+            filePath:   /tmp/products_export_%locale%_%scope%_%datetime%.xlsx
+    xlsx_category_import:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_category_import
+        label:     Category import
+        type:      import
+        configuration:
+            uploadAllowed:       true
+            circularRefsChecked: true
+    xlsx_category_export:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_category_export
+        label:     Category export
+        type:      export
+        configuration:
+            withHeader: true
+            filePath: /tmp/category.xlsx
+    xlsx_association_type_import:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_association_type_import
+        label:     Association type import
+        type:      import
+        configuration:
+            uploadAllowed: true
+    xlsx_association_type_export:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_association_type_export
+        label:     Association type export
+        type:      export
+        configuration:
+            withHeader: true
+            filePath: /tmp/association-type.xlsx
+    xlsx_group_import:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_group_import
+        label:     Group import
+        type:      import
+        configuration:
+            uploadAllowed: true
+    xlsx_group_export:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_group_export
+        label:     Group export
+        type:      export
+        configuration:
+            withHeader: true
+            filePath: /tmp/group.xlsx
+    xlsx_attribute_import:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_attribute_import
+        label:     Attribute import
+        type:      import
+        configuration:
+            uploadAllowed: true
+    xlsx_attribute_export:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_attribute_export
+        label:     Attribute export
+        type:      export
+        configuration:
+            withHeader: true
+            filePath: /tmp/attribute.xlsx
+    xlsx_option_import:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_attribute_option_import
+        label:     Option import
+        type:      import
+        configuration:
+            uploadAllowed: true
+
+    xlsx_option_export:
+        connector: Akeneo XLSX Connector
+        alias:     xlsx_attribute_option_export
+        label:     Option export
+        type:      export
+        configuration:
+            withHeader: true
+            filePath: /tmp/attribute-option.xlsx
