@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
-use Pim\Bundle\DataGeneratorBundle\Configuration\ProductGeneratorConfiguration;
+use Pim\Bundle\DataGeneratorBundle\DependencyInjection\Configuration\ProductGeneratorConfiguration;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
-use Pim\Bundle\DataGeneratorBundle\Configuration\FixtureGeneratorConfiguration;
+use Pim\Bundle\DataGeneratorBundle\DependencyInjection\Configuration\FixtureGeneratorConfiguration;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
