@@ -14,8 +14,10 @@ use Symfony\Component\Yaml\Parser;
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class JobGenerator
+class JobGenerator implements GeneratorInterface
 {
+    const TYPE = 'jobs';
+
     const JOB_FILENAME = 'jobs.yml';
 
     const INTERNAL_JOBS_FILE = 'Resources/config/internal_jobs.yml';
@@ -23,9 +25,9 @@ class JobGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
-        $jobs = $this->generateJobs($config);
+        $jobs = $this->generateJobs($entitiesConfig);
 
         $normalizedJobs = $this->normalizeJobs($jobs);
 
@@ -41,7 +43,7 @@ class JobGenerator
 
         $progress->advance();
 
-        return array_keys($normalizedJobs['jobs']);
+        return ['job_codes' => array_keys($normalizedJobs['jobs'])];
     }
 
     /**
@@ -149,5 +151,13 @@ class JobGenerator
         $yamlData = $dumper->dump($data, 5, 0, true, true);
 
         file_put_contents($filename, $yamlData);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

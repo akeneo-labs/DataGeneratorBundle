@@ -17,11 +17,20 @@ interface GeneratorInterface
      * Generate the amount of entity
      *
      * @param array          $globalConfig
-     * @param array          $generatorConfig
+     * @param array          $entitiesConfig
      * @param ProgressHelper $progress
      * @param array          $options
      *
-     * @return $this
+     * @return array
      */
-    public function generate(array $globalConfig, array $generatorConfig, ProgressHelper $progress, array $options = []);
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = []);
+
+    /**
+     * Check if the Generator can generate type
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function supports($type);
 }

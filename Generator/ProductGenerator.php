@@ -43,22 +43,22 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'data-gene');
-        $outputFile = $globalConfig['output_dir'] . DIRECTORY_SEPARATOR . trim($config['filename']);
+        $outputFile = $globalConfig['output_dir'] . DIRECTORY_SEPARATOR . trim($entitiesConfig['filename']);
 
         $seed                = $globalConfig['seed'];
-        $count               = (int) $config['count'];
-        $nbAttrBase          = (int) $config['filled_attributes_count'];
-        $nbAttrDeviation     = (int) $config['filled_attributes_standard_deviation'];
-        $startIndex          = (int) $config['start_index'];
-        $categoriesCount     = (int) $config['categories_count'];
-        $variantGroupCount   = (int) $config['products_per_variant_group'];
-        $mandatoryAttributes = $config['mandatory_attributes'];
-        $forcedValues        = $config['force_values'];
-        $delimiter           = $config['delimiter'];
-        $percentageComplete  = $config['percentage_complete'];
+        $count               = (int) $entitiesConfig['count'];
+        $nbAttrBase          = (int) $entitiesConfig['filled_attributes_count'];
+        $nbAttrDeviation     = (int) $entitiesConfig['filled_attributes_standard_deviation'];
+        $startIndex          = (int) $entitiesConfig['start_index'];
+        $categoriesCount     = (int) $entitiesConfig['categories_count'];
+        $variantGroupCount   = (int) $entitiesConfig['products_per_variant_group'];
+        $mandatoryAttributes = $entitiesConfig['mandatory_attributes'];
+        $forcedValues        = $entitiesConfig['force_values'];
+        $delimiter           = $entitiesConfig['delimiter'];
+        $percentageComplete  = $entitiesConfig['percentage_complete'];
 
         if ($variantGroupCount > 0) {
             foreach ($this->groupRepository->getAllVariantGroups() as $variantGroup) {

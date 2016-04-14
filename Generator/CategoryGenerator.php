@@ -19,6 +19,8 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class CategoryGenerator implements GeneratorInterface
 {
+    const TYPE = 'categories';
+
     const CATEGORIES_FILENAME = 'categories.csv';
 
     const CATEGORIES_CODE_PREFIX = 'cat_';
@@ -45,7 +47,7 @@ class CategoryGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
@@ -54,8 +56,8 @@ class CategoryGenerator implements GeneratorInterface
             $this->faker->seed($globalConfig['seed']);
         }
 
-        $count     = (int)$config['count'];
-        $levelMax  = (int)$config['levels'];
+        $count     = (int)$entitiesConfig['count'];
+        $levelMax  = (int)$entitiesConfig['levels'];
 
         $countByLevel = $this->calculateNodeCountPerLevel($levelMax, $count);
 
@@ -75,7 +77,7 @@ class CategoryGenerator implements GeneratorInterface
 
         $progress->advance($count);
 
-        return $this->flattenCategories($categories);
+        return ['categories' => $this->flattenCategories($categories)];
     }
 
     /**
@@ -254,5 +256,13 @@ class CategoryGenerator implements GeneratorInterface
         }
 
         return $totalNodeCount;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

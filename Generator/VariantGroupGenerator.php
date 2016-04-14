@@ -27,6 +27,8 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class VariantGroupGenerator implements GeneratorInterface
 {
+    const TYPE = 'variant_groups';
+
     const VARIANT_GROUPS_FILENAME = 'variant_groups.csv';
 
     /** @var CsvWriter */
@@ -58,10 +60,10 @@ class VariantGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $this->setAttributes($options['attributes']);
-        $this->setGroupTypes($options['group_types']);
+        $this->setGroupTypes(isset($options['group_types']) ? $options['group_types'] : []);
         $this->locales = $options['locales'];
 
         $this->faker = Factory::create();
@@ -72,8 +74,8 @@ class VariantGroupGenerator implements GeneratorInterface
         $variantGroups = [];
         $data          = [];
 
-        for ($i = 0; $i < $config['count']; $i++) {
-            $variantGroup = $this->generateVariantGroup($globalConfig, $config, $i);
+        for ($i = 0; $i < $entitiesConfig['count']; $i++) {
+            $variantGroup = $this->generateVariantGroup($globalConfig, $entitiesConfig, $i);
             $variantGroups[] = $variantGroup;
             $data[] = $this->normalizeVariantGroup($variantGroup);
 
@@ -89,7 +91,7 @@ class VariantGroupGenerator implements GeneratorInterface
             ))
             ->write($data);
 
-        return $variantGroups;
+        return [];
     }
 
     /**
@@ -274,5 +276,13 @@ class VariantGroupGenerator implements GeneratorInterface
 
         throw new Exception('There is no VARIANT group. ' .
             'Please add "group_types: ~" into your fixtures configuration file.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

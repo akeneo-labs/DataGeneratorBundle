@@ -24,7 +24,9 @@ use Symfony\Component\Yaml;
  */
 class UserGenerator implements GeneratorInterface
 {
-    const USERS_FILENAME = 'users.csv';
+    const TYPE = 'users';
+
+    const USERS_FILENAME = 'users.yml';
 
     /** @var CsvWriter */
     protected $writer;
@@ -61,20 +63,20 @@ class UserGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $this->locales            = $options['locales'];
         $this->channels           = $options['channels'];
         $this->categories         = $options['categories'];
         $this->userRoles          = $options['user_roles'];
         $this->userGroups         = $options['user_groups'];
-        $this->assetCategoryCodes = $options['asset_category_codes'];
+        $this->assetCategoryCodes = isset($options['asset_category_codes']) ? $options['asset_category_codes'] : [];
 
         $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
-        $users = $this->generateUsers($config);
+        $users = $this->generateUsers($entitiesConfig);
 
         $normalizedUsers = $this->normalizeUsers($users);
 
@@ -89,7 +91,7 @@ class UserGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return $users;
+        return ['users' => $users];
     }
 
     /**
@@ -101,6 +103,7 @@ class UserGenerator implements GeneratorInterface
      */
     protected function generateUsers(array $usersConfig)
     {
+        $users = [];
         foreach ($usersConfig as $userConfig) {
             $user = $this->generateUser($userConfig);
             $users[$user->getUsername()] = $user;
@@ -214,5 +217,27 @@ class UserGenerator implements GeneratorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Write a YAML file
+     *
+     * @param array  $data
+     * @param string $filename
+     */
+    protected function writeYamlFile(array $data, $filename)
+    {
+        $dumper = new Yaml\Dumper();
+        $yamlData = $dumper->dump($data, 5, 0, true, true);
+
+        file_put_contents($filename, $yamlData);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

@@ -4,11 +4,10 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker\Factory;
 use Faker\Generator;
-use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypeRegistry;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
+use Pim\Component\Catalog\AttributeTypeRegistry;
 use Pim\Component\Catalog\AttributeTypes;
-use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -21,6 +20,8 @@ use Symfony\Component\Yaml;
  */
 class AttributeGenerator implements GeneratorInterface
 {
+    const TYPE = 'attributes';
+
     const ATTRIBUTES_FILENAME = 'attributes.csv';
 
     const ATTRIBUTE_CODE_PREFIX = 'attr_';
@@ -64,20 +65,20 @@ class AttributeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $this->locales         = $options['locales'];
         $this->attributeGroups = $options['attribute_groups'];
 
-        $count = (int)$config['count'];
+        $count = (int)$entitiesConfig['count'];
 
-        $localizableProbability = (float)$config['localizable_probability'];
-        $scopableProbability    = (float)$config['scopable_probability'];
-        $locScopableProbability = (float)$config['localizable_and_scopable_probability'];
-        $gridFilterProbability  = (float)$config['useable_as_grid_filter_probability'];
-        $minVariantAxes         = (int)$config['min_variant_axes'];
-        $minVariantAttributes   = (int)$config['min_variant_attributes'];
-        $identifier             = $config['identifier_attribute'];
+        $localizableProbability = (float)$entitiesConfig['localizable_probability'];
+        $scopableProbability    = (float)$entitiesConfig['scopable_probability'];
+        $locScopableProbability = (float)$entitiesConfig['localizable_and_scopable_probability'];
+        $gridFilterProbability  = (float)$entitiesConfig['useable_as_grid_filter_probability'];
+        $minVariantAxes         = (int)$entitiesConfig['min_variant_axes'];
+        $minVariantAttributes   = (int)$entitiesConfig['min_variant_attributes'];
+        $identifier             = $entitiesConfig['identifier_attribute'];
 
         $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
@@ -93,7 +94,7 @@ class AttributeGenerator implements GeneratorInterface
             'useable_as_grid_filter' => 1,
         ];
 
-        $forceAttributes = $config['force_attributes'];
+        $forceAttributes = $entitiesConfig['force_attributes'];
 
         foreach ($forceAttributes as $forceAttribute) {
             list($code, $type) = explode('=', $forceAttribute);
@@ -161,6 +162,11 @@ class AttributeGenerator implements GeneratorInterface
                 self::ATTRIBUTES_FILENAME
             ))
             ->write($this->attributes);
+
+        return [
+            'attributes'            => $this->getAttributes(),
+            'media_attribute_codes' => $this->getMediaAttributeCodes(),
+        ];
     }
 
     /**
@@ -317,5 +323,52 @@ class AttributeGenerator implements GeneratorInterface
                 $this->faker->randomElements(['png', 'jpg', 'pdf'], 2)
             )
         ];
+    }
+
+    /**
+     * Write the CSV file from attributes
+     *
+     * @param array $attributes
+     * @param array $headers
+     */
+    protected function writeCsvFile(array $attributes, array $headers)
+    {
+        $csvFile = fopen($this->attributesFile, 'w');
+
+        fputcsv($csvFile, $headers, $this->delimiter);
+        $headersAsKeys = array_fill_keys($headers, "");
+
+        foreach ($attributes as $attribute) {
+            $attributeData = array_merge($headersAsKeys, $attribute);
+            fputcsv($csvFile, $attributeData, $this->delimiter);
+        }
+        fclose($csvFile);
+    }
+
+    /**
+     * Get a set of all keys inside arrays
+     *
+     * @param array $items
+     *
+     * @return array
+     */
+    protected function getAllKeys(array $items)
+    {
+        $keys = [];
+
+        foreach ($items as $item) {
+            $keys = array_merge($keys, array_keys($item));
+            $keys = array_unique($keys);
+        }
+
+        return $keys;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }
