@@ -8,7 +8,7 @@ use Pim\Component\Catalog\Repository\GroupRepositoryInterface;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\AbstractProductGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
 use Pim\Bundle\DataGeneratorBundle\VariantGroupDataProvider;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generate native CSV file for products
@@ -43,7 +43,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'data-gene');
         $outputFile = $globalConfig['output_dir'] . DIRECTORY_SEPARATOR . trim($entitiesConfig['filename']);

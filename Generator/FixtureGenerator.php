@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Fixture generator that will dispatch generation to specialized generator
@@ -30,7 +30,7 @@ class FixtureGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = null)
+    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = null)
     {
         $entitiesConfig = $globalConfig['entities'];
         unset($globalConfig['entities']);
@@ -49,6 +49,7 @@ class FixtureGenerator
 
         $generatedValues = [];
         foreach ($entitiesConfig as $entity => $entityConfig) {
+            $progress->setMessage(sprintf('Generating %s...', $entity));
             $generator = $this->registry->getGenerator($entity);
             if (null !== $generator) {
                 $generatedValues = array_merge(
@@ -59,5 +60,6 @@ class FixtureGenerator
                 echo sprintf("Generator for %s not found", $entity) . PHP_EOL;
             }
         }
+        $progress->setMessage('');
     }
 }

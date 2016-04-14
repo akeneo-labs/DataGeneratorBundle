@@ -5,7 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Faker\Factory;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generate native CSV file for asset categories
@@ -40,7 +40,7 @@ class AssetCategoryGenerator implements GeneratorInterface
      *
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 

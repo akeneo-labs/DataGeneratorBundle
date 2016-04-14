@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Data generator interface
@@ -16,14 +16,14 @@ interface GeneratorInterface
     /**
      * Generate the amount of entity
      *
-     * @param array          $globalConfig
-     * @param array          $entitiesConfig
-     * @param ProgressHelper $progress
-     * @param array          $options
+     * @param array       $globalConfig
+     * @param array       $entitiesConfig
+     * @param ProgressBar $progress
+     * @param array       $options
      *
      * @return array
      */
-    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = []);
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = []);
 
     /**
      * Check if the Generator can generate type

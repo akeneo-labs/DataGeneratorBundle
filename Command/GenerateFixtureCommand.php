@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
 use Pim\Bundle\DataGeneratorBundle\Configuration\FixtureGeneratorConfiguration;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -55,11 +56,14 @@ class GenerateFixtureCommand extends AbstractGenerateCommand
             )
         );
 
-        $progress = $this->getHelperSet()->get('progress');
-        $progress->start($output, $totalCount);
-
+        $progress = new ProgressBar($output, $totalCount);
+        $progress->setFormat(' %current%/%max% [%bar%] %elapsed:6s%/%estimated:-6s% %memory:6s% - %message%');
+        $progress->start();
         $generator->generate($config, [], $progress);
-
         $progress->finish();
+        $output->writeln('');
+        $output->writeln('<info>Entites generated!</info>');
+
+
     }
 }
