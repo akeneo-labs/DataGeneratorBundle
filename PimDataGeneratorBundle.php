@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle;
 
-use Pim\Bundle\DataGeneratorBundle\DependencyInjection\RegisterGeneratorsPass;
+use Pim\Bundle\DataGeneratorBundle\DependencyInjection\Compiler\RegisterGeneratorsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
