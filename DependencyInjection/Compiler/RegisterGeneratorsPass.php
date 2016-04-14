@@ -1,6 +1,6 @@
 <?php
 
-namespace Pim\Bundle\DataGeneratorBundle\DependencyInjection;
+namespace Pim\Bundle\DataGeneratorBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -25,8 +25,9 @@ class RegisterGeneratorsPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $definition = $container->getDefinition(self::GENERATOR_REGISTRY);
+        $ids = array_keys($container->findTaggedServiceIds(self::GENERATOR_TAG));
 
-        foreach ($container->findTaggedServiceIds(self::GENERATOR_TAG) as $id => $tags) {
+        foreach ($ids as $id) {
             $definition->addMethodCall('register', [new Reference($id)]);
         }
     }
