@@ -1,6 +1,6 @@
 <?php
 
-namespace Pim\Bundle\DataGeneratorBundle\Configuration;
+namespace Pim\Bundle\DataGeneratorBundle\DependencyInjection\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
