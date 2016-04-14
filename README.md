@@ -1,6 +1,8 @@
 DataGeneratorBundle
 ===================
 
+[![Build Status](https://travis-ci.org/akeneo-labs/DataGeneratorBundle.svg?branch=master)](https://travis-ci.org/akeneo-labs/DataGeneratorBundle)
+
 This bundle generates file data in the native Akeneo CSV format.
 
 It's able to generate products and attributes information (including families and attributes options).
