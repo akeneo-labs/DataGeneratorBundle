@@ -2,10 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
-use Pim\Component\Catalog\Model\AttributeGroupInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -17,9 +15,11 @@ use Symfony\Component\Yaml;
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class AttributeGroupsAccessGenerator implements GeneratorInterface
+class AttributeGroupAccessGenerator implements GeneratorInterface
 {
-    const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_group_accesses.csv';
+    const TYPE = 'attribute_group_accesses';
+
+    const ASSET_CATEGORY_ACCESSES_FILENAME = 'attribute_group_accesses.yml';
 
     /** @var CsvWriter */
     protected $writer;
@@ -35,9 +35,9 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
-        $groups          = $options['groups'];
+        $groups          = $options['user_groups'];
         $attributeGroups = $options['attribute_groups'];
 
         $data = [];
@@ -65,5 +65,15 @@ class AttributeGroupsAccessGenerator implements GeneratorInterface
                 self::ASSET_CATEGORY_ACCESSES_FILENAME
             ))
             ->write($data);
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

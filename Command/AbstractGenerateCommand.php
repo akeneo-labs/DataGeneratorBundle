@@ -70,7 +70,7 @@ abstract class AbstractGenerateCommand extends ContainerAwareCommand
     {
         $fs = new Filesystem();
         if (!$fs->exists($outputDir)) {
-            throw new \RuntimeException(sprintf('The output directory "%s" does not exist!', $outputDir));
+            mkdir($outputDir, 0777, true);
         }
     }
 }

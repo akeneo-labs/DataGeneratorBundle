@@ -5,7 +5,6 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
-use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
 use Symfony\Component\Yaml;
 
@@ -16,11 +15,16 @@ use Symfony\Component\Yaml;
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class LocalesAccessGenerator implements GeneratorInterface
+class LocaleAccessGenerator implements GeneratorInterface
 {
-    const LOCALE_ACCESSES_FILENAME = 'locale_accesses.csv';
+    const TYPE = 'locale_accesses';
+
+    const LOCALE_ACCESSES_FILENAME = 'locale_accesses.yml';
 
     const LOCALE_ACCESSES = 'locale_accesses';
+
+    /** @var Group[] */
+    protected $groups;
 
     /** @var CsvWriter */
     protected $writer;
@@ -36,9 +40,9 @@ class LocalesAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
-        $groups  = $options['groups'];
+        $groups  = $options['user_groups'];
         $locales = $options['locales'];
 
         $groupNames = [];
@@ -66,5 +70,15 @@ class LocalesAccessGenerator implements GeneratorInterface
                 self::LOCALE_ACCESSES_FILENAME
             ))
             ->write($data);
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

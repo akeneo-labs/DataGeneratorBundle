@@ -18,6 +18,8 @@ use Symfony\Component\Yaml;
  */
 class UserGroupGenerator implements GeneratorInterface
 {
+    const TYPE = 'user_groups';
+
     const GROUPS_FILENAME = 'user_groups.csv';
 
     /** @var CsvWriter */
@@ -34,9 +36,9 @@ class UserGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
-        $groups = $this->generateGroups($config);
+        $groups = $this->generateGroups($entitiesConfig);
 
         $normalizedGroups = $this->normalizeGroups(array_values($groups));
 
@@ -51,7 +53,7 @@ class UserGroupGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return $groups;
+        return ['user_groups' => $groups];
     }
 
     /**
@@ -116,5 +118,27 @@ class UserGroupGenerator implements GeneratorInterface
     protected function normalizeGroup(Group $group)
     {
         return ['name' => $group->getName()];
+    }
+
+    /**
+     * Write a YAML file
+     *
+     * @param array  $data
+     * @param string $filename
+     */
+    protected function writeYamlFile(array $data, $filename)
+    {
+        $dumper = new Yaml\Dumper();
+        $yamlData = $dumper->dump($data, 5, 0, true, true);
+
+        file_put_contents($filename, $yamlData);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

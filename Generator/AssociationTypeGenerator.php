@@ -21,7 +21,9 @@ use Symfony\Component\Yaml;
  */
 class AssociationTypeGenerator implements GeneratorInterface
 {
-    const ASSOCIATION_TYPES_FILENAME = 'association_types.csv';
+    const TYPE = 'association_types';
+
+    const ASSOCIATION_TYPES_FILENAME = 'association_types.yml';
 
     const ASSOCIATIONS = 'associations';
 
@@ -45,7 +47,7 @@ class AssociationTypeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
@@ -55,7 +57,7 @@ class AssociationTypeGenerator implements GeneratorInterface
             $this->faker->seed($globalConfig['seed']);
         }
 
-        for ($i = 0; $i < $config['count']; $i++) {
+        for ($i = 0; $i < $entitiesConfig['count']; $i++) {
             $associationType = $this->generateAssociationType();
             $data[] = $this->normalizeAssociationType($associationType);
 
@@ -73,7 +75,7 @@ class AssociationTypeGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return $this;
+        return [];
     }
 
     /**
@@ -110,5 +112,27 @@ class AssociationTypeGenerator implements GeneratorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Write a YAML file
+     *
+     * @param array  $data
+     * @param string $outputDir
+     */
+    protected function writeYamlFile(array $data, $outputDir)
+    {
+        $dumper = new Yaml\Dumper();
+        $yamlData = $dumper->dump($data, 4, 0, true, true);
+
+        file_put_contents($outputDir.'/'.self::ASSOCIATION_TYPES_FILENAME, $yamlData);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }

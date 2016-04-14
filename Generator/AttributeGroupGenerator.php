@@ -19,6 +19,8 @@ use Symfony\Component\Yaml;
  */
 class AttributeGroupGenerator implements GeneratorInterface
 {
+    const TYPE = 'attribute_groups';
+
     const ATTR_GROUP_CODE_PREFIX = 'attr_gr_';
 
     const ATTRIBUTE_GROUP_FILENAME = 'attribute_groups.csv';
@@ -46,10 +48,10 @@ class AttributeGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressHelper $progress, array $options = [])
     {
         $this->locales = $options['locales'];
-        $count         = (int)$config['count'];
+        $count         = (int)$entitiesConfig['count'];
 
         $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
@@ -81,7 +83,7 @@ class AttributeGroupGenerator implements GeneratorInterface
             ))
             ->write($normalizedGroups);
 
-        return $this;
+        return ['attribute_groups' => $this->getAttributeGroups()];
     }
 
     /**
@@ -136,5 +138,13 @@ class AttributeGroupGenerator implements GeneratorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE == $type;
     }
 }
