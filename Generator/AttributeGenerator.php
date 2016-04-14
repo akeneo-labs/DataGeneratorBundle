@@ -113,12 +113,12 @@ class AttributeGenerator implements GeneratorInterface
             $attribute['type'] = $type;
             $attribute['group'] = $this->getRandomAttributeGroupCode();
 
-            if ($type == AttributeTypes::OPTION_SIMPLE_SELECT && $minVariantAxes > 0) {
+            if (AttributeTypes::OPTION_SIMPLE_SELECT === $type && $minVariantAxes > 0) {
                 // Configure a minimum set of non localizable and non scopable select axes for variant groups.
                 $attribute['localizable'] = 0;
                 $attribute['scopable'] = 0;
                 $minVariantAxes--;
-            } elseif ($type == AttributeTypes::TEXT && $minVariantAttributes > 0) {
+            } elseif (AttributeTypes::TEXT === $type && $minVariantAttributes > 0) {
                 // Configure a minimum set of non localizable and non scopable text attributes for variant groups.
                 $attribute['localizable'] = 0;
                 $attribute['scopable'] = 0;
@@ -330,6 +330,6 @@ class AttributeGenerator implements GeneratorInterface
      */
     public function supports($type)
     {
-        return self::TYPE == $type;
+        return self::TYPE === $type;
     }
 }

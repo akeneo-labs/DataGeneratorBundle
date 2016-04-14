@@ -252,7 +252,7 @@ class VariantGroupGenerator implements GeneratorInterface
         });
 
         $this->availableAttributes = array_filter($attributes, function ($attribute) {
-            return (($attribute->getAttributeType() == AttributeTypes::TEXT)
+            return (($attribute->getAttributeType() === AttributeTypes::TEXT)
                 && !$attribute->isLocalizable()
                 && !$attribute->isScopable()
             );
@@ -267,7 +267,7 @@ class VariantGroupGenerator implements GeneratorInterface
     protected function setGroupTypes(array $groupTypes)
     {
         foreach ($groupTypes as $groupType) {
-            if ($groupType->getCode() == 'VARIANT') {
+            if ($groupType->getCode() === 'VARIANT') {
                 $this->variantGroupType = $groupType;
 
                 return $this;
@@ -283,6 +283,6 @@ class VariantGroupGenerator implements GeneratorInterface
      */
     public function supports($type)
     {
-        return self::TYPE == $type;
+        return self::TYPE === $type;
     }
 }

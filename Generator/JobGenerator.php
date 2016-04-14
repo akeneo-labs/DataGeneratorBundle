@@ -158,6 +158,6 @@ class JobGenerator implements GeneratorInterface
      */
     public function supports($type)
     {
-        return self::TYPE == $type;
+        return self::TYPE === $type;
     }
 }
