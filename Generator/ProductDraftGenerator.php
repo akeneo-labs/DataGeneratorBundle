@@ -16,6 +16,8 @@ use Symfony\Component\Console\Helper\ProgressBar;
  */
 class ProductDraftGenerator extends AbstractProductGenerator implements GeneratorInterface
 {
+    const TYPE = 'product_drafts';
+
     /**
      * {@inheritdoc}
      */
@@ -54,6 +56,14 @@ class ProductDraftGenerator extends AbstractProductGenerator implements Generato
         $this->writeCsvFile($this->headers, $outputFile, $tmpFile, $delimiter);
         unlink($tmpFile);
 
-        return $this;
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

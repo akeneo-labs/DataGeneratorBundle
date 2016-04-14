@@ -142,45 +142,6 @@ class AttributeOptionGenerator implements GeneratorInterface
     }
 
     /**
-     * Write the CSV file from attributeOptions
-     *
-     * @param array $attributeOptions
-     * @param array $headers
-     */
-    protected function writeCsvFile(array $attributeOptions, array $headers)
-    {
-        $csvFile = fopen($this->attributeOptionsFile, 'w');
-
-        fputcsv($csvFile, $headers, $this->delimiter);
-        $headersAsKeys = array_fill_keys($headers, "");
-
-        foreach ($attributeOptions as $attributeOption) {
-            $attributeOptionData = array_merge($headersAsKeys, $attributeOption);
-            fputcsv($csvFile, $attributeOptionData, $this->delimiter);
-        }
-        fclose($csvFile);
-    }
-
-    /**
-     * Get a set of all keys inside arrays
-     *
-     * @param array $items
-     *
-     * @return array
-     */
-    protected function getAllKeys(array $items)
-    {
-        $keys = [];
-
-        foreach ($items as $item) {
-            $keys = array_merge($keys, array_keys($item));
-            $keys = array_unique($keys);
-        }
-
-        return $keys;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function supports($type)

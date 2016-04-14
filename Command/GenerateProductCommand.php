@@ -23,7 +23,7 @@ class GenerateProductCommand extends AbstractGenerateCommand
     {
         $this
             ->setName('pim:generate:products-file')
-            ->setDescription('Generate test products for PIM entities')
+            ->setDescription('Generate test products and product drafts for PIM entities')
             ->addArgument(
                 'configuration-file',
                 InputArgument::REQUIRED,
@@ -34,31 +34,8 @@ class GenerateProductCommand extends AbstractGenerateCommand
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function getGeneratorConfiguration()
     {
-        $configFile = $input->getArgument('configuration-file');
-        $globalConfig = $this->getConfiguration($configFile, new ProductGeneratorConfiguration());
-
-        $outputDir = $globalConfig['output_dir'];
-        $this->checkOutputDirExists($outputDir);
-
-        $productGenerator = $this->getContainer()->get('pim_data_generator.generator.product');
-
-        $count = $globalConfig['entities']['products']['count'];
-        $output->writeln(sprintf('<info>Generating <comment>%d</comment> products', $count));
-        $progress = $this->getHelperSet()->get('progress');
-        $progress->start($output, $count);
-        $productGenerator->generate($globalConfig, $globalConfig['entities']['products'], $progress);
-        $progress->finish();
-
-        if (isset($globalConfig['entities']['product_drafts'])) {
-            $count = $globalConfig['entities']['product_drafts']['count'];
-            $draftGenerator = $this->getContainer()->get('pim_data_generator.generator.product_draft');
-            $output->writeln(sprintf('<info>Generating <comment>%d</comment> product drafts', $count));
-            $progress = $this->getHelperSet()->get('progress');
-            $progress->start($output, $count);
-            $draftGenerator->generate($globalConfig, $globalConfig['entities']['product_drafts'], $progress);
-            $progress->finish();
-        }
+        return new ProductGeneratorConfiguration();
     }
 }

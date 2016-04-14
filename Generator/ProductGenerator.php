@@ -19,6 +19,8 @@ use Symfony\Component\Console\Helper\ProgressBar;
  */
 class ProductGenerator extends AbstractProductGenerator implements GeneratorInterface
 {
+    const TYPE = 'products';
+
     /** @var GroupRepositoryInterface */
     private $groupRepository;
 
@@ -119,7 +121,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         $this->writeCsvFile($this->headers, $outputFile, $tmpFile, $delimiter);
         unlink($tmpFile);
 
-        return $this;
+        return [];
     }
 
     /**
@@ -144,5 +146,13 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         }
 
         return $variantGroupProvider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

@@ -17,7 +17,7 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
 {
     const TYPE = 'asset_category_accesses';
 
-    const ASSET_CATEGORY_ACCESSES_FILENAME = 'asset_category_accesses.yml';
+    const ASSET_CATEGORY_ACCESSES_FILENAME = 'asset_category_accesses.csv';
 
     /** @var CsvWriter */
     protected $writer;

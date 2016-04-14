@@ -19,7 +19,7 @@ class LocaleAccessGenerator implements GeneratorInterface
 {
     const TYPE = 'locale_accesses';
 
-    const LOCALE_ACCESSES_FILENAME = 'locale_accesses.yml';
+    const LOCALE_ACCESSES_FILENAME = 'locale_accesses.csv';
 
     const LOCALE_ACCESSES = 'locale_accesses';
 

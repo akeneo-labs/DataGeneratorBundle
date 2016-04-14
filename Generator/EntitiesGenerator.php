@@ -7,17 +7,14 @@ use Symfony\Component\Console\Helper\ProgressBar;
 /**
  * Fixture generator that will dispatch generation to specialized generator
  *
- * @author    Benoit Jacquemont <benoit@akeneo.com>
- * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
+ * @author    Pierre Allard <pierre.allard@akeneo.com>
+ * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class FixtureGenerator
+class EntitiesGenerator
 {
     /** @var GeneratorRegistry */
     protected $registry;
-
-    /** @var LocaleGenerator */
-    protected $localeGenerator;
 
     /**
      * @param GeneratorRegistry $registry
@@ -30,7 +27,7 @@ class FixtureGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressBar $progress, array $options = null)
+    public function generate(array $globalConfig, ProgressBar $progress)
     {
         $entitiesConfig = $globalConfig['entities'];
         unset($globalConfig['entities']);

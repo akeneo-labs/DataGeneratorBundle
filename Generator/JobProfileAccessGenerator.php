@@ -18,7 +18,7 @@ class JobProfileAccessGenerator implements GeneratorInterface
 {
     const TYPE = 'job_profile_accesses';
 
-    const JOB_PROFILE_ACCESSES_FILENAME = 'job_profile_accesses.yml';
+    const JOB_PROFILE_ACCESSES_FILENAME = 'job_profile_accesses.csv';
 
     const JOB_PROFILE_ACCESSES = 'job_profile_accesses';
 
