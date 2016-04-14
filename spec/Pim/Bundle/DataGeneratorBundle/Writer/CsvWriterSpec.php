@@ -5,7 +5,6 @@ namespace spec\Pim\Bundle\DataGeneratorBundle\Writer;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-
 class CsvWriterSpec extends ObjectBehavior
 {
     function it_is_initializable()
