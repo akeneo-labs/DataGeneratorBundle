@@ -6,34 +6,26 @@ use PhpSpec\ObjectBehavior;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
 use Pim\Component\Catalog\Model\FamilyInterface;
 use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
-use Pim\Component\Catalog\Repository\GroupRepositoryInterface;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-class ProductGeneratorSpec extends ObjectBehavior
+class ProductDraftGeneratorSpec extends ObjectBehavior
 {
     function let(
         ProductRawBuilder $rawBuilder,
-        FamilyRepositoryInterface $familyRepo,
-        GroupRepositoryInterface $groupRepo
+        FamilyRepositoryInterface $familyRepo
     ) {
-        $this->beConstructedWith($rawBuilder, $familyRepo, $groupRepo);
+        $this->beConstructedWith($rawBuilder, $familyRepo);
     }
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator');
+        $this->shouldHaveType('Pim\Bundle\DataGeneratorBundle\Generator\ProductDraftGenerator');
     }
 
     function it_is_a_generator()
     {
-        $this->shouldImplement('Pim\Bundle\DataGeneratorBundle\Generator\GeneratorInterface');
-    }
-
-    function it_supports_products()
-    {
-        $this->supports('products')->shouldReturn(true);
-        $this->supports('yolo')->shouldReturn(false);
+        $this->shouldHaveType('Pim\Bundle\DataGeneratorBundle\Generator\GeneratorInterface');
     }
 
     function it_generates_products(
@@ -44,17 +36,14 @@ class ProductGeneratorSpec extends ObjectBehavior
     ) {
         $globalConfig = ['output_dir' => '/tmp/', 'seed' => 123456789];
         $entitiesConfig = [
-            'count' => 1,
-            'filled_attributes_count' => 1,
+            'count'                                => 1,
+            'filled_attributes_count'              => 1,
             'filled_attributes_standard_deviation' => 0,
-            'start_index' => 0,
-            'categories_count' => 0,
-            'products_per_variant_group' => 0,
-            'mandatory_attributes' => [],
-            'force_values' => [],
-            'percentage_complete' => 0,
-            'filename' => 'product_draft.csv',
-            'delimiter' => ';',
+            'start_index'                          => 0,
+            'mandatory_attributes'                 => [],
+            'force_values'                         => [],
+            'delimiter'                            => ';',
+            'filename'                             => 'product.csv',
         ];
         $options = [];
         $raw = [
