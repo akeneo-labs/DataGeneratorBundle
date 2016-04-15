@@ -69,4 +69,12 @@ class AssetCategoryGenerator implements GeneratorInterface
 
         return ['asset_category_codes' => [self::ASSET_MAIN_CATALOG]];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
+    }
 }

@@ -12,7 +12,10 @@ use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\UserInterface;
 use Pim\Component\Catalog\Model\CategoryInterface;
 use Pim\Bundle\UserBundle\Entity\User;
+use Pim\Component\Catalog\Model\ChannelInterface;
+use Pim\Component\Catalog\Model\LocaleInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Yaml;
 
 /**
@@ -31,16 +34,16 @@ class UserGenerator implements GeneratorInterface
     /** @var CsvWriter */
     protected $writer;
 
-    /** @var Channel[] */
+    /** @var ChannelInterface[] */
     protected $channels = [];
 
-    /** @var Locale[] */
+    /** @var LocaleInterface[] */
     protected $locales = [];
 
     /** @var Group[] */
     protected $userGroups = [];
 
-    /** @var Role[] */
+    /** @var RoleInterface[] */
     protected $userRoles = [];
 
     /** @var string[] */
