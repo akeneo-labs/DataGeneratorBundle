@@ -23,9 +23,6 @@ class LocaleAccessGenerator implements GeneratorInterface
 
     const LOCALE_ACCESSES = 'locale_accesses';
 
-    /** @var Group[] */
-    protected $groups;
-
     /** @var CsvWriter */
     protected $writer;
 

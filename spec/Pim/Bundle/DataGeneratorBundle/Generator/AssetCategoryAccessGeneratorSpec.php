@@ -31,7 +31,7 @@ class AssetCategoryAccessGeneratorSpec extends ObjectBehavior
         $this->supports('yolo')->shouldReturn(false);
     }
 
-    function it_should_generate_accesses_for_all_groups_except_all(
+    function it_should_generate_accesses_for_all_groups(
         $writer,
         Group $userGroup1,
         Group $userGroup2,

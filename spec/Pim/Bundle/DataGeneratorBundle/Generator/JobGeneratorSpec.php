@@ -4,6 +4,7 @@ namespace spec\Pim\Bundle\DataGeneratorBundle\Generator;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class JobGeneratorSpec extends ObjectBehavior
 {
@@ -21,5 +22,15 @@ class JobGeneratorSpec extends ObjectBehavior
     {
         $this->supports('jobs')->shouldReturn(true);
         $this->supports('yolo')->shouldReturn(false);
+    }
+
+    function it_generates_jobs(
+        ProgressBar $progress
+    ) {
+        $globalConfig = ['output_dir' => '/tmp/'];
+        $entitiesConfig = [];
+        $options = [];
+
+        $this->generate($globalConfig, $entitiesConfig, $progress, $options);
     }
 }

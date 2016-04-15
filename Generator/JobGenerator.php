@@ -30,6 +30,9 @@ class JobGenerator implements GeneratorInterface
         $jobs = $this->generateJobs($entitiesConfig);
 
         $normalizedJobs = $this->normalizeJobs($jobs);
+        if (!isset($normalizedJobs['jobs'])) {
+            $normalizedJobs['jobs'] = [];
+        }
 
         $normalizedJobs['jobs'] = array_merge(
             $normalizedJobs['jobs'],
@@ -55,6 +58,7 @@ class JobGenerator implements GeneratorInterface
      */
     protected function generateJobs(array $jobsConfig)
     {
+        $jobs = [];
         foreach ($jobsConfig as $jobCode => $jobConfig) {
             $job = $this->generateJob($jobCode, $jobConfig);
             $jobs[$job->getCode()] = $job;

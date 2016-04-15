@@ -70,14 +70,14 @@ class AttributeGenerator implements GeneratorInterface
         $this->locales         = $options['locales'];
         $this->attributeGroups = $options['attribute_groups'];
 
-        $count = (int)$entitiesConfig['count'];
+        $count = (int) $entitiesConfig['count'];
 
-        $localizableProbability = (float)$entitiesConfig['localizable_probability'];
-        $scopableProbability    = (float)$entitiesConfig['scopable_probability'];
-        $locScopableProbability = (float)$entitiesConfig['localizable_and_scopable_probability'];
-        $gridFilterProbability  = (float)$entitiesConfig['useable_as_grid_filter_probability'];
-        $minVariantAxes         = (int)$entitiesConfig['min_variant_axes'];
-        $minVariantAttributes   = (int)$entitiesConfig['min_variant_attributes'];
+        $localizableProbability = (float) $entitiesConfig['localizable_probability'];
+        $scopableProbability    = (float) $entitiesConfig['scopable_probability'];
+        $locScopableProbability = (float) $entitiesConfig['localizable_and_scopable_probability'];
+        $gridFilterProbability  = (float) $entitiesConfig['useable_as_grid_filter_probability'];
+        $minVariantAxes         = (int) $entitiesConfig['min_variant_axes'];
+        $minVariantAttributes   = (int) $entitiesConfig['min_variant_attributes'];
         $identifier             = $entitiesConfig['identifier_attribute'];
 
         $this->faker = Factory::create();
@@ -116,19 +116,19 @@ class AttributeGenerator implements GeneratorInterface
             if (AttributeTypes::OPTION_SIMPLE_SELECT === $type && $minVariantAxes > 0) {
                 // Configure a minimum set of non localizable and non scopable select axes for variant groups.
                 $attribute['localizable'] = 0;
-                $attribute['scopable'] = 0;
+                $attribute['scopable']    = 0;
                 $minVariantAxes--;
             } elseif (AttributeTypes::TEXT === $type && $minVariantAttributes > 0) {
                 // Configure a minimum set of non localizable and non scopable text attributes for variant groups.
                 $attribute['localizable'] = 0;
-                $attribute['scopable'] = 0;
+                $attribute['scopable']    = 0;
                 $minVariantAttributes--;
             } elseif ($this->faker->boolean($locScopableProbability)) {
                 $attribute['localizable'] = 1;
-                $attribute['scopable'] = 1;
+                $attribute['scopable']    = 1;
             } else {
-                $attribute['localizable'] = (int)$this->faker->boolean($localizableProbability);
-                $attribute['scopable'] = (int)$this->faker->boolean($scopableProbability);
+                $attribute['localizable'] = (int) $this->faker->boolean($localizableProbability);
+                $attribute['scopable']    = (int) $this->faker->boolean($scopableProbability);
             }
 
             if ('pim_catalog_metric' === $type) {
@@ -149,7 +149,7 @@ class AttributeGenerator implements GeneratorInterface
             }
 
             if (!isset($attribute['useable_as_grid_filter'])) {
-                $useable = (int)$this->faker->boolean($gridFilterProbability);
+                $useable = (int) $this->faker->boolean($gridFilterProbability);
                 $this->attributes[$code]['useable_as_grid_filter'] = $useable;
             }
         }

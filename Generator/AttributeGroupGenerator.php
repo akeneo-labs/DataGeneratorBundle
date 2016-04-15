@@ -51,7 +51,7 @@ class AttributeGroupGenerator implements GeneratorInterface
     public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->locales = $options['locales'];
-        $count         = (int)$entitiesConfig['count'];
+        $count         = (int) $entitiesConfig['count'];
 
         $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {

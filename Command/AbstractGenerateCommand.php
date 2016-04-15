@@ -48,12 +48,12 @@ abstract class AbstractGenerateCommand extends ContainerAwareCommand
 
         $config = $this->getConfiguration($configFile);
 
-        $generator = $this->getContainer()->get('pim_data_generator.entities_generator');
+        $generator = $this->getContainer()->get('pim_data_generator.chained_generator');
 
         $totalCount = $this->getTotalCount($config);
 
         $outputDir = $config['output_dir'];
-        $this->checkOutputDirExists($outputDir);
+        $this->generateOutputDir($outputDir);
 
         $output->writeln(
             sprintf(
@@ -95,11 +95,11 @@ abstract class AbstractGenerateCommand extends ContainerAwareCommand
     }
 
     /**
-    * Checks if the output directory exists
+    * Checks if the output directory exists, creates it if not.
     *
     * @param string $outputDir
     */
-    protected function checkOutputDirExists($outputDir)
+    protected function generateOutputDir($outputDir)
     {
         $fs = new Filesystem();
         if (!$fs->exists($outputDir)) {

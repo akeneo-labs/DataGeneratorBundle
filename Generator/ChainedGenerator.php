@@ -11,7 +11,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class EntitiesGenerator
+class ChainedGenerator
 {
     /** @var GeneratorRegistry */
     protected $registry;
@@ -25,7 +25,12 @@ class EntitiesGenerator
     }
 
     /**
-     * {@inheritdoc}
+     * Generates a set of files
+     *
+     * @param array       $globalConfig
+     * @param ProgressBar $progress
+     *
+     * @throws \Exception
      */
     public function generate(array $globalConfig, ProgressBar $progress)
     {
@@ -54,7 +59,7 @@ class EntitiesGenerator
                     $generator->generate($globalConfig, $entityConfig, $progress, $generatedValues)
                 );
             } else {
-                echo sprintf("Generator for %s not found", $entity) . PHP_EOL;
+                throw new \Exception(sprintf('Generator for "%s" not found', $entity));
             }
         }
         $progress->setMessage('');

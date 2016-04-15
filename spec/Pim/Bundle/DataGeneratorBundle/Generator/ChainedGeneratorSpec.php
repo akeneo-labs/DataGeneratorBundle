@@ -8,7 +8,7 @@ use Pim\Bundle\DataGeneratorBundle\Generator\GeneratorRegistry;
 use Prophecy\Argument;
 use Symfony\Component\Console\Helper\ProgressBar;
 
-class EntitiesGeneratorSpec extends ObjectBehavior
+class ChainedGeneratorSpec extends ObjectBehavior
 {
     function let(GeneratorRegistry $registry)
     {
@@ -17,7 +17,7 @@ class EntitiesGeneratorSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Pim\Bundle\DataGeneratorBundle\Generator\EntitiesGenerator');
+        $this->shouldHaveType('Pim\Bundle\DataGeneratorBundle\Generator\ChainedGenerator');
     }
 
     function it_should_generate_entities(

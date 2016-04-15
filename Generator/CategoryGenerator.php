@@ -56,8 +56,8 @@ class CategoryGenerator implements GeneratorInterface
             $this->faker->seed($globalConfig['seed']);
         }
 
-        $count     = (int)$entitiesConfig['count'];
-        $levelMax  = (int)$entitiesConfig['levels'];
+        $count     = (int) $entitiesConfig['count'];
+        $levelMax  = (int) $entitiesConfig['levels'];
 
         $countByLevel = $this->calculateNodeCountPerLevel($levelMax, $count);
 
