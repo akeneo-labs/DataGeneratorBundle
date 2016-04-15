@@ -44,6 +44,7 @@ class AssociationTypeGeneratorSpec extends ObjectBehavior
         $locale2->getCode()->willReturn('en_US');
 
         $writer->setFilename(Argument::any())->willReturn($writer);
+
         $writer->write([
             [
                 'code'        => 'LAUDANTIUM',
@@ -55,6 +56,7 @@ class AssociationTypeGeneratorSpec extends ObjectBehavior
                 'label-en_US' => 'minima'
             ]
         ])->shouldBeCalled();
+
         $this->generate($globalConfig, $entitiesConfig, $progress, $options);
     }
 }

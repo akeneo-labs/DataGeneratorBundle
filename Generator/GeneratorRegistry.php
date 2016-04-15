@@ -3,11 +3,13 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 /**
+ * Registry for Generators.
+ *
  * @author    Pierre Allard <pierre.allard@akeneo.com>
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class GeneratorRegistry
+class GeneratorRegistry implements GeneratorRegistryInterface
 {
     /** @var GeneratorInterface[] */
     protected $generators = [];
@@ -23,11 +25,7 @@ class GeneratorRegistry
     }
 
     /**
-     * Get a generator supported by type
-     *
-     * @param string $type
-     *
-     * @return GeneratorInterface|null
+     * {@inheritdoc}
      */
     public function getGenerator($type)
     {
