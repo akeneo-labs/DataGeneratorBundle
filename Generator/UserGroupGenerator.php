@@ -6,7 +6,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
 use Pim\Component\Catalog\Model\GroupInterface;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -18,6 +18,8 @@ use Symfony\Component\Yaml;
  */
 class UserGroupGenerator implements GeneratorInterface
 {
+    const TYPE = 'user_groups';
+
     const GROUPS_FILENAME = 'user_groups.csv';
 
     /** @var CsvWriter */
@@ -34,9 +36,9 @@ class UserGroupGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $groups = $this->generateGroups($config);
+        $groups = $this->generateGroups($entitiesConfig);
 
         $normalizedGroups = $this->normalizeGroups(array_values($groups));
 
@@ -51,7 +53,7 @@ class UserGroupGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return $groups;
+        return ['user_groups' => $groups];
     }
 
     /**
@@ -116,5 +118,13 @@ class UserGroupGenerator implements GeneratorInterface
     protected function normalizeGroup(Group $group)
     {
         return ['name' => $group->getName()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

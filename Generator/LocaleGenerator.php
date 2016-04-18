@@ -2,7 +2,7 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generates CSV locales file for fixtures.
@@ -13,6 +13,8 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class LocaleGenerator implements GeneratorInterface
 {
+    const TYPE = 'locales';
+
     const LOCALES_FILENAME = 'locales.csv';
 
     const INTERNAL_LOCALES_FILE = 'Resources/config/locales.csv';
@@ -20,7 +22,7 @@ class LocaleGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $generatorConfig, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         copy(
             sprintf(
@@ -39,5 +41,15 @@ class LocaleGenerator implements GeneratorInterface
         );
 
         $progress->advance();
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

@@ -6,7 +6,7 @@ use Faker\Factory;
 use Faker\Generator;
 use Pim\Bundle\CatalogBundle\Entity\Family;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -18,6 +18,8 @@ use Symfony\Component\Yaml;
  */
 class FamilyGenerator implements GeneratorInterface
 {
+    const TYPE = 'families';
+
     const FAMILIES_FILENAME = 'families.csv';
 
     const FAMILY_CODE_PREFIX = 'fam_';
@@ -62,17 +64,17 @@ class FamilyGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->locales    = $options['locales'];
         $this->attributes = $options['attributes'];
         $this->channels   = $options['channels'];
 
-        $count = (int) $config['count'];
-        $attributesCount = (int) $config['attributes_count'] - 1;
-        $requirementsCount = (int) $config['requirements_count'] - 1;
-        $this->identifierAttribute = $config['identifier_attribute'];
-        $this->labelAttribute      = $config['label_attribute'];
+        $count                     = (int) $entitiesConfig['count'];
+        $attributesCount           = (int) $entitiesConfig['attributes_count'] - 1;
+        $requirementsCount         = (int) $entitiesConfig['requirements_count'] - 1;
+        $this->identifierAttribute = $entitiesConfig['identifier_attribute'];
+        $this->labelAttribute      = $entitiesConfig['label_attribute'];
 
         $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
@@ -121,7 +123,7 @@ class FamilyGenerator implements GeneratorInterface
             ))
             ->write($families);
 
-        return $this;
+        return [];
     }
 
     /**
@@ -177,5 +179,13 @@ class FamilyGenerator implements GeneratorInterface
         }
 
         return $this->filteredAttrCodes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

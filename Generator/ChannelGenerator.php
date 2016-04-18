@@ -9,7 +9,7 @@ use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\ChannelInterface;
 use Pim\Component\Catalog\Model\CurrencyInterface;
 use Pim\Component\Catalog\Model\LocaleInterface;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -21,6 +21,8 @@ use Symfony\Component\Yaml;
  */
 class ChannelGenerator implements GeneratorInterface
 {
+    const TYPE = 'channels';
+
     const CHANNEL_FILENAME = 'channels.csv';
 
     const CURRENCY_FILENAME = 'currencies.csv';
@@ -56,7 +58,7 @@ class ChannelGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->channelsFilePath = sprintf(
             '%s%s%s',
@@ -71,19 +73,22 @@ class ChannelGenerator implements GeneratorInterface
             self::CURRENCY_FILENAME
         );
 
-        $this->locales = $this->generateLocales($config);
+        $this->locales = $this->generateLocales($entitiesConfig);
 
-        $this->currencies = $this->generateCurrencies($config);
+        $this->currencies = $this->generateCurrencies($entitiesConfig);
 
-        $this->channels = $this->generateChannels($config);
+        $this->channels = $this->generateChannels($entitiesConfig);
 
         $this->writeCurrenciesFile();
 
-        $this->writeChannelsFile($config);
+        $this->writeChannelsFile($entitiesConfig);
 
         $progress->advance();
 
-        return $this;
+        return [
+            'locales'  => $this->locales,
+            'channels' => $this->channels,
+        ];
     }
 
     /**
@@ -250,5 +255,13 @@ class ChannelGenerator implements GeneratorInterface
         $this->writer
             ->setFilename($this->channelsFilePath)
             ->write($data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

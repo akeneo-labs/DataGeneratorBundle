@@ -4,7 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -16,6 +16,8 @@ use Symfony\Component\Yaml;
  */
 class UserRoleGenerator implements GeneratorInterface
 {
+    const TYPE = 'user_roles';
+
     const ROLES_FILENAME = 'user_roles.csv';
 
     /** @var CsvWriter */
@@ -32,9 +34,9 @@ class UserRoleGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $roles = $this->generateRoles($config);
+        $roles = $this->generateRoles($entitiesConfig);
 
         $normalizedRoles = $this->normalizeRoles($roles);
 
@@ -49,7 +51,7 @@ class UserRoleGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return $roles;
+        return ['user_roles' => $roles];
     }
 
     /**
@@ -117,5 +119,13 @@ class UserRoleGenerator implements GeneratorInterface
             'label' => $role->getLabel(),
             'role'  => $role->getRole(),
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

@@ -5,14 +5,14 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Faker\Factory;
 use Faker\Generator;
 use Oro\Bundle\UserBundle\Entity\Group;
-use Oro\Bundle\UserBundle\Entity\Role;
-use Pim\Bundle\CatalogBundle\Entity\Channel;
-use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
+use Pim\Bundle\UserBundle\Entity\User;
 use Pim\Bundle\UserBundle\Entity\UserInterface;
 use Pim\Component\Catalog\Model\CategoryInterface;
-use Pim\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Pim\Component\Catalog\Model\ChannelInterface;
+use Pim\Component\Catalog\Model\LocaleInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Yaml;
 
 /**
@@ -24,21 +24,23 @@ use Symfony\Component\Yaml;
  */
 class UserGenerator implements GeneratorInterface
 {
+    const TYPE = 'users';
+
     const USERS_FILENAME = 'users.csv';
 
     /** @var CsvWriter */
     protected $writer;
 
-    /** @var Channel[] */
+    /** @var ChannelInterface[] */
     protected $channels = [];
 
-    /** @var Locale[] */
+    /** @var LocaleInterface[] */
     protected $locales = [];
 
     /** @var Group[] */
     protected $userGroups = [];
 
-    /** @var Role[] */
+    /** @var RoleInterface[] */
     protected $userRoles = [];
 
     /** @var string[] */
@@ -61,20 +63,20 @@ class UserGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->locales            = $options['locales'];
         $this->channels           = $options['channels'];
         $this->categories         = $options['categories'];
         $this->userRoles          = $options['user_roles'];
         $this->userGroups         = $options['user_groups'];
-        $this->assetCategoryCodes = $options['asset_category_codes'];
+        $this->assetCategoryCodes = isset($options['asset_category_codes']) ? $options['asset_category_codes'] : [];
 
         $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
         }
-        $users = $this->generateUsers($config);
+        $users = $this->generateUsers($entitiesConfig);
 
         $normalizedUsers = $this->normalizeUsers($users);
 
@@ -89,7 +91,7 @@ class UserGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return $users;
+        return ['users' => $users];
     }
 
     /**
@@ -101,6 +103,7 @@ class UserGenerator implements GeneratorInterface
      */
     protected function generateUsers(array $usersConfig)
     {
+        $users = [];
         foreach ($usersConfig as $userConfig) {
             $user = $this->generateUser($userConfig);
             $users[$user->getUsername()] = $user;
@@ -214,5 +217,13 @@ class UserGenerator implements GeneratorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

@@ -2,25 +2,25 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
-use Pim\Component\Catalog\Model\LocaleInterface;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
- * Generate native CSV file for locales accesses. It gives all rights for every group in every locale.
+ * Generate native CSV file for job profile accesses. It gives all rights for every group in every job.
  *
  * @author    Pierre Allard <pierre.allard@akeneo.com>
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class LocalesAccessGenerator implements GeneratorInterface
+class JobProfileAccessGenerator implements GeneratorInterface
 {
-    const LOCALE_ACCESSES_FILENAME = 'locale_accesses.csv';
+    const TYPE = 'job_profile_accesses';
 
-    const LOCALE_ACCESSES = 'locale_accesses';
+    const JOB_PROFILE_ACCESSES_FILENAME = 'job_profile_accesses.csv';
+
+    const JOB_PROFILE_ACCESSES = 'job_profile_accesses';
 
     /** @var CsvWriter */
     protected $writer;
@@ -36,10 +36,10 @@ class LocalesAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $groups  = $options['groups'];
-        $locales = $options['locales'];
+        $groups   = $options['user_groups'];
+        $jobCodes = $options['job_codes'];
 
         $groupNames = [];
         foreach ($groups as $group) {
@@ -49,13 +49,14 @@ class LocalesAccessGenerator implements GeneratorInterface
         }
 
         $data = [];
-        foreach ($locales as $locale) {
+        foreach ($jobCodes as $jobCode) {
             $data[] = [
-                'locale' => $locale->getCode(),
-                'view_products' => implode(',', $groupNames),
-                'edit_products' => implode(',', $groupNames),
+                'job_profile'         => $jobCode,
+                'execute_job_profile' => implode(',', $groupNames),
+                'edit_job_profile'    => implode(',', $groupNames),
             ];
         }
+
         $progress->advance();
 
         $this->writer
@@ -63,8 +64,18 @@ class LocalesAccessGenerator implements GeneratorInterface
                 '%s%s%s',
                 $globalConfig['output_dir'],
                 DIRECTORY_SEPARATOR,
-                self::LOCALE_ACCESSES_FILENAME
+                self::JOB_PROFILE_ACCESSES_FILENAME
             ))
             ->write($data);
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

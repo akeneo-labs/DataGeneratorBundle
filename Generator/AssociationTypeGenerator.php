@@ -9,7 +9,7 @@ use Pim\Bundle\CatalogBundle\Entity\AssociationTypeTranslation;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Component\Catalog\Model\AssociationTypeInterface;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
@@ -21,6 +21,8 @@ use Symfony\Component\Yaml;
  */
 class AssociationTypeGenerator implements GeneratorInterface
 {
+    const TYPE = 'association_types';
+
     const ASSOCIATION_TYPES_FILENAME = 'association_types.csv';
 
     const ASSOCIATIONS = 'associations';
@@ -45,7 +47,7 @@ class AssociationTypeGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
@@ -55,7 +57,7 @@ class AssociationTypeGenerator implements GeneratorInterface
             $this->faker->seed($globalConfig['seed']);
         }
 
-        for ($i = 0; $i < $config['count']; $i++) {
+        for ($i = 0; $i < $entitiesConfig['count']; $i++) {
             $associationType = $this->generateAssociationType();
             $data[] = $this->normalizeAssociationType($associationType);
 
@@ -73,7 +75,7 @@ class AssociationTypeGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return $this;
+        return [];
     }
 
     /**
@@ -110,5 +112,13 @@ class AssociationTypeGenerator implements GeneratorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pim\Bundle\DataGeneratorBundle\Configuration;
+namespace Pim\Bundle\DataGeneratorBundle\DependencyInjection\Configuration;
 
 use Pim\Bundle\DataGeneratorBundle\Generator\ProductGenerator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;

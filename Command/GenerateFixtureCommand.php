@@ -2,7 +2,8 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Command;
 
-use Pim\Bundle\DataGeneratorBundle\Configuration\FixtureGeneratorConfiguration;
+use Pim\Bundle\DataGeneratorBundle\DependencyInjection\Configuration\FixtureGeneratorConfiguration;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,32 +35,8 @@ class GenerateFixtureCommand extends AbstractGenerateCommand
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function getGeneratorConfiguration()
     {
-        $configFile = $input->getArgument('configuration-file');
-
-        $config = $this->getConfiguration($configFile, new FixtureGeneratorConfiguration());
-
-        $generator = $this->getContainer()->get('pim_data_generator.fixture_generator');
-
-        $totalCount = $this->getTotalCount($config);
-
-        $outputDir = $config['output_dir'];
-        $this->checkOutputDirExists($outputDir);
-
-        $output->writeln(
-            sprintf(
-                '<info>Generating <comment>%d</comment> entities in the <comment>%s</comment> directory</info>',
-                $totalCount,
-                $outputDir
-            )
-        );
-
-        $progress = $this->getHelperSet()->get('progress');
-        $progress->start($output, $totalCount);
-
-        $generator->generate($config, [], $progress);
-
-        $progress->finish();
+        return new FixtureGeneratorConfiguration();
     }
 }

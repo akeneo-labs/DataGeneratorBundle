@@ -2,36 +2,22 @@
 
 namespace spec\Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Akeneo\Component\Classification\Repository\CategoryRepositoryInterface;
 use PhpSpec\ObjectBehavior;
-use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
-use Pim\Component\Catalog\Repository\ChannelRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\CurrencyRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\FamilyRepositoryInterface;
-use Pim\Bundle\CatalogBundle\Repository\GroupRepositoryInterface;
-use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
+use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
+use Pim\Component\Catalog\Model\FamilyInterface;
+use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
+use Pim\Component\Catalog\Repository\GroupRepositoryInterface;
 use Prophecy\Argument;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class ProductGeneratorSpec extends ObjectBehavior
 {
     function let(
-        FamilyRepositoryInterface $familyRepository,
-        AttributeRepositoryInterface $attributeRepository,
-        ChannelRepositoryInterface $channelRepository,
-        LocaleRepositoryInterface $localeRepository,
-        CurrencyRepositoryInterface $currencyRepository,
-        CategoryRepositoryInterface $categoryRepository,
-        GroupRepositoryInterface $groupRepository
+        ProductRawBuilder $rawBuilder,
+        FamilyRepositoryInterface $familyRepo,
+        GroupRepositoryInterface $groupRepo
     ) {
-        $this->beConstructedWith(
-            $familyRepository,
-            $attributeRepository,
-            $channelRepository,
-            $localeRepository,
-            $currencyRepository,
-            $categoryRepository,
-            $groupRepository
-        );
+        $this->beConstructedWith($rawBuilder, $familyRepo, $groupRepo);
     }
 
     function it_is_initializable()
@@ -42,5 +28,49 @@ class ProductGeneratorSpec extends ObjectBehavior
     function it_is_a_generator()
     {
         $this->shouldImplement('Pim\Bundle\DataGeneratorBundle\Generator\GeneratorInterface');
+    }
+
+    function it_supports_products()
+    {
+        $this->supports('products')->shouldReturn(true);
+        $this->supports('yolo')->shouldReturn(false);
+    }
+
+    function it_generates_products(
+        $rawBuilder,
+        $familyRepo,
+        ProgressBar $progress,
+        FamilyInterface $family
+    ) {
+        $globalConfig = ['output_dir' => '/tmp/', 'seed' => 123456789];
+        $entitiesConfig = [
+            'count' => 1,
+            'filled_attributes_count' => 1,
+            'filled_attributes_standard_deviation' => 0,
+            'start_index' => 0,
+            'categories_count' => 0,
+            'products_per_variant_group' => 0,
+            'mandatory_attributes' => [],
+            'force_values' => [],
+            'percentage_complete' => 0,
+            'filename' => 'product_draft.csv',
+            'delimiter' => ';',
+        ];
+        $options = [];
+        $raw = [
+            'sku'    => 'id-0',
+            'family' => 'family_code',
+            'groups' => '',
+        ];
+
+        $familyRepo->findAll()->willReturn([$family]);
+        $family->getCode()->willReturn('family_code');
+        $rawBuilder->buildBaseProduct($family, 'id-0', '')->willReturn($raw);
+        $rawBuilder->setFakerGenerator(Argument::any())->willReturn(null);
+        $rawBuilder->fillInRandomCategories($raw, 0)->willReturn(null);
+        $rawBuilder->fillInRandomAttributes($family, $raw, [], 1, 0)->willReturn(null);
+        $rawBuilder->fillInMandatoryAttributes($family, $raw, [], [])->willReturn(null);
+
+        $this->generate($globalConfig, $entitiesConfig, $progress, $options);
     }
 }

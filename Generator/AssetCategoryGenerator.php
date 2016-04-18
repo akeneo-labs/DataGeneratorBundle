@@ -5,7 +5,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 use Faker\Factory;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generate native CSV file for asset categories
@@ -18,6 +18,8 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class AssetCategoryGenerator implements GeneratorInterface
 {
+    const TYPE = 'asset_categories';
+
     const ASSET_CATEGORIES_FILENAME = 'asset_categories.csv';
 
     const ASSET_MAIN_CATALOG = 'asset_main_catalog';
@@ -38,7 +40,7 @@ class AssetCategoryGenerator implements GeneratorInterface
      *
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $this->locales = $options['locales'];
 
@@ -65,6 +67,14 @@ class AssetCategoryGenerator implements GeneratorInterface
 
         $progress->advance();
 
-        return [ self::ASSET_MAIN_CATALOG ];
+        return ['asset_category_codes' => [self::ASSET_MAIN_CATALOG]];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

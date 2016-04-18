@@ -18,6 +18,7 @@ use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
 class AbstractProductGenerator
 {
     const IDENTIFIER_PREFIX = 'id-';
+
     const DEFAULT_DELIMITER = ';';
 
     /** @var FamilyRepositoryInterface */

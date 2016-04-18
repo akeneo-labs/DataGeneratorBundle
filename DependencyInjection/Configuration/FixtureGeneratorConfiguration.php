@@ -1,6 +1,6 @@
 <?php
 
-namespace Pim\Bundle\DataGeneratorBundle\Configuration;
+namespace Pim\Bundle\DataGeneratorBundle\DependencyInjection\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -29,6 +29,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                 ->arrayNode('entities')
                     ->isRequired()
                     ->children()
+                        ->arrayNode('locales')->end()
                         ->arrayNode('group_types')->end()
                         ->arrayNode('associations')
                             ->children()
@@ -179,9 +180,9 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('asset_categories')->end()
                         ->arrayNode('asset_category_accesses')->end()
-                        ->arrayNode('attribute_groups_accesses')->end()
-                        ->arrayNode('job_profiles_accesses')->end()
-                        ->arrayNode('locales_accesses')->end()
+                        ->arrayNode('attribute_group_accesses')->end()
+                        ->arrayNode('job_profile_accesses')->end()
+                        ->arrayNode('locale_accesses')->end()
                         ->arrayNode('product_category_accesses')->end()
                     ->end()
                 ->end()

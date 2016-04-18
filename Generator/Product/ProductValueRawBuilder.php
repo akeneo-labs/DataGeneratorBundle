@@ -143,7 +143,7 @@ class ProductValueRawBuilder
                 break;
         }
 
-        return (string)$data;
+        return (string) $data;
     }
 
     /**
@@ -286,7 +286,7 @@ class ProductValueRawBuilder
 
         $number = $this->faker->randomFloat($decimals, $min, $max);
 
-        return (string)$number;
+        return (string) $number;
     }
 
     /**

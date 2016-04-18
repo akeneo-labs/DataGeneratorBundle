@@ -2,10 +2,9 @@
 
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
-use Oro\Bundle\UserBundle\Entity\Group;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
 use Pim\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Console\Helper\ProgressHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generate native CSV file for asset categories accesses. It gives all rights for every group in every category.
@@ -16,6 +15,8 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class AssetCategoryAccessGenerator implements GeneratorInterface
 {
+    const TYPE = 'asset_category_accesses';
+
     const ASSET_CATEGORY_ACCESSES_FILENAME = 'asset_category_accesses.csv';
 
     /** @var CsvWriter */
@@ -29,9 +30,9 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $groups             = $options['groups'];
+        $groups             = $options['user_groups'];
         $assetCategoryCodes = $options['asset_category_codes'];
 
         $data = [];
@@ -59,5 +60,15 @@ class AssetCategoryAccessGenerator implements GeneratorInterface
                 self::ASSET_CATEGORY_ACCESSES_FILENAME
             ))
             ->write($data);
+
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

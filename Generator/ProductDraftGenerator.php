@@ -4,8 +4,7 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\AbstractProductGenerator;
-use Symfony\Component\Console\Helper\ProgressHelper;
-
+use Symfony\Component\Console\Helper\ProgressBar;
 
 /**
  * Generate native CSV file for product drafts
@@ -16,27 +15,28 @@ use Symfony\Component\Console\Helper\ProgressHelper;
  */
 class ProductDraftGenerator extends AbstractProductGenerator implements GeneratorInterface
 {
+    const TYPE = 'product_drafts';
+
     /**
      * {@inheritdoc}
      */
-    public function generate(array $globalConfig, array $config, ProgressHelper $progress, array $options = [])
+    public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
         $tmpFile = tempnam(sys_get_temp_dir(), 'data-gene');
-        $outputFile = $globalConfig['output_dir'] . DIRECTORY_SEPARATOR . trim($config['filename']);
+        $outputFile = $globalConfig['output_dir'] . DIRECTORY_SEPARATOR . trim($entitiesConfig['filename']);
 
         $seed                = $globalConfig['seed'];
-        $count               = (int) $config['count'];
-        $nbAttrBase          = (int) $config['filled_attributes_count'];
-        $nbAttrDeviation     = (int) $config['filled_attributes_standard_deviation'];
-        $startIndex          = (int) $config['start_index'];
-        $mandatoryAttributes = $config['mandatory_attributes'];
-        $forcedValues        = $config['force_values'];
-        $delimiter           = $config['delimiter'];
+        $count               = (int) $entitiesConfig['count'];
+        $nbAttrBase          = (int) $entitiesConfig['filled_attributes_count'];
+        $nbAttrDeviation     = (int) $entitiesConfig['filled_attributes_standard_deviation'];
+        $startIndex          = (int) $entitiesConfig['start_index'];
+        $mandatoryAttributes = $entitiesConfig['mandatory_attributes'];
+        $forcedValues        = $entitiesConfig['force_values'];
+        $delimiter           = $entitiesConfig['delimiter'];
 
         $faker = $this->initFaker($seed);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
-
             $product = $this->buildRawProduct(
                 $faker,
                 $forcedValues,
@@ -54,6 +54,14 @@ class ProductDraftGenerator extends AbstractProductGenerator implements Generato
         $this->writeCsvFile($this->headers, $outputFile, $tmpFile, $delimiter);
         unlink($tmpFile);
 
-        return $this;
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($type)
+    {
+        return self::TYPE === $type;
     }
 }

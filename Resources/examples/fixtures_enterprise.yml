@@ -2,9 +2,8 @@ data_generator:
     output_dir: /tmp/fixtures
     seed: 20160218
     entities:
+        locales: ~
         group_types: ~
-        associations:
-            count: 4
         channels:
             ecommerce:
                 code: ecommerce
@@ -285,7 +284,7 @@ data_generator:
             attributes_count: 3
         asset_categories: ~
         asset_category_accesses: ~
-        attribute_groups_accesses: ~
-        job_profiles_accesses: ~
-        locales_accesses: ~
+        attribute_group_accesses: ~
+        job_profile_accesses: ~
+        locale_accesses: ~
         product_category_accesses: ~
