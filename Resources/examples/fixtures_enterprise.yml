@@ -281,6 +281,46 @@ data_generator:
                 alias:     rule_impacted_product_count
                 label:     Calculation of the matching products for the rules
                 type:      mass_edit_rule
+            xlsx_asset_import:
+                connector: Akeneo Product Asset Connector
+                alias:     xlsx_asset_import
+                label:     XLSX Demo asset import
+                type:      import
+                configuration:
+                    filePath:      /tmp/assets.xlsx
+                    uploadAllowed: true
+            xlsx_asset_category_import:
+                connector: Akeneo Product Asset Connector
+                alias:     xlsx_asset_category_import
+                label:     XLSX Demo asset category import
+                type:      import
+                configuration:
+                    filePath:      /tmp/asset_categories.xlsx
+                    uploadAllowed: true
+            xlsx_asset_export:
+                connector: Akeneo Product Asset Connector
+                alias:     xlsx_asset_export
+                label:     Demo XLSX asset export
+                type:      export
+                configuration:
+                    withHeader: true
+                    filePath:   /tmp/asset.xlsx
+            xlsx_asset_category_export:
+                connector: Akeneo Product Asset Connector
+                alias:     xlsx_asset_category_export
+                label:     Demo XLSX asset category export
+                type:      export
+                configuration:
+                    withHeader: true
+                    filePath:   /tmp/asset_category.xlsx
+            xlsx_asset_variation_export:
+                connector: Akeneo Product Asset Connector
+                alias:     xlsx_asset_variation_export
+                label:     Demo XLSX asset variation export
+                type:      export
+                configuration:
+                    withHeader: true
+                    filePath:   /tmp/asset_variation.xlsx
         user_groups:
             it_support:
                 name: IT support

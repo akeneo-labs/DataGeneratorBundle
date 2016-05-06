@@ -211,7 +211,6 @@ jobs:
         type:      import
         configuration:
             uploadAllowed: true
-
     xlsx_option_export:
         connector: Akeneo XLSX Connector
         alias:     xlsx_attribute_option_export
