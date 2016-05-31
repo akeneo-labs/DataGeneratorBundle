@@ -188,7 +188,6 @@ class ChannelGenerator implements GeneratorInterface
 
             $channel->setCode($channelConfig['code']);
             $channel->setLabel($channelConfig['label']);
-            $channel->setColor($channelConfig['color']);
 
             foreach ($channelConfig['locales'] as $localeCode) {
                 $locale = $this->locales[$localeCode];

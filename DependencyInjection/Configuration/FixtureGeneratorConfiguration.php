@@ -50,7 +50,6 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                                         ->isRequired()
                                         ->prototype('scalar')->end()
                                     ->end()
-                                    ->scalarNode('color')->isRequired()->end()
                                 ->end()
                             ->end()
                         ->end()
