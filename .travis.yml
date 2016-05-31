@@ -20,11 +20,10 @@ before_install:
 
 install:
     - composer update --prefer-dist --no-interaction
-    - curl http://get.sensiolabs.org/php-cs-fixer.phar -o php-cs-fixer
 
 script:
     - bin/phpspec run
-    - php php-cs-fixer fix --dry-run -v --diff --config-file=.php_cs.php
+    - bin/php-cs-fixer fix --dry-run -v --diff --config-file=.php_cs.php
 
 
 notifications:
