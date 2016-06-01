@@ -41,7 +41,6 @@ class ChannelGeneratorSpec extends ObjectBehavior
                 'label'      => 'Ecommerce',
                 'locales'    => ['fr_FR', 'en_US'],
                 'currencies' => ['USD', 'EUR'],
-                'color'      => 'blue',
             ]
         ];
         $options = [];

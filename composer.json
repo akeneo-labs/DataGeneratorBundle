@@ -28,6 +28,7 @@
     },
     "require-dev": {
         "akeneo/pim-community-dev": "dev-master@dev",
+        "friendsofphp/php-cs-fixer": "~1.11",
         "phpspec/phpspec": "~2.1"
     },
     "config": {
