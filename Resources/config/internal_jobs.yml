@@ -9,6 +9,11 @@ jobs:
         alias:     add_product_value
         label:     Mass add products values
         type:      mass_edit
+    remove_product_value:
+        connector: Akeneo Mass Edit Connector
+        alias:     remove_product_value
+        label:     Mass remove products values
+        type:      mass_edit
     edit_common_attributes:
         connector: Akeneo Mass Edit Connector
         alias:     edit_common_attributes
@@ -44,7 +49,6 @@ jobs:
             delimiter:           ;
             enclosure:           '"'
             escape:              '\'
-            circularRefsChecked: true
     csv_category_export:
         connector: Akeneo CSV Connector
         alias:     csv_category_export
@@ -150,7 +154,6 @@ jobs:
         type:      import
         configuration:
             uploadAllowed:       true
-            circularRefsChecked: true
     xlsx_category_export:
         connector: Akeneo XLSX Connector
         alias:     xlsx_category_export

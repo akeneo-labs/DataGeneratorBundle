@@ -115,13 +115,18 @@ class JobGenerator implements GeneratorInterface
      */
     protected function normalizeJob(JobInstance $job)
     {
-        return [
-            "connector"     => $job->getConnector(),
-            "alias"         => $job->getAlias(),
-            "label"         => $job->getLabel(),
-            "type"          => $job->getType(),
-            "configuration" => $job->getRawConfiguration()
+        $normalizeJob = [
+            "connector" => $job->getConnector(),
+            "alias"     => $job->getAlias(),
+            "label"     => $job->getLabel(),
+            "type"      => $job->getType()
         ];
+
+        if (count($job->getRawConfiguration()) > 0) {
+            $normalizeJob["configuration"] = $job->getRawConfiguration();
+        }
+
+        return $normalizeJob;
     }
 
     /**
