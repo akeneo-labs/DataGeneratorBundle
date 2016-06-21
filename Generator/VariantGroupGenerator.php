@@ -4,11 +4,11 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker\Factory;
 use Faker\Generator;
+use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
 use Pim\Bundle\CatalogBundle\Entity\Group;
 use Pim\Bundle\CatalogBundle\Entity\GroupTranslation;
 use Pim\Bundle\CatalogBundle\Entity\ProductTemplate;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
-use Pim\Component\Catalog\AttributeTypes;
 use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\GroupInterface;
 use Pim\Component\Catalog\Model\GroupTypeInterface;

@@ -53,6 +53,7 @@ class ChainedGenerator
         foreach ($entitiesConfig as $entity => $entityConfig) {
             $progress->setMessage(sprintf('Generating %s...', $entity));
             $generator = $this->registry->getGenerator($entity);
+            var_dump(get_class($generator));
             if (null !== $generator) {
                 $generatedValues = array_merge(
                     $generatedValues,
