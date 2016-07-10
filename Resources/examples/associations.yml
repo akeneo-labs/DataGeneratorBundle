@@ -1,0 +1,12 @@
+# With this configuration, product associations are generated from existing associations
+# in Akeneo PIM
+data_generator:
+    output_dir: /tmp/fixtures/associations
+    seed: 20160218
+    entities:
+        associations:
+            filename: associations.csv
+            delimiter: ;
+            product_associations_per_product: 2
+            group_associations_per_product: 2
+            products_to_process_limit: 1000

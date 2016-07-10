@@ -1,7 +1,7 @@
 # With this configuration, product data are generated from existing attributes
 # in Akeneo PIM
 data_generator:
-    output_dir: /tmp
+    output_dir: /tmp/fixtures/products
     seed: 20160218
     entities:
         products:
