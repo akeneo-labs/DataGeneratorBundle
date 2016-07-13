@@ -101,30 +101,30 @@ class AssociationGenerator implements GeneratorInterface
             $this->faker->seed($globalConfig['seed']);
         }
 
-        foreach ($products as $i => $product) {
-            if (null !== $associationLimitNumber && $i >= $associationLimitNumber) {
+        foreach ($products as $productIndex => $product) {
+            if (null !== $associationLimitNumber && $productIndex >= $associationLimitNumber) {
                 break;
             }
 
             $association = [];
             $association[$identifierCode] = $product->getIdentifier()->getData();
 
-            $associationTypeProduct = $this->getRandomAssociations('-products');
-            $randomProducts = $this->generateRandomProducts(
+            $associationTypesProduct = $this->getRandomAssociation('-products');
+            $randomProducts = $this->generateRandomProductIdentifiers(
                 $product,
                 $productsToAssociate,
                 $associationsProductCount
             );
-            if ('' !== $randomProducts) {
-                $association[$associationTypeProduct] = $randomProducts;
+            if (0 !== count($randomProducts)) {
+                $association[$associationTypesProduct] = join(',', $randomProducts);
             }
 
-            $associationTypeGroup = $this->getRandomAssociations('-groups');
-            $randomGroups = $this->generateRandomVariantGroups(
+            $associationTypeGroup = $this->getRandomAssociation('-groups');
+            $randomGroups = $this->generateRandomVariantGroupIdentifiers(
                 $associationsVariantGroupCount
             );
-            if ('' !== $randomGroups) {
-                $association[$associationTypeGroup] = $randomGroups;
+            if (0 !== count($randomGroups)) {
+                $association[$associationTypeGroup] = join(',', $randomGroups);
             }
 
             $this->bufferizeAssociation($association, $tmpFile);
@@ -141,24 +141,20 @@ class AssociationGenerator implements GeneratorInterface
     }
 
     /**
-     * Generates a list of random comma separated association types code
+     * Generates a normalised association type code
      *
      * @param $typeOfAssociation string
      *
-     * @return array
+     * @return string
      */
-    protected function getRandomAssociations($typeOfAssociation)
+    protected function getRandomAssociation($typeOfAssociation)
     {
-        $associationTypes = $this->faker->randomElements($this->associationTypeRepository->findAll());
-        $associationTypesCodes = array_map(function ($associationType) use ($typeOfAssociation) {
-            return $associationType->getCode() . $typeOfAssociation;
-        }, $associationTypes);
-
-        return join(',', $associationTypesCodes);
+        $associationType = $this->faker->randomElement($this->associationTypeRepository->findAll());
+        return $associationType->getCode() . $typeOfAssociation;
     }
 
     /**
-     * Find product skus different from the product passed as parameter
+     * Find randomly product identifiers different from the product passed as parameter
      *
      * @param ProductInterface $excludedProduct
      * @param CursorInterface  $products
@@ -166,7 +162,7 @@ class AssociationGenerator implements GeneratorInterface
      *
      * @return array
      */
-    protected function generateRandomProducts($excludedProduct, CursorInterface $products, $associationCount)
+    protected function generateRandomProductIdentifiers($excludedProduct, CursorInterface $products, $associationCount)
     {
         $productIdentifiers = [];
         $i = 0;
@@ -189,7 +185,7 @@ class AssociationGenerator implements GeneratorInterface
             $this->objectDetacher->detach($product);
         }
 
-        return join(',', $productIdentifiers);
+        return $productIdentifiers;
     }
 
     /**
@@ -197,12 +193,12 @@ class AssociationGenerator implements GeneratorInterface
      *
      * @param $associationsVariantGroupCount
      *
-     * @return string
+     * @return array
      */
-    private function generateRandomVariantGroups($associationsVariantGroupCount)
+    private function generateRandomVariantGroupIdentifiers($associationsVariantGroupCount)
     {
         if (0 === $associationsVariantGroupCount) {
-            return '';
+            return [];
         }
 
         $variantGroups = $this->faker->randomElements(
@@ -214,7 +210,7 @@ class AssociationGenerator implements GeneratorInterface
             return $variantGroup->getCode();
         }, $variantGroups);
 
-        return join(',', $variantGroupCodes);
+        return $variantGroupCodes;
     }
 
     /**
