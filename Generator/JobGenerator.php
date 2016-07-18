@@ -80,10 +80,10 @@ class JobGenerator implements GeneratorInterface
         $job = new JobInstance();
         $job->setCode($code);
         $job->setConnector($jobConfig['connector']);
-        $job->setAlias($jobConfig['alias']);
+        $job->setJobName($jobConfig['alias']);
         $job->setLabel($jobConfig['label']);
         $job->setType($jobConfig['type']);
-        $job->setRawConfiguration($jobConfig['configuration']);
+        $job->setRawParameters($jobConfig['configuration']);
 
         return $job;
     }
@@ -117,13 +117,13 @@ class JobGenerator implements GeneratorInterface
     {
         $normalizeJob = [
             "connector" => $job->getConnector(),
-            "alias"     => $job->getAlias(),
+            "alias"     => $job->getJobName(),
             "label"     => $job->getLabel(),
             "type"      => $job->getType()
         ];
 
-        if (count($job->getRawConfiguration()) > 0) {
-            $normalizeJob["configuration"] = $job->getRawConfiguration();
+        if (count($job->getRawParameters()) > 0) {
+            $normalizeJob["configuration"] = $job->getRawParameters();
         }
 
         return $normalizeJob;
