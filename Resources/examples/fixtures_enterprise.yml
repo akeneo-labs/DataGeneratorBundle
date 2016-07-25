@@ -68,22 +68,28 @@ data_generator:
                 label:     Product export
                 type:      export
                 configuration:
-                    channel:    ecommerce
                     delimiter:  ;
                     enclosure:  '"'
                     withHeader: true
                     filePath: /tmp/product.csv
+                    filters:
+                        data: []
+                        structure:
+                            scope: ecommerce
             ecommerce_published_product_export:
                 connector: Akeneo CSV Connector
                 alias:     csv_published_product_export
                 label:     Published product export for ecommerce
                 type:      export
                 configuration:
-                    channel:    ecommerce
                     delimiter:  ;
                     enclosure:  '"'
                     withHeader: true
                     filePath: /tmp/published-product.csv
+                    filters:
+                        data: []
+                        structure:
+                            scope: ecommerce
             rule_import:
                 connector: Akeneo Rule Engine Connector
                 alias:     yml_rule_import
