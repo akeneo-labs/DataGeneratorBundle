@@ -68,11 +68,14 @@ data_generator:
                 label:     Product export
                 type:      export
                 configuration:
-                    channel:    ecommerce
                     delimiter:  ;
                     enclosure:  '"'
                     withHeader: true
                     filePath: /tmp/product.csv
+                    filters:
+                        data: []
+                        structure:
+                            scope: ecommerce
         user_groups:
             it_support:
                 name: IT support

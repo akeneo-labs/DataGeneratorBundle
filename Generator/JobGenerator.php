@@ -83,7 +83,10 @@ class JobGenerator implements GeneratorInterface
         $job->setJobName($jobConfig['alias']);
         $job->setLabel($jobConfig['label']);
         $job->setType($jobConfig['type']);
-        $job->setRawParameters($jobConfig['configuration']);
+
+        if (isset($jobConfig['configuration'])) {
+            $job->setRawParameters($jobConfig['configuration']);
+        }
 
         return $job;
     }
