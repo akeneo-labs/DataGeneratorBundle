@@ -1,11 +1,36 @@
-checks:
-    php: true
+filter:
+    paths:
+        - ./*
 
-#build:
-#  tests:
-#    override:
-#      -
-#        command: 'vendor/bin/phpspec run -f progress -c phpspec-ci.yml'
-#        coverage:
-#          file: 'coverage.clover'
-#          format: 'php-clover'
+tools:
+    sensiolabs_security_checker: true
+    php_mess_detector:
+        filter:
+            excluded_paths:
+              - spec/*
+              - vendor/*
+    php_analyzer:
+        filter:
+            excluded_paths:
+              - spec/*
+              - vendor/*
+    php_code_sniffer:
+        config:
+            standard: PSR2
+        filter:
+            excluded_paths:
+                - spec/*
+                - vendor/*
+    php_cpd:
+        filter:
+            excluded_paths:
+              - spec/*
+              - vendor/*
+    php_loc:
+        excluded_dirs:
+            - spec/*
+            - vendor/*
+    php_pdepend:
+        excluded_dirs:
+            - spec/*
+            - vendor/*

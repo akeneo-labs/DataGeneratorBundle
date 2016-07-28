@@ -22,19 +22,30 @@ and update your ``app/AppKernel.php`` as follow:
 
 How to use it
 -------------
-The catalog generation is done in two phases:
- 1. generating the catalog fixtures
- 2. generating the product CSV import files
+
+In order to generate a full catalog, you need to:
+ 1. Generate the fixtures data
+ 2. Copy the minimal data set fixtures into a new fixtures set
+ 3. Copy the generated fixtures into this new set
+ 4. Install the PIM with the new fixtures set by configuring the `installer_data` parameter
+ 5. Generate the products data
+ 6. Import the generated products in the PIM using a CSV product import job
+ 7. Generate the associations
+ 8. Import the generated associations in the PIM using a CSV product import jobt a
+
+Products data cannot be generated at the same time as the base fixtures (families, categories, attributes, etc...).
+Indeed, to generate products data, we use the objects available in the PIM (families, attributes, etc).
+In the same way, product associations are generated using products imported beforehand.
 
 ```bash
 Usage:
  pim:generate:fixtures <configuration_file_path>
  pim:generate:products-file <configuration_file_path>
+ pim:generate:associations-file <configuration_file_path>
 
 Arguments:
  configuration-file    YAML configuration file
 ```
-
 
 Configuration file examples
 ---------------------------
@@ -54,10 +65,12 @@ data_generator:
             label_attribute: "label"
 ```
 
-Generating products:
+Now, You can install the PIM with the generated fixtures by configuring the `installer_data` parameter in the `app/config/parameters.yml` file.
+
+Generating products :
 ```yaml
 data_generator:
-    output_dir: /tmp/
+    output_dir: /tmp/fixtures/products
     entities:
         products:
             count: 1000
@@ -70,23 +83,33 @@ data_generator:
             categories_count: 10
 ```
 
+Once the fixtures are set up in the PIM, you can generate and manually import the generated products file.
+
+Generating associations :
+```yaml
+data_generator:
+    output_dir: /tmp/fixtures/associations/
+    seed: 20160218
+    entities:
+        associations:
+            filename: associations.csv
+            delimiter: ;
+            product_associations_per_product: 1
+            group_associations_per_product: 1
+            products_to_process_limit: 1000
+```
+
+Once the products are imported in the PIM, you can generate the associations file. In order to import it in the PIM use a `csv_product_import` job.
+
+This configuration will generate the number of associations as following:
+```
+MAX(
+    product_associations_per_product * Number of products in the PIM + group_associations_per_product * number_of_products_in_the_pim,
+    products_to_process_limit
+)
+```
+
 More configuration examples are available in the ``Resources\examples`` directory.
-
-## Warning
-Products data cannot be generated at the same time as the base fixtures (families, categories, attributes, etc...).
-Indeed, to generate products data, we use the objects available in the PIM (families, attributes, etc).
-
-So if you need to generate a full catalog, you need to:
- 1. generate the fixtures
- 2. copy the minimal data set fixtures into a new fixtures set
- 3. copy the generated fixtures into this new set
- 4. install the new fixtures set by changing the `installer_data` configuration
- 5. generate the products data
-
-How to use the generated attributes and families data
------------------------------------------------------
-The generated files are meant to be used in the fixtures. Only the generated products CSV file
-must be imported by the import profiles.
 
 Compatibility
 -------------

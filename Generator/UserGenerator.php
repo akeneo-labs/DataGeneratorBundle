@@ -119,8 +119,10 @@ class UserGenerator
         if (isset($userConfig['catalog_locale'])) {
             $localeCode = $userConfig['catalog_locale'];
             $user->setCatalogLocale($this->locales[$localeCode]);
+            $user->setUiLocale($this->locales[$localeCode]);
         } else {
             $user->setCatalogLocale(reset($this->locales));
+            $user->setUiLocale(reset($this->locales));
         }
 
         if (isset($userConfig['catalog_scope'])) {
@@ -178,17 +180,20 @@ class UserGenerator
         }
 
         $result = [
-            "username"       => $user->getUsername(),
-            "password"       => $user->getPassword(),
-            "email"          => $user->getEmail(),
-            "firstname"      => $user->getFirstname(),
-            "lastname"       => $user->getLastname(),
-            "catalog_locale" => $user->getCatalogLocale()->getCode(),
-            "catalog_scope"  => $user->getCatalogScope()->getCode(),
-            "default_tree"   => $user->getDefaultTree()->getCode(),
-            "roles"          => $userRoleCodes,
-            "groups"         => $userGroupCodes,
-            "enable"         => $user->isEnabled()
+            "username"                         => $user->getUsername(),
+            "password"                         => $user->getPassword(),
+            "email"                            => $user->getEmail(),
+            "firstname"                        => $user->getFirstname(),
+            "lastname"                         => $user->getLastname(),
+            "ui_locale"                        => $user->getUiLocale()->getCode(),
+            "catalog_locale"                   => $user->getCatalogLocale()->getCode(),
+            "catalog_scope"                    => $user->getCatalogScope()->getCode(),
+            "default_tree"                     => $user->getDefaultTree()->getCode(),
+            "roles"                            => $userRoleCodes,
+            "groups"                           => $userGroupCodes,
+            "enable"                           => $user->isEnabled(),
+            "proposals_to_review_notification" => $this->faker->boolean(),
+            "proposals_state_notifications"    => $this->faker->boolean(),
         ];
 
         if (count($this->assetCategoryCodes) > 0) {

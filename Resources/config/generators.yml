@@ -21,99 +21,109 @@ parameters:
     pim_data_generator.generator.association_type.class:        Pim\Bundle\DataGeneratorBundle\Generator\AssociationTypeGenerator
     pim_data_generator.generator.group_type.class:              Pim\Bundle\DataGeneratorBundle\Generator\GroupTypeGenerator
     pim_data_generator.generator.product_draft.class:           Pim\Bundle\DataGeneratorBundle\Generator\ProductDraftGenerator
+    pim_data_generator.generator.association.class:             Pim\Bundle\DataGeneratorBundle\Generator\AssociationGenerator
 
 services:
     pim_data_generator.fixture_generator:
-        class: %pim_data_generator.generator.fixture.class%
+        class: '%pim_data_generator.generator.fixture.class%'
         arguments:
-            - @pim_data_generator.generator.channel
-            - @pim_data_generator.generator.user_role
-            - @pim_data_generator.generator.user_group
-            - @pim_data_generator.generator.user
-            - @pim_data_generator.generator.attribute
-            - @pim_data_generator.generator.family
-            - @pim_data_generator.generator.category
-            - @pim_data_generator.generator.attribute_group
-            - @pim_data_generator.generator.attribute_option
-            - @pim_data_generator.generator.job
-            - @pim_data_generator.generator.asset_category
-            - @pim_data_generator.generator.asset_category_access
-            - @pim_data_generator.generator.attribute_groups_access
-            - @pim_data_generator.generator.job_profiles_access
-            - @pim_data_generator.generator.locales_access
-            - @pim_data_generator.generator.product_category_access
-            - @pim_data_generator.generator.association_type
-            - @pim_data_generator.generator.group_type
-            - @pim_data_generator.generator.variant_group
+            - '@pim_data_generator.generator.channel'
+            - '@pim_data_generator.generator.user_role'
+            - '@pim_data_generator.generator.user_group'
+            - '@pim_data_generator.generator.user'
+            - '@pim_data_generator.generator.attribute'
+            - '@pim_data_generator.generator.family'
+            - '@pim_data_generator.generator.category'
+            - '@pim_data_generator.generator.attribute_group'
+            - '@pim_data_generator.generator.attribute_option'
+            - '@pim_data_generator.generator.job'
+            - '@pim_data_generator.generator.asset_category'
+            - '@pim_data_generator.generator.asset_category_access'
+            - '@pim_data_generator.generator.attribute_groups_access'
+            - '@pim_data_generator.generator.job_profiles_access'
+            - '@pim_data_generator.generator.locales_access'
+            - '@pim_data_generator.generator.product_category_access'
+            - '@pim_data_generator.generator.association_type'
+            - '@pim_data_generator.generator.group_type'
+            - '@pim_data_generator.generator.variant_group'
 
     pim_data_generator.generator.channel:
-        class: %pim_data_generator.generator.channel.class%
+        class: '%pim_data_generator.generator.channel.class%'
 
     pim_data_generator.generator.category:
-        class: %pim_data_generator.generator.category.class%
+        class: '%pim_data_generator.generator.category.class%'
 
     pim_data_generator.generator.user_role:
-        class: %pim_data_generator.generator.user_role.class%
+        class: '%pim_data_generator.generator.user_role.class%'
 
     pim_data_generator.generator.user_group:
-        class: %pim_data_generator.generator.user_group.class%
+        class: '%pim_data_generator.generator.user_group.class%'
 
     pim_data_generator.generator.user:
-        class: %pim_data_generator.generator.user.class%
+        class: '%pim_data_generator.generator.user.class%'
 
     pim_data_generator.generator.attribute:
-        class: %pim_data_generator.generator.attribute.class%
+        class: '%pim_data_generator.generator.attribute.class%'
         arguments:
             - '@pim_catalog.registry.attribute_type'
 
     pim_data_generator.generator.family:
-        class: %pim_data_generator.generator.family.class%
+        class: '%pim_data_generator.generator.family.class%'
 
     pim_data_generator.generator.attribute_option:
-        class: %pim_data_generator.generator.attribute_option.class%
+        class: '%pim_data_generator.generator.attribute_option.class%'
 
     pim_data_generator.generator.attribute_group:
-        class: %pim_data_generator.generator.attribute_group.class%
+        class: '%pim_data_generator.generator.attribute_group.class%'
 
     pim_data_generator.generator.job:
-        class: %pim_data_generator.generator.job.class%
+        class: '%pim_data_generator.generator.job.class%'
 
     pim_data_generator.generator.variant_group:
-        class: %pim_data_generator.generator.variant_group.class%
+        class: '%pim_data_generator.generator.variant_group.class%'
 
     pim_data_generator.generator.product:
-        class: %pim_data_generator.generator.product.class%
+        class: '%pim_data_generator.generator.product.class%'
         arguments:
             - '@pim_data_generator.product.product_raw_builder'
             - '@pim_catalog.repository.family'
             - '@pim_catalog.repository.group'
 
     pim_data_generator.generator.asset_category:
-        class: %pim_data_generator.generator.asset_category.class%
+        class: '%pim_data_generator.generator.asset_category.class%'
 
     pim_data_generator.generator.asset_category_access:
-        class: %pim_data_generator.generator.asset_category_access.class%
+        class: '%pim_data_generator.generator.asset_category_access.class%'
 
     pim_data_generator.generator.attribute_groups_access:
-        class: %pim_data_generator.generator.attribute_groups_access.class%
+        class: '%pim_data_generator.generator.attribute_groups_access.class%'
 
     pim_data_generator.generator.job_profiles_access:
-        class: %pim_data_generator.generator.job_profiles_access.class%
+        class: '%pim_data_generator.generator.job_profiles_access.class%'
 
     pim_data_generator.generator.locales_access:
-        class: %pim_data_generator.generator.locales_access.class%
+        class: '%pim_data_generator.generator.locales_access.class%'
 
     pim_data_generator.generator.product_category_access:
-        class: %pim_data_generator.generator.product_category_access.class%
+        class: '%pim_data_generator.generator.product_category_access.class%'
 
     pim_data_generator.generator.association_type:
-        class: %pim_data_generator.generator.association_type.class%
+        class: '%pim_data_generator.generator.association_type.class%'
 
     pim_data_generator.generator.group_type:
-        class: %pim_data_generator.generator.group_type.class%
+        class: '%pim_data_generator.generator.group_type.class%'
 
     pim_data_generator.generator.product_draft:
-        class: %pim_data_generator.generator.product_draft.class%
+        class: '%pim_data_generator.generator.product_draft.class%'
         arguments:
             - '@pim_data_generator.product.product_raw_builder'
             - '@pim_catalog.repository.family'
+
+    pim_data_generator.generator.association:
+        class: '%pim_data_generator.generator.association.class%'
+        arguments:
+            - '@pim_catalog.query.product_query_builder_factory'
+            - '@pim_catalog.repository.association_type'
+            - '@pim_catalog.repository.group'
+            - '@pim_catalog.repository.attribute'
+            - '@akeneo_storage_utils.doctrine.object_detacher'

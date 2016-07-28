@@ -8,10 +8,9 @@ use Pim\Bundle\CatalogBundle\Entity\AssociationTypeTranslation;
 use Pim\Bundle\CatalogBundle\Entity\Locale;
 use Pim\Component\Catalog\Model\AssociationTypeInterface;
 use Symfony\Component\Console\Helper\ProgressHelper;
-use Symfony\Component\Yaml;
 
 /**
- * Generate native YAML file for association types.
+ * Generate native CSV file for association types.
  *
  * @author    Pierre Allard <pierre.allard@akeneo.com>
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
@@ -19,14 +18,12 @@ use Symfony\Component\Yaml;
  */
 class AssociationTypeGenerator implements GeneratorInterface
 {
-    const ASSOCIATION_TYPES_FILENAME = 'association_types.yml';
-
-    const ASSOCIATIONS = 'associations';
+    const ASSOCIATION_TYPES_FILENAME = 'association_types.csv';
 
     /** @var Locale[] */
-    protected $locales;
+    protected $locales = [];
 
-    /** @var Faker\Generator */
+    /** @var Generator */
     protected $faker;
 
     /**
@@ -36,7 +33,12 @@ class AssociationTypeGenerator implements GeneratorInterface
     {
         $this->locales = $options['locales'];
 
+        $associationTypeFile = $globalConfig['output_dir'].'/'.self::ASSOCIATION_TYPES_FILENAME;
+        $delimiter = $config['delimiter'];
+
         $data = [];
+        $headers = [];
+
         $this->faker = \Faker\Factory::create();
         if (isset($globalConfig['seed'])) {
             $this->faker->seed($globalConfig['seed']);
@@ -44,18 +46,43 @@ class AssociationTypeGenerator implements GeneratorInterface
 
         for ($i = 0; $i < $config['count']; $i++) {
             $associationType = $this->generateAssociationType();
-            $data = array_merge($data, $this->normalizeAssociationType($associationType));
+            $associationType = $this->normalizeAssociationType($associationType);
+            $data[] = $associationType;
+
+            $headers = array_unique(array_merge($headers, array_keys($associationType)));
 
             $progress->advance();
         }
 
-        $data = [self::ASSOCIATIONS => $data];
-
-        $this->writeYamlFile($data, $globalConfig['output_dir']);
+        $this->writeCsvFile($data, $headers, $associationTypeFile, $delimiter);
 
         $progress->advance();
 
         return $this;
+    }
+
+    /**
+     * Write the CSV file from attributes
+     *
+     * @param array  $associationTypes
+     * @param array  $headers
+     * @param string $outputFile
+     * @param string $delimiter
+     *
+     * @internal param array $attributes
+     */
+    protected function writeCsvFile(array $associationTypes, array $headers, $outputFile, $delimiter)
+    {
+        $csvFile = fopen($outputFile, 'w');
+
+        fputcsv($csvFile, $headers, $delimiter);
+        $headersAsKeys = array_fill_keys($headers, "");
+
+        foreach ($associationTypes as $attribute) {
+            $attributeData = array_merge($headersAsKeys, $attribute);
+            fputcsv($csvFile, $attributeData, $delimiter);
+        }
+        fclose($csvFile);
     }
 
     /**
@@ -85,32 +112,12 @@ class AssociationTypeGenerator implements GeneratorInterface
      */
     protected function normalizeAssociationType(AssociationTypeInterface $associationType)
     {
-        $code = $associationType->getCode();
-        $result = [
-            $code => [
-                'labels' => []
-            ]
-        ];
+        $result = ['code' => $associationType->getCode()];
 
-        /** @var AssociationTypeTranslation $translation */
         foreach ($associationType->getTranslations() as $translation) {
-            $result[$code]['labels'][$translation->getLocale()] = $translation->getLabel();
+            $result[sprintf('label-%s', $translation->getLocale())] = $translation->getLabel();
         }
 
         return $result;
-    }
-
-    /**
-     * Write a YAML file
-     *
-     * @param array  $data
-     * @param string $outputDir
-     */
-    protected function writeYamlFile(array $data, $outputDir)
-    {
-        $dumper = new Yaml\Dumper();
-        $yamlData = $dumper->dump($data, 4, 0, true, true);
-
-        file_put_contents($outputDir.'/'.self::ASSOCIATION_TYPES_FILENAME, $yamlData);
     }
 }
