@@ -76,6 +76,9 @@ data_generator:
                         data: []
                         structure:
                             scope: ecommerce
+                            locales:
+                                - fr_FR
+                                - en_US
             ecommerce_published_product_export:
                 connector: Akeneo CSV Connector
                 alias:     csv_published_product_export
@@ -90,6 +93,9 @@ data_generator:
                         data: []
                         structure:
                             scope: ecommerce
+                            locales:
+                                - fr_FR
+                                - en_US
             rule_import:
                 connector: Akeneo Rule Engine Connector
                 alias:     yml_rule_import
