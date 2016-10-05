@@ -1,0 +1,113 @@
+data_generator:
+    output_dir: /tmp/large_100M
+    seed: 20160430
+    entities:
+        group_types: ~
+        channels:
+            ecommerce:
+                code: ecommerce
+                label: Ecommerce
+                locales:
+                    - fr_FR
+                    - en_US
+                    - de_DE
+                    - ru_RU
+                    - it_IT
+                currencies:
+                    - USD
+                    - EUR
+            print:
+                code: print
+                label: Print
+                locales:
+                    - fr_FR
+                    - en_US
+                    - de_DE
+                    - ru_RU
+                    - it_IT
+                currencies:
+                    - USD
+                    - EUR
+        attribute_groups:
+            count: 20
+        attributes:
+            count: 1000
+            identifier_attribute: sku
+            localizable_probability: 2
+            scopable_probability: 1
+            localizable_and_scopable_probability: 0.5
+            useable_as_grid_filter_probability: 10
+            force_attributes:
+                - name = pim_catalog_text
+        attribute_options:
+            count_per_attribute: 10
+        families:
+            count: 400
+            attributes_count: 100
+            identifier_attribute: sku
+            label_attribute: name
+            requirements_count: 5
+        categories:
+            delimiter: ;
+            count: 4000
+            levels: 3
+        jobs:
+          csv_product_import:
+            connector: Akeneo CSV Connector
+            alias:     csv_product_import
+            label:     CSV product import
+            type:      import
+            configuration:
+              filePath:           /tmp/product.csv
+              uploadAllowed:      true
+              delimiter:          ;
+              enclosure:          '"'
+              escape:             '\'
+              enabled:            true
+              categoriesColumn:   categories
+              familyColumn:       family
+              groupsColumn:       groups
+              realTimeVersioning: true
+              decimalSeparator:   .
+              dateFormat:         yyyy-MM-dd
+          csv_product_export:
+            connector: Akeneo CSV Connector
+            alias:   csv_product_export
+            label:   CSV product export
+            type:    export
+            configuration:
+              delimiter:  ;
+              enclosure:  '"'
+              withHeader: true
+              filePath: /tmp/product.csv
+              filters:
+                  data: []
+                  structure:
+                      scope: ecommerce
+                      locales:
+                          - fr_FR
+                          - en_US
+                          - de_DE
+                          - ru_RU
+                          - it_IT
+        user_groups:
+            it_support:
+                name: IT support
+            manager:
+                name: Manager
+        user_roles:
+            ROLE_ADMINISTRATOR:
+                label: Administrator
+        users:
+            -   username: admin
+                password: admin
+                email: admin@example.com
+                firstname: Peter
+                lastname: Doe
+                roles: [ ROLE_ADMINISTRATOR ]
+                groups: [ IT support ]
+                enable: true
+        variant_groups:
+            count: 10000
+            axes_count: 3
+            attributes_count: 5
