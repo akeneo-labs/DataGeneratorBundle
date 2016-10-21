@@ -31,7 +31,7 @@ class FixtureGeneratorConfiguration implements ConfigurationInterface
                     ->children()
                         ->arrayNode('locales')->end()
                         ->arrayNode('group_types')->end()
-                        ->arrayNode('associations')
+                        ->arrayNode('association_types')
                             ->children()
                                 ->integerNode('count')->min(0)->isRequired()->end()
                             ->end()

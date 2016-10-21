@@ -25,7 +25,7 @@ class AssociationTypeGenerator implements GeneratorInterface
 
     const ASSOCIATION_TYPES_FILENAME = 'association_types.csv';
 
-    const ASSOCIATIONS = 'associations';
+    const ASSOCIATION_TYPES = 'association_types';
 
     /** @var CsvWriter */
     protected $writer;
@@ -49,7 +49,7 @@ class AssociationTypeGenerator implements GeneratorInterface
      */
     public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $this->locales = $options['locales'];
+        $this->locales = isset($options['locales']) ? $options['locales'] : [];
 
         $data = [];
         $this->faker = Factory::create();

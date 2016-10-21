@@ -4,10 +4,10 @@ namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker\Factory;
 use Faker\Generator;
+use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypeRegistry;
+use Pim\Bundle\CatalogBundle\AttributeType\AttributeTypes;
 use Pim\Bundle\CatalogBundle\Entity\Attribute;
 use Pim\Bundle\DataGeneratorBundle\Writer\CsvWriter;
-use Pim\Component\Catalog\AttributeTypeRegistry;
-use Pim\Component\Catalog\AttributeTypes;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
