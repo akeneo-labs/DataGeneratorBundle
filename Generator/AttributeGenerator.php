@@ -81,8 +81,8 @@ class AttributeGenerator implements GeneratorInterface
         $identifier             = $entitiesConfig['identifier_attribute'];
 
         $this->faker = Factory::create();
-        if (isset($globalConfig['seed'])) {
-            $this->faker->seed($globalConfig['seed']);
+        if (isset($globalConfig['seed']) && isset($globalConfig['start_index'])) {
+            $this->faker->seed($globalConfig['seed'] . $globalConfig['start_index']);
         }
 
         $this->attributes = [];

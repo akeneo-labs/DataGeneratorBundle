@@ -34,7 +34,7 @@ class ProductDraftGenerator extends AbstractProductGenerator implements Generato
         $forcedValues        = $entitiesConfig['force_values'];
         $delimiter           = $entitiesConfig['delimiter'];
 
-        $faker = $this->initFaker($seed);
+        $faker = $this->initFaker($seed . $startIndex);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
             $product = $this->buildRawProduct(

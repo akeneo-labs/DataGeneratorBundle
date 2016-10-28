@@ -53,8 +53,8 @@ class AssociationTypeGenerator implements GeneratorInterface
 
         $data = [];
         $this->faker = Factory::create();
-        if (isset($globalConfig['seed'])) {
-            $this->faker->seed($globalConfig['seed']);
+        if (isset($globalConfig['seed']) && isset($globalConfig['start_index'])) {
+            $this->faker->seed($globalConfig['seed'] . $globalConfig['start_index']);
         }
 
         for ($i = 0; $i < $entitiesConfig['count']; $i++) {
