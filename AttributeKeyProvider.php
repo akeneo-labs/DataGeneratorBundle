@@ -70,70 +70,40 @@ class AttributeKeyProvider
     {
         $keys = [];
 
-        $keys[$attribute->getCode()] = [];
+        $locales  = $attribute->isLocalizable() ? $this->getLocales() : [null];
+        $channels = $attribute->isScopable() ? $this->getChannels() : [null];
+        foreach ($channels as $channel) {
+            foreach ($locales as $locale) {
+                $localeInChannel  = null === $channel ||
+                    null === $locale ||
+                    in_array($locale, $channel->getLocales()->toArray());
+                $localeInSpecific = !$attribute->isLocaleSpecific() ||
+                    null === $locale ||
+                    in_array($locale->getCode(), $attribute->getLocaleSpecificCodes());
 
-        $updatedKeys = [];
-        if ($attribute->isScopable() && $attribute->isLocalizable()) {
-            foreach ($this->getLocales() as $locale) {
-                foreach ($this->getChannels() as $channel) {
-                    foreach ($keys as $baseKey => $keyOptions) {
-                        $key               = $baseKey . '-' . $locale->getCode() . '-' . $channel->getCode();
-                        $updatedKeys[$key] = array_merge($keyOptions, ['locale' => $locale, 'channel' => $channel]);
-                    }
+                if ($localeInChannel && $localeInSpecific) {
+                    $keys[] = $this->createKey($attribute, $channel, $locale);
                 }
             }
-            $keys = $updatedKeys;
-        } elseif ($attribute->isScopable() && !$attribute->isLocalizable()) {
-            foreach ($this->getChannels() as $channel) {
-                foreach ($keys as $baseKey => $keyOptions) {
-                    $key               = $baseKey . '-' . $channel->getCode();
-                    $updatedKeys[$key] = array_merge($keyOptions, ['channel' => $channel]);
-                }
-            }
-            $keys = $updatedKeys;
-        } elseif (!$attribute->isScopable() && $attribute->isLocalizable()) {
-            foreach ($this->getLocales() as $locale) {
-                foreach ($keys as $baseKey => $keyOptions) {
-                    $key               = $baseKey . '-' . $locale->getCode();
-                    $updatedKeys[$key] = array_merge($keyOptions, ['locale' => $locale]);
-                }
-            }
-            $keys = $updatedKeys;
         }
 
         switch ($attribute->getBackendType()) {
             case 'prices':
-                $updatedKeys = [];
-
-                foreach ($keys as $key => $keyOptions) {
+                foreach ($keys as $index => $key) {
                     foreach ($this->getCurrencies() as $currency) {
-                        $updatedKeys[$key . '-' . $currency->getCode()] = array_merge(
-                            $keyOptions,
-                            ['currency' => $currency]
-                        );
+                        $keys[] = $key . '-' . $currency->getCode();
                     }
+                    unset($keys[$index]);
                 }
-                $keys = $updatedKeys;
                 break;
             case 'metric':
-                $updatedKeys = [];
-
-                foreach ($keys as $key => $keyOptions) {
-                    $updatedKeys[$key]                           = $keyOptions;
-                    $updatedKeys[$key . '-' . self::METRIC_UNIT] = $keyOptions;
+                foreach ($keys as $index => $key) {
+                    $keys[] = $key . '-' .  self::METRIC_UNIT;
                 }
-                $keys = $updatedKeys;
                 break;
         }
 
-        $enabledKeys = [];
-        foreach ($keys as $key => $keyOptions) {
-            if ($this->isAttributeKeyValid($keyOptions)) {
-                $enabledKeys[] = $key;
-            }
-        }
-
-        return $enabledKeys;
+        return $keys;
     }
 
     /**
@@ -190,67 +160,23 @@ class AttributeKeyProvider
         return $this->locales;
     }
 
-
     /**
-     * Returns true if the key is valid, according to channels locale and currency.
+     * Return the key for the given attribute, locale and channem.
      *
-     * @param $options
+     * @param AttributeInterface    $attribute
+     * @param ChannelInterface|null $channel
+     * @param LocaleInterface|null  $locale
      *
-     * @return bool
+     * @return string
      */
-    private function isAttributeKeyValid(array $options)
-    {
-        if (isset($options['channel'])) {
-            $channel = $options['channel'];
+    private function createKey(
+        AttributeInterface $attribute,
+        ChannelInterface $channel = null,
+        LocaleInterface $locale = null
+    ) {
+        $channelCode = null !== $channel ? '-' . $channel->getCode() : '';
+        $localeCode = null !== $locale ? '-' . $locale->getCode() : '';
 
-            if (isset($options['locale']) && !$this->hasChannelLocale($channel, $options['locale'])) {
-                return false;
-            }
-
-            if (isset($options['currency']) && !$this->hasChannelCurrency($channel, $options['currency'])) {
-                return false;
-            }
-        }
-
-        return true;
+        return $attribute->getCode() . $localeCode . $channelCode;
     }
-
-    /**
-     * Returns true if channel has activated locale.
-     *
-     * @param ChannelInterface $channel
-     * @param LocaleInterface  $locale
-     *
-     * @return bool
-     */
-    private function hasChannelLocale(ChannelInterface $channel, LocaleInterface $locale)
-    {
-        foreach ($channel->getLocaleCodes() as $availableLocale) {
-            if ($locale->getCode() === $availableLocale) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true if channel has activated currency.
-     *
-     * @param ChannelInterface  $channel
-     * @param CurrencyInterface $currency
-     *
-     * @return bool
-     */
-    private function hasChannelCurrency(ChannelInterface $channel, CurrencyInterface $currency)
-    {
-        foreach ($channel->getCurrencies() as $availableCurrency) {
-            if ($currency->getCode() === $availableCurrency->getCode()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 }
