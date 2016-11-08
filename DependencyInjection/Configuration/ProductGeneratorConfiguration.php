@@ -31,6 +31,7 @@ class ProductGeneratorConfiguration implements ConfigurationInterface
                 ->integerNode('categories_count')->min(0)->defaultValue(0)->info('Number of categories per product')->end()
                 ->integerNode('products_per_variant_group')->min(0)->defaultValue(0)->info('Number of products in each variant group')->end()
                 ->integerNode('percentage_complete')->min(0)->max(100)->defaultValue(20)->info('Percentage of complete products')->end()
+                ->booleanNode('all_attribute_keys')->defaultFalse()->info('If true exports the products with all attribute keys possible')->end()
             ->end();
 
         $draftsNode = $this->getDraftAndProductBaseNode('product_drafts');

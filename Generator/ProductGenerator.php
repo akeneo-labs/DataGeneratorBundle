@@ -3,9 +3,11 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator;
 
 use Faker;
+use Pim\Bundle\DataGeneratorBundle\AttributeKeyProvider;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\AbstractProductGenerator;
 use Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder;
 use Pim\Bundle\DataGeneratorBundle\VariantGroupDataProvider;
+use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
 use Pim\Component\Catalog\Repository\FamilyRepositoryInterface;
 use Pim\Component\Catalog\Repository\GroupRepositoryInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -27,19 +29,31 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
     /** @var VariantGroupDataProvider[] */
     private $variantGroupDataProviders = [];
 
+    /** @var AttributeRepositoryInterface */
+    private $attributeRepository;
+
+    /** @var AttributeKeyProvider */
+    private $attributeKeyProvider;
+
     /**
      * @param ProductRawBuilder            $productRawBuilder
      * @param FamilyRepositoryInterface    $familyRepository
      * @param GroupRepositoryInterface     $groupRepository
+     * @param AttributeRepositoryInterface $attributeRepository
+     * @param AttributeKeyProvider         $attributeKeyProvider
      */
     public function __construct(
         ProductRawBuilder $productRawBuilder,
         FamilyRepositoryInterface $familyRepository,
-        GroupRepositoryInterface $groupRepository
+        GroupRepositoryInterface $groupRepository,
+        AttributeRepositoryInterface $attributeRepository,
+        AttributeKeyProvider $attributeKeyProvider
     ) {
         parent::__construct($productRawBuilder, $familyRepository);
         $this->groupRepository = $groupRepository;
         $this->variantGroupDataProviders = [];
+        $this->attributeRepository = $attributeRepository;
+        $this->attributeKeyProvider = $attributeKeyProvider;
     }
 
     /**
@@ -61,6 +75,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         $forcedValues        = $entitiesConfig['force_values'];
         $delimiter           = $entitiesConfig['delimiter'];
         $percentageComplete  = $entitiesConfig['percentage_complete'];
+        $allAttributeKeys    = $entitiesConfig['all_attribute_keys'];
 
         if ($variantGroupCount > 0) {
             foreach ($this->groupRepository->getAllVariantGroups() as $variantGroup) {
@@ -117,6 +132,11 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
             $progress->advance();
         }
 
+        if (true === $allAttributeKeys) {
+            $this->headers = array_unique(array_merge($this->getCompleteHeaderList(), $this->headers));
+            sort($this->headers);
+        }
+
         $this->writeCsvFile($this->headers, $outputFile, $tmpFile, $delimiter);
         unlink($tmpFile);
 
@@ -145,6 +165,21 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         }
 
         return $variantGroupProvider;
+    }
+
+    /**
+     * Return all the possible attribute keys of the catalog.
+     *
+     * @return array
+     */
+    private function getCompleteHeaderList()
+    {
+        $keys = [];
+        foreach ($this->attributeRepository->findBy([], ['code' => 'ASC']) as $attribute) {
+            $keys = array_merge($keys, $this->attributeKeyProvider->getAttributeKeys($attribute));
+        }
+
+        return $keys;
     }
 
     /**

@@ -1,10 +1,15 @@
 services:
-    pim_data_generator.product.product_value_raw_builder:
-        class: 'Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductValueRawBuilder'
+    pim_data_generator.attribute_key_provider:
+        class: 'Pim\Bundle\DataGeneratorBundle\AttributeKeyProvider'
         arguments:
             - '@pim_catalog.repository.channel'
             - '@pim_catalog.repository.locale'
             - '@pim_catalog.repository.currency'
+
+    pim_data_generator.product.product_value_raw_builder:
+        class: 'Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductValueRawBuilder'
+        arguments:
+            - '@pim_data_generator.attribute_key_provider'
 
     pim_data_generator.product.product_raw_builder:
         class: 'Pim\Bundle\DataGeneratorBundle\Generator\Product\ProductRawBuilder'
@@ -15,3 +20,4 @@ services:
 
     pim_data_generator.generator.registry:
         class: 'Pim\Bundle\DataGeneratorBundle\Generator\GeneratorRegistry'
+
