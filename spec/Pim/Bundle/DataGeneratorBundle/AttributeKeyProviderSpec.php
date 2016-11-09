@@ -89,9 +89,9 @@ class AttributeKeyProviderSpec extends ObjectBehavior
         $attribute->getBackendType()->willReturn('text');
 
         $this->getAttributeKeys($attribute)->shouldReturn([
+            'attr-de_DE',
             'attr-en_US',
             'attr-fr_FR',
-            'attr-de_DE',
         ]);
     }
 
@@ -104,10 +104,10 @@ class AttributeKeyProviderSpec extends ObjectBehavior
         $attribute->getBackendType()->willReturn('text');
 
         $this->getAttributeKeys($attribute)->shouldReturn([
-            'attr-en_US-ecommerce',
-            'attr-fr_FR-ecommerce',
             'attr-de_DE-ecommerce',
+            'attr-en_US-ecommerce',
             'attr-en_US-print',
+            'attr-fr_FR-ecommerce',
         ]);
     }
 
@@ -121,8 +121,8 @@ class AttributeKeyProviderSpec extends ObjectBehavior
 
         $this->getAttributeKeys($attribute)->shouldReturn([
             'attr-ecommerce',
-            'attr-print',
             'attr-ecommerce-unit',
+            'attr-print',
             'attr-print-unit',
         ]);
     }
@@ -136,12 +136,12 @@ class AttributeKeyProviderSpec extends ObjectBehavior
         $attribute->getBackendType()->willReturn('prices');
 
         $this->getAttributeKeys($attribute)->shouldHaveAttributeKeys([
+            'attr-de_DE-eur',
+            'attr-de_DE-usd',
             'attr-en_US-eur',
             'attr-en_US-usd',
             'attr-fr_FR-eur',
             'attr-fr_FR-usd',
-            'attr-de_DE-eur',
-            'attr-de_DE-usd',
         ]);
     }
 

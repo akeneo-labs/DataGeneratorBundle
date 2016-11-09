@@ -175,7 +175,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
     private function getCompleteHeaderList()
     {
         $keys = [];
-        foreach ($this->attributeRepository->findBy([], ['code' => 'ASC']) as $attribute) {
+        foreach ($this->attributeRepository->findAll() as $attribute) {
             $keys = array_merge($keys, $this->attributeKeyProvider->getAttributeKeys($attribute));
         }
 

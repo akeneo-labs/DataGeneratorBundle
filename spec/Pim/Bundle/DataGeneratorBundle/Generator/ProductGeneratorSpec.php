@@ -119,7 +119,7 @@ class ProductGeneratorSpec extends ObjectBehavior
         $rawBuilder->fillInRandomCategories($raw, 0)->willReturn(null);
         $rawBuilder->fillInRandomAttributes($family, $raw, [], 1, 0)->willReturn(null);
         $rawBuilder->fillInMandatoryAttributes($family, $raw, [], [])->willReturn(null);
-        $attributeRepository->findBy(Argument::cetera())->willReturn(
+        $attributeRepository->findAll()->willReturn(
             [
                 $attribute1,
                 $attribute2

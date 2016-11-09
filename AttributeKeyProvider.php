@@ -11,7 +11,10 @@ use Pim\Component\Catalog\Repository\CurrencyRepositoryInterface;
 use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
 
 /**
- * @author    Philippe Mossière <philippe.mossiere@akeneo.com>
+ * Generate the list of attribute keys for a given attribute. The keys are sorted so that we always get
+ * them in the same consistent order.
+ *
+ * @author    Philippe Mossiere <philippe.mossiere@akeneo.com>
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
@@ -55,7 +58,8 @@ class AttributeKeyProvider
     }
 
     /**
-     * Generate the list of attribute keys for a given attribute
+     * Generate the list of attribute keys for a given attribute. The keys are sorted so that we always get
+     * them in the same consistent order.
      *
      * Example:
      * Attribute: description localizable in english and french for ecommerce
@@ -102,6 +106,8 @@ class AttributeKeyProvider
                 }
                 break;
         }
+
+        sort($keys);
 
         return $keys;
     }
