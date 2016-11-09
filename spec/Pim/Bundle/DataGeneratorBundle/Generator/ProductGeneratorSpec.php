@@ -19,10 +19,9 @@ class ProductGeneratorSpec extends ObjectBehavior
         ProductRawBuilder $rawBuilder,
         FamilyRepositoryInterface $familyRepo,
         GroupRepositoryInterface $groupRepo,
-        AttributeRepositoryInterface $attributeRepository,
         AttributeKeyProvider $attributeKeyProvider
     ) {
-        $this->beConstructedWith($rawBuilder, $familyRepo, $groupRepo, $attributeRepository, $attributeKeyProvider);
+        $this->beConstructedWith($rawBuilder, $familyRepo, $groupRepo, $attributeKeyProvider);
     }
 
     function it_is_initializable()
@@ -83,12 +82,9 @@ class ProductGeneratorSpec extends ObjectBehavior
     function it_generates_products_with_all_attribute_keys(
         $rawBuilder,
         $familyRepo,
-        $attributeRepository,
         $attributeKeyProvider,
         ProgressBar $progress,
-        FamilyInterface $family,
-        AttributeInterface $attribute1,
-        AttributeInterface $attribute2
+        FamilyInterface $family
     ) {
         $globalConfig = ['output_dir' => '/tmp/', 'seed' => 123456789];
         $entitiesConfig = [
@@ -119,27 +115,7 @@ class ProductGeneratorSpec extends ObjectBehavior
         $rawBuilder->fillInRandomCategories($raw, 0)->willReturn(null);
         $rawBuilder->fillInRandomAttributes($family, $raw, [], 1, 0)->willReturn(null);
         $rawBuilder->fillInMandatoryAttributes($family, $raw, [], [])->willReturn(null);
-        $attributeRepository->findAll()->willReturn(
-            [
-                $attribute1,
-                $attribute2
-            ]
-        );
-        $attributeKeyProvider->getAttributeKeys($attribute1)
-            ->shouldBeCalled()
-            ->willReturn(
-                [
-                    'attribute1-en_US',
-                    'attribute1-fr_FR',
-                ]
-            );
-        $attributeKeyProvider->getAttributeKeys($attribute2)
-            ->shouldBeCalled()
-            ->willReturn(
-                [
-                    'attribute2-en_US-ecommerce',
-                ]
-            );
+        $attributeKeyProvider->getAllAttributesKeys()->shouldBeCalled()->willReturn([]);
 
         $this->generate($globalConfig, $entitiesConfig, $progress, $options);
     }

@@ -8,6 +8,7 @@ use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\ChannelInterface;
 use Pim\Component\Catalog\Model\CurrencyInterface;
 use Pim\Component\Catalog\Model\LocaleInterface;
+use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
 use Pim\Component\Catalog\Repository\ChannelRepositoryInterface;
 use Pim\Component\Catalog\Repository\CurrencyRepositoryInterface;
 use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
@@ -15,6 +16,7 @@ use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
 class AttributeKeyProviderSpec extends ObjectBehavior
 {
     function let(
+        AttributeRepositoryInterface $attributeRepository,
         ChannelRepositoryInterface $channelRepository,
         LocaleRepositoryInterface $localeRepository,
         CurrencyRepositoryInterface $currencyRepository,
@@ -50,7 +52,7 @@ class AttributeKeyProviderSpec extends ObjectBehavior
         $ecommerce->getCode()->willReturn('ecommerce');
         $print->getCode()->willReturn('print');
 
-        $this->beConstructedWith($channelRepository, $localeRepository, $currencyRepository);
+        $this->beConstructedWith($attributeRepository, $channelRepository, $localeRepository, $currencyRepository);
     }
 
     function it_provides_keys_for_simple_attribute(AttributeInterface $attribute)
@@ -160,6 +162,34 @@ class AttributeKeyProviderSpec extends ObjectBehavior
             'attr-en_US-ecommerce-usd',
             'attr-en_US-print-eur',
             'attr-en_US-print-usd',
+        ]);
+    }
+
+    function it_provides_the_keys_of_all_attributes(
+        $attributeRepository,
+        AttributeInterface $attribute1,
+        AttributeInterface $attribute2
+    ) {
+        $attributeRepository->findAll()->willReturn([$attribute1, $attribute2]);
+
+        $attribute1->getCode()->willReturn('name');
+        $attribute1->isScopable()->willReturn(false);
+        $attribute1->isLocalizable()->willReturn(false);
+        $attribute1->isLocaleSpecific()->willReturn(false);
+        $attribute1->getBackendType()->willReturn('text');
+
+        $attribute2->getCode()->willReturn('description');
+        $attribute2->isScopable()->willReturn(true);
+        $attribute2->isLocalizable()->willReturn(true);
+        $attribute2->isLocaleSpecific()->willReturn(false);
+        $attribute2->getBackendType()->willReturn('text');
+
+        $this->getAllAttributesKeys()->shouldReturn([
+            'description-de_DE-ecommerce',
+            'description-en_US-ecommerce',
+            'description-en_US-print',
+            'description-fr_FR-ecommerce',
+            'name',
         ]);
     }
 

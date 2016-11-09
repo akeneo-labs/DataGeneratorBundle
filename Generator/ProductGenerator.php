@@ -29,9 +29,6 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
     /** @var VariantGroupDataProvider[] */
     private $variantGroupDataProviders = [];
 
-    /** @var AttributeRepositoryInterface */
-    private $attributeRepository;
-
     /** @var AttributeKeyProvider */
     private $attributeKeyProvider;
 
@@ -39,20 +36,17 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
      * @param ProductRawBuilder            $productRawBuilder
      * @param FamilyRepositoryInterface    $familyRepository
      * @param GroupRepositoryInterface     $groupRepository
-     * @param AttributeRepositoryInterface $attributeRepository
      * @param AttributeKeyProvider         $attributeKeyProvider
      */
     public function __construct(
         ProductRawBuilder $productRawBuilder,
         FamilyRepositoryInterface $familyRepository,
         GroupRepositoryInterface $groupRepository,
-        AttributeRepositoryInterface $attributeRepository,
         AttributeKeyProvider $attributeKeyProvider
     ) {
         parent::__construct($productRawBuilder, $familyRepository);
         $this->groupRepository = $groupRepository;
         $this->variantGroupDataProviders = [];
-        $this->attributeRepository = $attributeRepository;
         $this->attributeKeyProvider = $attributeKeyProvider;
     }
 
@@ -133,8 +127,9 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         }
 
         if (true === $allAttributeKeys) {
-            $this->headers = array_unique(array_merge($this->getCompleteHeaderList(), $this->headers));
-            sort($this->headers);
+            $keys = array_unique(array_merge($this->attributeKeyProvider->getAllAttributesKeys(), $this->headers));
+            sort($keys);
+            $this->headers = $keys;
         }
 
         $this->writeCsvFile($this->headers, $outputFile, $tmpFile, $delimiter);
@@ -165,21 +160,6 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         }
 
         return $variantGroupProvider;
-    }
-
-    /**
-     * Return all the possible attribute keys of the catalog.
-     *
-     * @return array
-     */
-    private function getCompleteHeaderList()
-    {
-        $keys = [];
-        foreach ($this->attributeRepository->findAll() as $attribute) {
-            $keys = array_merge($keys, $this->attributeKeyProvider->getAttributeKeys($attribute));
-        }
-
-        return $keys;
     }
 
     /**

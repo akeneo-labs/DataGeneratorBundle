@@ -2,6 +2,7 @@ services:
     pim_data_generator.attribute_key_provider:
         class: 'Pim\Bundle\DataGeneratorBundle\AttributeKeyProvider'
         arguments:
+            - '@pim_catalog.repository.attribute'
             - '@pim_catalog.repository.channel'
             - '@pim_catalog.repository.locale'
             - '@pim_catalog.repository.currency'

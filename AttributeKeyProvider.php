@@ -6,12 +6,13 @@ use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\ChannelInterface;
 use Pim\Component\Catalog\Model\CurrencyInterface;
 use Pim\Component\Catalog\Model\LocaleInterface;
+use Pim\Component\Catalog\Repository\AttributeRepositoryInterface;
 use Pim\Component\Catalog\Repository\ChannelRepositoryInterface;
 use Pim\Component\Catalog\Repository\CurrencyRepositoryInterface;
 use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
 
 /**
- * Generate the list of attribute keys for a given attribute. The keys are sorted so that we always get
+ * Generate the list of attribute keys. The keys are sorted so that we always get
  * them in the same consistent order.
  *
  * @author    Philippe Mossiere <philippe.mossiere@akeneo.com>
@@ -21,6 +22,9 @@ use Pim\Component\Catalog\Repository\LocaleRepositoryInterface;
 class AttributeKeyProvider
 {
     const METRIC_UNIT = 'unit';
+
+    /** @var AttributeRepositoryInterface */
+    private $attributeRepository;
 
     /** @var ChannelRepositoryInterface */
     private $channelRepository;
@@ -43,15 +47,18 @@ class AttributeKeyProvider
     /**
      * ProductValueRawBuilder constructor.
      *
-     * @param ChannelRepositoryInterface  $channelRepository
-     * @param LocaleRepositoryInterface   $localeRepository
-     * @param CurrencyRepositoryInterface $currencyRepository
+     * @param AttributeRepositoryInterface $attributeRepository
+     * @param ChannelRepositoryInterface   $channelRepository
+     * @param LocaleRepositoryInterface    $localeRepository
+     * @param CurrencyRepositoryInterface  $currencyRepository
      */
     public function __construct(
+        AttributeRepositoryInterface $attributeRepository,
         ChannelRepositoryInterface $channelRepository,
         LocaleRepositoryInterface $localeRepository,
         CurrencyRepositoryInterface $currencyRepository
     ) {
+        $this->attributeRepository = $attributeRepository;
         $this->channelRepository = $channelRepository;
         $this->localeRepository = $localeRepository;
         $this->currencyRepository = $currencyRepository;
@@ -105,6 +112,24 @@ class AttributeKeyProvider
                     $keys[] = $key . '-' .  self::METRIC_UNIT;
                 }
                 break;
+        }
+
+        sort($keys);
+
+        return $keys;
+    }
+
+    /**
+     * Generate the list of attribute keys for all attributes. The keys are sorted so that we always get
+     * them in the same consistent order.
+     *
+     * @return array
+     */
+    public function getAllAttributesKeys()
+    {
+        $keys = [];
+        foreach ($this->attributeRepository->findAll() as $attribute) {
+            $keys = array_merge($keys, $this->getAttributeKeys($attribute));
         }
 
         sort($keys);
