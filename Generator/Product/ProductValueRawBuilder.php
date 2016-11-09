@@ -3,6 +3,7 @@
 namespace Pim\Bundle\DataGeneratorBundle\Generator\Product;
 
 use Faker;
+use Pim\Bundle\DataGeneratorBundle\AttributeKeyProvider;
 use Pim\Component\Catalog\Model\AttributeInterface;
 use Pim\Component\Catalog\Model\AttributeOptionInterface;
 use Pim\Component\Catalog\Model\ChannelInterface;
@@ -26,26 +27,11 @@ class ProductValueRawBuilder
     const DEFAULT_NUMBER_MAX = '1000';
     const DEFAULT_NB_DECIMALS = '4';
 
-    /** @var ChannelRepositoryInterface */
-    private $channelRepository;
-
-    /** @var LocaleRepositoryInterface */
-    private $localeRepository;
-
-    /** @var CurrencyRepositoryInterface */
-    private $currencyRepository;
-
+    /** @var AttributeKeyProvider */
+    private $attributeKeyProvider;
+    
     /** @var Faker\Generator */
     private $faker;
-
-    /** @var ChannelInterface[] */
-    private $channels;
-
-    /** @var CurrencyInterface[] */
-    private $currencies;
-
-    /** @var LocaleInterface[] */
-    private $locales;
 
     /** @var AttributeOptionInterface[] */
     private $attributeOptions;
@@ -53,18 +39,11 @@ class ProductValueRawBuilder
     /**
      * ProductValueRawBuilder constructor.
      *
-     * @param ChannelRepositoryInterface  $channelRepository
-     * @param LocaleRepositoryInterface   $localeRepository
-     * @param CurrencyRepositoryInterface $currencyRepository
+     * @param AttributeKeyProvider $attributeKeyProvider
      */
-    public function __construct(
-        ChannelRepositoryInterface $channelRepository,
-        LocaleRepositoryInterface $localeRepository,
-        CurrencyRepositoryInterface $currencyRepository
-    ) {
-        $this->channelRepository = $channelRepository;
-        $this->localeRepository = $localeRepository;
-        $this->currencyRepository = $currencyRepository;
+    public function __construct(AttributeKeyProvider $attributeKeyProvider)
+    {
+        $this->attributeKeyProvider = $attributeKeyProvider;
     }
 
     /**
@@ -93,7 +72,7 @@ class ProductValueRawBuilder
         }
 
         $valueData = [];
-        $keys      = $this->getAttributeKeys($attribute);
+        $keys      = $this->attributeKeyProvider->getAttributeKeys($attribute);
 
         foreach ($keys as $key) {
             $valueData[$key] = $this->generateValueData($attribute, $key);
@@ -145,84 +124,6 @@ class ProductValueRawBuilder
 
         return (string) $data;
     }
-
-    /**
-     * Provides the potential column keys for this attribute
-     *
-     * @param AttributeInterface $attribute
-     *
-     * @return array
-     */
-    private function getAttributeKeys(AttributeInterface $attribute)
-    {
-        $keys = [];
-
-        $keys[$attribute->getCode()] = [];
-
-        $updatedKeys = [];
-        if ($attribute->isScopable() && $attribute->isLocalizable()) {
-            foreach ($this->getLocales() as $locale) {
-                foreach ($this->getChannels() as $channel) {
-                    foreach ($keys as $baseKey => $keyOptions) {
-                        $key               = $baseKey . '-' . $locale->getCode() . '-' . $channel->getCode();
-                        $updatedKeys[$key] = array_merge($keyOptions, ['locale' => $locale, 'channel' => $channel]);
-                    }
-                }
-            }
-            $keys = $updatedKeys;
-        } elseif ($attribute->isScopable() && !$attribute->isLocalizable()) {
-            foreach ($this->getChannels() as $channel) {
-                foreach ($keys as $baseKey => $keyOptions) {
-                    $key               = $baseKey . '-' . $channel->getCode();
-                    $updatedKeys[$key] = array_merge($keyOptions, ['channel' => $channel]);
-                }
-            }
-            $keys = $updatedKeys;
-        } elseif (!$attribute->isScopable() && $attribute->isLocalizable()) {
-            foreach ($this->getLocales() as $locale) {
-                foreach ($keys as $baseKey => $keyOptions) {
-                    $key               = $baseKey . '-' . $locale->getCode();
-                    $updatedKeys[$key] = array_merge($keyOptions, ['locale' => $locale]);
-                }
-            }
-            $keys = $updatedKeys;
-        }
-
-        switch ($attribute->getBackendType()) {
-            case 'prices':
-                $updatedKeys = [];
-
-                foreach ($keys as $key => $keyOptions) {
-                    foreach ($this->getCurrencies() as $currency) {
-                        $updatedKeys[$key . '-' . $currency->getCode()] = array_merge(
-                            $keyOptions,
-                            ['currency' => $currency]
-                        );
-                    }
-                }
-                $keys = $updatedKeys;
-                break;
-            case 'metric':
-                $updatedKeys = [];
-
-                foreach ($keys as $key => $keyOptions) {
-                    $updatedKeys[$key]                           = $keyOptions;
-                    $updatedKeys[$key . '-' . self::METRIC_UNIT] = $keyOptions;
-                }
-                $keys = $updatedKeys;
-                break;
-        }
-
-        $enabledKeys = [];
-        foreach ($keys as $key => $keyOptions) {
-            if ($this->isAttributeKeyValid($keyOptions)) {
-                $enabledKeys[] = $key;
-            }
-        }
-
-        return $enabledKeys;
-    }
-
 
     /**
      * Generate a varchar product value data
@@ -337,121 +238,5 @@ class ProductValueRawBuilder
         }
 
         return $this->faker->randomElement($this->attributeOptions[$attribute->getCode()]);
-    }
-
-    /**
-     * Returns true if the key is valid, according to channels locale and currency.
-     *
-     * @param $options
-     *
-     * @return bool
-     */
-    private function isAttributeKeyValid(array $options)
-    {
-        if (isset($options['channel'])) {
-            $channel = $options['channel'];
-
-            if (isset($options['locale']) && !$this->hasChannelLocale($channel, $options['locale'])) {
-                return false;
-            }
-
-            if (isset($options['currency']) && !$this->hasChannelCurrency($channel, $options['currency'])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Returns true if channel has activated locale.
-     *
-     * @param ChannelInterface $channel
-     * @param LocaleInterface  $locale
-     *
-     * @return bool
-     */
-    private function hasChannelLocale(ChannelInterface $channel, LocaleInterface $locale)
-    {
-        foreach ($channel->getLocaleCodes() as $availableLocale) {
-            if ($locale->getCode() === $availableLocale) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true if channel has activated currency.
-     *
-     * @param ChannelInterface  $channel
-     * @param CurrencyInterface $currency
-     *
-     * @return bool
-     */
-    private function hasChannelCurrency(ChannelInterface $channel, CurrencyInterface $currency)
-    {
-        foreach ($channel->getCurrencies() as $availableCurrency) {
-            if ($currency->getCode() === $availableCurrency->getCode()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Get all channels
-     *
-     * @return ChannelInterface[]
-     */
-    private function getChannels()
-    {
-        if (null === $this->channels) {
-            $this->channels = [];
-            $channels       = $this->channelRepository->findAll();
-            foreach ($channels as $channel) {
-                $this->channels[$channel->getCode()] = $channel;
-            }
-        }
-
-        return $this->channels;
-    }
-
-    /**
-     * Get active currencies
-     *
-     * @return CurrencyInterface[]
-     */
-    private function getCurrencies()
-    {
-        if (null === $this->currencies) {
-            $this->currencies = [];
-            $currencies       = $this->currencyRepository->findBy(['activated' => 1]);
-            foreach ($currencies as $currency) {
-                $this->currencies[$currency->getCode()] = $currency;
-            }
-        }
-
-        return $this->currencies;
-    }
-
-    /**
-     * Get active locales
-     *
-     * @return LocaleInterface[]
-     */
-    private function getLocales()
-    {
-        if (null === $this->locales) {
-            $this->locales = [];
-            $locales       = $this->localeRepository->findBy(['activated' => 1]);
-            foreach ($locales as $locale) {
-                $this->locales[$locale->getCode()] = $locale;
-            }
-        }
-
-        return $this->locales;
     }
 }
