@@ -80,8 +80,6 @@ class ProductRawBuilder
     {
         $product                             = [];
         $product[$this->getIdentifierCode()] = $id;
-        $product['family']                   = $family->getCode();
-        $product['groups']                   = $groups;
 
         return $product;
     }

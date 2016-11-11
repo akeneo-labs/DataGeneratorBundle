@@ -71,7 +71,6 @@ class AbstractProductGenerator
         $family = $this->getRandomFamily($faker);
         $product = $this->productRawBuilder->buildBaseProduct($family, $id, '');
 
-        $this->productRawBuilder->fillInRandomCategories($product, $nbCategories);
         $this->productRawBuilder->fillInRandomAttributes($family, $product, $forcedValues, $nbAttr, $nbAttrDeviation);
         $this->productRawBuilder->fillInMandatoryAttributes($family, $product, $forcedValues, $mandatoryAttributes);
 
@@ -95,7 +94,6 @@ class AbstractProductGenerator
         $family = $this->getRandomFamily($faker);
         $product = $this->productRawBuilder->buildBaseProduct($family, $id, '');
 
-        $this->productRawBuilder->fillInRandomCategories($product, $nbCategories);
         $this->productRawBuilder->fillInAllRequirementAttributes($family, $product, $forcedValues);
 
         return $product;
