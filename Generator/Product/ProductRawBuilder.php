@@ -79,7 +79,7 @@ class ProductRawBuilder
     public function buildBaseProduct(FamilyInterface $family, $id, $groups)
     {
         $product                             = [];
-        $product[$this->getIdentifierCode()] = $id;
+        $product['identifier'] = $id;
 
         return $product;
     }
