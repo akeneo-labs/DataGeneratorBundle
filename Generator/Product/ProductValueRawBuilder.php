@@ -59,7 +59,7 @@ class ProductValueRawBuilder
     }
 
     /**
-     * Generate a value in term of one or several entries in the product array
+     * Generate the values for the given attribute.
      *
      * @param AttributeInterface $attribute
      *
@@ -71,30 +71,48 @@ class ProductValueRawBuilder
             throw new \LogicException('Please set the faker generator before using this method.');
         }
 
-        $valueData = [];
-        $keys      = $this->attributeKeyProvider->getAttributeKeys($attribute);
+        $attributeCode = $attribute->getCode();
+        $values[$attributeCode] = [];
 
-        foreach ($keys as $key) {
-            $valueData[$key] = $this->generateValueData($attribute, $key);
+        $locales  = $attribute->isLocalizable() ? $this->attributeKeyProvider->getLocales() : [null];
+        $channels = $attribute->isScopable() ? $this->attributeKeyProvider->getChannels() : [null];
+        foreach ($channels as $channel) {
+            foreach ($locales as $locale) {
+                $localeInChannel  = null === $channel ||
+                    null === $locale ||
+                    in_array($locale, $channel->getLocales()->toArray());
+                $localeInSpecific = !$attribute->isLocaleSpecific() ||
+                    null === $locale ||
+                    in_array($locale->getCode(), $attribute->getLocaleSpecificCodes());
+
+                if ($localeInChannel && $localeInSpecific) {
+                    $channelCode = null !== $channel ? $channel->getCode() : '<all_channels>';
+                    $localeCode = null !== $locale ? $locale->getCode() : '<all_locales>';
+
+                    $values[$attributeCode][$channelCode][$localeCode] = $this->generateValueData($attribute);
+                }
+            }
         }
 
-        return $valueData;
+        return $values;
     }
 
     /**
      * Generate value content based on backend type
      *
      * @param AttributeInterface $attribute
-     * @param string             $key
      *
      * @return string
      */
-    private function generateValueData(AttributeInterface $attribute, $key)
+    private function generateValueData(AttributeInterface $attribute)
     {
+        //TODO: prices
+        //TODO: metric
+        /*
         if (preg_match('/-' . self::METRIC_UNIT . '$/', $key)) {
             return $attribute->getDefaultMetricUnit();
         }
-
+        */
         switch ($attribute->getBackendType()) {
             case "varchar":
                 $data = $this->generateVarcharData($attribute);
@@ -187,6 +205,7 @@ class ProductValueRawBuilder
 
         $number = $this->faker->randomFloat($decimals, $min, $max);
 
+        //TODO: real number
         return (string) $number;
     }
 
@@ -197,6 +216,7 @@ class ProductValueRawBuilder
      */
     private function generateBooleanData()
     {
+        //TODO: real bool
         return $this->faker->boolean() ? "1" : "0";
     }
 

@@ -142,7 +142,7 @@ class AttributeKeyProvider
      *
      * @return ChannelInterface[]
      */
-    private function getChannels()
+    public function getChannels()
     {
         if (null === $this->channels) {
             $this->channels = [];
@@ -178,7 +178,7 @@ class AttributeKeyProvider
      *
      * @return LocaleInterface[]
      */
-    private function getLocales()
+    public function getLocales()
     {
         if (null === $this->locales) {
             $this->locales = [];
