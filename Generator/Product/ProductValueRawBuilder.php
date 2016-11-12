@@ -60,6 +60,11 @@ class ProductValueRawBuilder
 
     /**
      * Generate the values for the given attribute.
+     * [
+     *      <all_channel> => [
+     *          <all_locales> => 'foo'
+     *      ]
+     * ]
      *
      * @param AttributeInterface $attribute
      * @param mixed              $withData
@@ -72,8 +77,7 @@ class ProductValueRawBuilder
             throw new \LogicException('Please set the faker generator before using this method.');
         }
 
-        $attributeCode = $attribute->getCode();
-        $values[$attributeCode] = [];
+        $values = [];
 
         $locales  = $attribute->isLocalizable() ? $this->attributeKeyProvider->getLocales() : [null];
         $channels = $attribute->isScopable() ? $this->attributeKeyProvider->getChannels() : [null];
@@ -91,7 +95,7 @@ class ProductValueRawBuilder
                     $localeCode = null !== $locale ? $locale->getCode() : '<all_locales>';
 
                     $data = null === $withData ? $this->generateValueData($attribute) : $withData;
-                    $values[$attributeCode][$channelCode][$localeCode] = $data;
+                    $values[$channelCode][$localeCode] = $data;
                 }
             }
         }

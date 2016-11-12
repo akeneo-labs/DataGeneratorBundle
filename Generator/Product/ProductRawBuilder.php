@@ -109,8 +109,7 @@ class ProductRawBuilder
         $values = [];
 
         foreach ($attributes as $attribute) {
-            $valueData = $this->generateValue($attribute, $forcedAttributes);
-            $values = array_merge($values, $valueData);
+            $values[$attribute->getCode()] = $this->generateValue($attribute, $forcedAttributes);
         }
 
         if (!isset($product['values'])) {
@@ -140,8 +139,7 @@ class ProductRawBuilder
         foreach ($mandatoryAttributes as $attribute) {
             if (isset($this->attributesByFamily[$family->getCode()][$attribute])) {
                 $attribute = $this->attributesByFamily[$family->getCode()][$attribute];
-                $valueData = $this->generateValue($attribute, $forcedAttributes);
-                $values = array_merge($values, $valueData);
+                $values[$attribute->getCode()] = $this->generateValue($attribute, $forcedAttributes);
             }
         }
 
@@ -168,8 +166,7 @@ class ProductRawBuilder
             $attributeCode = $requirement->getAttributeCode();
             if ($requirement->isRequired() && $attributeCode !== $this->getIdentifierCode()) {
                 $attribute = $this->attributesByFamily[$family->getCode()][$attributeCode];
-                $valueData = $this->generateValue($attribute, $forcedAttributes);
-                $values = array_merge($values, $valueData);
+                $values[$attributeCode] = $this->generateValue($attribute, $forcedAttributes);
             }
         }
 
