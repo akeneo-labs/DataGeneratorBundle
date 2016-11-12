@@ -202,8 +202,7 @@ class ProductRawBuilder
     private function generateValue(AttributeInterface $attribute, array $forceProperties)
     {
         if (isset($forceProperties[$attribute->getCode()])) {
-            //TODO: handle that
-            return [$attribute->getCode() => $forceProperties[$attribute->getCode()]];
+            return $this->valueRawBuilder->build($attribute, $forceProperties[$attribute->getCode()]);
         }
 
         return $this->valueRawBuilder->build($attribute);

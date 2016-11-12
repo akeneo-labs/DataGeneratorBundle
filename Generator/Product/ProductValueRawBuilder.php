@@ -62,10 +62,11 @@ class ProductValueRawBuilder
      * Generate the values for the given attribute.
      *
      * @param AttributeInterface $attribute
+     * @param mixed              $withData
      *
      * @return array
      */
-    public function build(AttributeInterface $attribute)
+    public function build(AttributeInterface $attribute, $withData = null)
     {
         if (null === $this->faker) {
             throw new \LogicException('Please set the faker generator before using this method.');
@@ -89,7 +90,8 @@ class ProductValueRawBuilder
                     $channelCode = null !== $channel ? $channel->getCode() : '<all_channels>';
                     $localeCode = null !== $locale ? $locale->getCode() : '<all_locales>';
 
-                    $values[$attributeCode][$channelCode][$localeCode] = $this->generateValueData($attribute);
+                    $data = null === $withData ? $this->generateValueData($attribute) : $withData;
+                    $values[$attributeCode][$channelCode][$localeCode] = $data;
                 }
             }
         }
