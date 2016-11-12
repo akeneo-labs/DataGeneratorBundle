@@ -100,12 +100,6 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
             $progress->advance();
         }
 
-        if (true === $allAttributeKeys) {
-            $keys = array_unique(array_merge($this->attributeKeyProvider->getAllAttributesKeys(), $this->headers));
-            sort($keys);
-            $this->headers = $keys;
-        }
-
         $this->writeCsvFile($this->headers, $outputFile, $tmpFile, $delimiter);
         unlink($tmpFile);
 

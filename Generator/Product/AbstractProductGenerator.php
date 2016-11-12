@@ -74,6 +74,8 @@ class AbstractProductGenerator
         $this->productRawBuilder->fillInRandomAttributes($family, $product, $forcedValues, $nbAttr, $nbAttrDeviation);
         $this->productRawBuilder->fillInMandatoryAttributes($family, $product, $forcedValues, $mandatoryAttributes);
 
+        $product['values'] = json_encode($product['values']);
+
         return $product;
     }
 
@@ -95,6 +97,8 @@ class AbstractProductGenerator
         $product = $this->productRawBuilder->buildBaseProduct($family, $id, '');
 
         $this->productRawBuilder->fillInAllRequirementAttributes($family, $product, $forcedValues);
+
+        $product['values'] = json_encode($product['values']);
 
         return $product;
     }
