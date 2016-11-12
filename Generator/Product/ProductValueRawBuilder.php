@@ -106,13 +106,6 @@ class ProductValueRawBuilder
      */
     private function generateValueData(AttributeInterface $attribute)
     {
-        //TODO: prices
-        //TODO: metric
-        /*
-        if (preg_match('/-' . self::METRIC_UNIT . '$/', $key)) {
-            return $attribute->getDefaultMetricUnit();
-        }
-        */
         switch ($attribute->getBackendType()) {
             case "varchar":
                 $data = $this->generateVarcharData($attribute);
@@ -124,9 +117,22 @@ class ProductValueRawBuilder
                 $data = $this->generateDateData($attribute);
                 break;
             case "metric":
+                $data = [
+                    'amount' => $this->generateNumberData($attribute),
+                    'unit' => $attribute->getDefaultMetricUnit()
+                ];
+                break;
             case "decimal":
-            case "prices":
                 $data = $this->generateNumberData($attribute);
+                break;
+            case "prices":
+                $data = [];
+                foreach ($this->attributeKeyProvider->getCurrencies() as $currency) {
+                    $data[] = [
+                        'amount' => $this->generateNumberData($attribute),
+                        'currency' => $currency->getCode()
+                    ];
+                }
                 break;
             case "boolean":
                 $data = $this->generateBooleanData();
@@ -140,7 +146,7 @@ class ProductValueRawBuilder
                 break;
         }
 
-        return (string) $data;
+        return $data;
     }
 
     /**
@@ -205,8 +211,7 @@ class ProductValueRawBuilder
 
         $number = $this->faker->randomFloat($decimals, $min, $max);
 
-        //TODO: real number
-        return (string) $number;
+        return $number;
     }
 
     /**
@@ -216,8 +221,7 @@ class ProductValueRawBuilder
      */
     private function generateBooleanData()
     {
-        //TODO: real bool
-        return $this->faker->boolean() ? "1" : "0";
+        return $this->faker->boolean();
     }
 
     /**

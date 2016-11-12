@@ -160,7 +160,7 @@ class AttributeKeyProvider
      *
      * @return CurrencyInterface[]
      */
-    private function getCurrencies()
+    public function getCurrencies()
     {
         if (null === $this->currencies) {
             $this->currencies = [];
