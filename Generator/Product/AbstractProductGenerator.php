@@ -118,13 +118,13 @@ class AbstractProductGenerator
 
         $csvFile = fopen($outputFile, 'w');
 
-        fputcsv($csvFile, $headers, $delimiter);
+        fputcsv($csvFile, $headers, $delimiter, "'");
         $headersAsKeys = array_fill_keys($headers, "");
 
         while ($bufferedProduct = fgets($buffer)) {
             $product     = unserialize($bufferedProduct);
             $productData = array_merge($headersAsKeys, $product);
-            fputcsv($csvFile, $productData, $delimiter);
+            fputcsv($csvFile, $productData, $delimiter, "'");
         }
         fclose($csvFile);
         fclose($buffer);
