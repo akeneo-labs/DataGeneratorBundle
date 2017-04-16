@@ -73,8 +73,8 @@ class UserGenerator implements GeneratorInterface
         $this->assetCategoryCodes = isset($options['asset_category_codes']) ? $options['asset_category_codes'] : [];
 
         $this->faker = Factory::create();
-        if (isset($globalConfig['seed'])) {
-            $this->faker->seed($globalConfig['seed']);
+        if (isset($globalConfig['seed']) && isset($globalConfig['start_index'])) {
+            $this->faker->seed($globalConfig['seed'] . $globalConfig['start_index']);
         }
         $users = $this->generateUsers($entitiesConfig);
 

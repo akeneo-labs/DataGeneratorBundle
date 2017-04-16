@@ -54,8 +54,8 @@ class AttributeGroupGenerator implements GeneratorInterface
         $count         = (int) $entitiesConfig['count'];
 
         $this->faker = Factory::create();
-        if (isset($globalConfig['seed'])) {
-            $this->faker->seed($globalConfig['seed']);
+        if (isset($globalConfig['seed']) && isset($globalConfig['start_index'])) {
+            $this->faker->seed($globalConfig['seed'] . $globalConfig['start_index']);
         }
 
         $this->attributeGroups = [];

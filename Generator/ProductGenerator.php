@@ -87,7 +87,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
             ));
         }
 
-        $faker = $this->initFaker($seed);
+        $faker = $this->initFaker($seed . $startIndex);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
             $isComplete = (bool)($faker->numberBetween(0, 100) < $percentageComplete);

@@ -27,13 +27,13 @@ class AssetCategoryGenerator implements GeneratorInterface
     /** @var CsvWriter */
     protected $writer;
 
+    /** @var Locale[] */
+    protected $locales;
+
     public function __construct(CsvWriter $writer)
     {
         $this->writer = $writer;
     }
-
-    /** @var Locale[] */
-    protected $locales;
 
     /**
      * Returns the codes of the generated asset categories.
@@ -45,8 +45,8 @@ class AssetCategoryGenerator implements GeneratorInterface
         $this->locales = $options['locales'];
 
         $faker = Factory::create();
-        if (isset($globalConfig['seed'])) {
-            $faker->seed($globalConfig['seed']);
+        if (isset($globalConfig['seed']) && isset($globalConfig['start_index'])) {
+            $faker->seed($globalConfig['seed'] . $globalConfig['start_index']);
         }
 
         $assetCategories = [['code' => self::ASSET_MAIN_CATALOG, 'parent' => '']];

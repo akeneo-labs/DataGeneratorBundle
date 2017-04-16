@@ -61,8 +61,8 @@ class AttributeOptionGenerator implements GeneratorInterface
         $this->attributes = $options['attributes'];
 
         $this->faker = Factory::create();
-        if (isset($globalConfig['seed'])) {
-            $this->faker->seed($globalConfig['seed']);
+        if (isset($globalConfig['seed']) && isset($globalConfig['start_index'])) {
+            $this->faker->seed($globalConfig['seed'] . $globalConfig['start_index']);
         }
 
         $countPerAttribute = (int) $entitiesConfig['count_per_attribute'];
