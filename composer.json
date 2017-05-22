@@ -27,7 +27,7 @@
         "fzaninotto/faker": "1.4.0"
     },
     "require-dev": {
-        "akeneo/pim-community-dev": "dev-master@dev",
+        "akeneo/pim-community-dev": "~1.7.0",
         "friendsofphp/php-cs-fixer": "~1.11",
         "phpspec/phpspec": "~2.1"
     },
