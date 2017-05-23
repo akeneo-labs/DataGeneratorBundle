@@ -7,7 +7,9 @@ data_generator:
         channels:
             ecommerce:
                 code: ecommerce
-                label: Ecommerce
+                label:
+                    locale: en_US
+                    data: Ecommerce
                 locales:
                     - fr_FR
                     - en_US
@@ -16,7 +18,9 @@ data_generator:
                     - EUR
             print:
                 code: print
-                label: Print
+                label:
+                    locale: fr_FR
+                    data: Print
                 locales:
                     - fr_FR
                     - de_DE

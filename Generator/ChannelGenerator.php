@@ -187,7 +187,7 @@ class ChannelGenerator implements GeneratorInterface
             $channel = new Channel();
 
             $channel->setCode($channelConfig['code']);
-            $channel->setLabel($channelConfig['label']);
+            $channel->setLocale($channelConfig['label']['locale'])->setLabel($channelConfig['label']['data']);
 
             foreach ($channelConfig['locales'] as $localeCode) {
                 $locale = $this->locales[$localeCode];

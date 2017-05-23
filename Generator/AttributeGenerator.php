@@ -90,6 +90,8 @@ class AttributeGenerator implements GeneratorInterface
         $this->attributes[$identifier] = [
             'code'                   => $identifier,
             'type'                   => 'pim_catalog_identifier',
+            'localizable'            => 0,
+            'scopable'               => 0,
             'group'                  => $this->getRandomAttributeGroupCode(),
             'useable_as_grid_filter' => 1,
         ];
@@ -99,9 +101,11 @@ class AttributeGenerator implements GeneratorInterface
         foreach ($forceAttributes as $forceAttribute) {
             list($code, $type) = explode('=', $forceAttribute);
             $this->attributes[trim($code)] = [
-                'code'  => trim($code),
-                'type'  => trim($type),
-                'group' => $this->getRandomAttributeGroupCode(),
+                'code'        => trim($code),
+                'type'        => trim($type),
+                'localizable' => 0,
+                'scopable'    => 0,
+                'group'       => $this->getRandomAttributeGroupCode(),
             ];
         }
 
@@ -131,12 +135,22 @@ class AttributeGenerator implements GeneratorInterface
                 $attribute['scopable']    = (int) $this->faker->boolean($scopableProbability);
             }
 
-            if ('pim_catalog_metric' === $type) {
-                $attribute = array_merge($attribute, $this->getMetricProperties());
-            }
-
-            if ('pim_catalog_image' === $type || 'pim_catalog_file' === $type) {
-                $attribute = array_merge($attribute, $this->getMediaProperties());
+            switch ($type) {
+                case 'pim_catalog_metric':
+                    $attribute = array_merge($attribute, $this->getMetricProperties());
+                    break;
+                case 'pim_catalog_image':
+                case 'pim_catalog_file':
+                    $attribute = array_merge($attribute, $this->getMediaProperties());
+                    break;
+                case 'pim_catalog_number':
+                    $attribute = array_merge($attribute, $this->getNumberProperties());
+                    break;
+                case 'pim_catalog_price_collection':
+                    $attribute = array_merge($attribute, $this->getPriceProperties());
+                    break;
+                default:
+                    break;
             }
 
             $this->attributes[$attribute['code']] = $attribute;
@@ -306,7 +320,34 @@ class AttributeGenerator implements GeneratorInterface
     {
         return [
             "metric_family"       => "Length",
-            "default_metric_unit" => "METER"
+            "default_metric_unit" => "METER",
+            "decimals_allowed" => 0,
+            "negative_allowed" => 0,
+        ];
+    }
+
+    /**
+     * Provide number specific properties
+     *
+     * @return array
+     */
+    protected function getNumberProperties()
+    {
+        return [
+            "decimals_allowed" => 0,
+            "negative_allowed" => 0,
+        ];
+    }
+
+    /**
+     * Provide price specific properties
+     *
+     * @return array
+     */
+    protected function getPriceProperties()
+    {
+        return [
+            "decimals_allowed" => 0,
         ];
     }
 
@@ -320,7 +361,7 @@ class AttributeGenerator implements GeneratorInterface
         return [
             'allowed_extensions' => implode(
                 ',',
-                $this->faker->randomElements(['png', 'jpg', 'pdf'], 2)
+                $this->faker->randomElements(['png', 'pdf'], 2)
             )
         ];
     }
