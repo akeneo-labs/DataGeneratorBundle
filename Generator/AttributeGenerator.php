@@ -67,8 +67,8 @@ class AttributeGenerator implements GeneratorInterface
      */
     public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $this->locales         = $options['locales'];
-        $this->attributeGroups = $options['attribute_groups'];
+        $this->locales         = $options['locales'] ?? [];
+        $this->attributeGroups = $options['attribute_groups'] ?? [];
 
         $count = (int) $entitiesConfig['count'];
 
@@ -76,8 +76,8 @@ class AttributeGenerator implements GeneratorInterface
         $scopableProbability    = (float) $entitiesConfig['scopable_probability'];
         $locScopableProbability = (float) $entitiesConfig['localizable_and_scopable_probability'];
         $gridFilterProbability  = (float) $entitiesConfig['useable_as_grid_filter_probability'];
-        $minVariantAxes         = (int) $entitiesConfig['min_variant_axes'];
-        $minVariantAttributes   = (int) $entitiesConfig['min_variant_attributes'];
+        $minVariantAxes         = (int) ($entitiesConfig['min_variant_axes'] ?? 0);
+        $minVariantAttributes   = (int) ($entitiesConfig['min_variant_attributes'] ?? 0);
         $identifier             = $entitiesConfig['identifier_attribute'];
 
         $this->faker = Factory::create();

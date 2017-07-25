@@ -57,8 +57,8 @@ class AttributeOptionGenerator implements GeneratorInterface
      */
     public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $this->locales    = $options['locales'];
-        $this->attributes = $options['attributes'];
+        $this->locales    = $options['locales'] ?? [];
+        $this->attributes = $options['attributes'] ?? [];
 
         $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {

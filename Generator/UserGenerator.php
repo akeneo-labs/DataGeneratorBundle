@@ -65,12 +65,12 @@ class UserGenerator implements GeneratorInterface
      */
     public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $this->locales            = $options['locales'];
-        $this->channels           = $options['channels'];
-        $this->categories         = $options['categories'];
-        $this->userRoles          = $options['user_roles'];
-        $this->userGroups         = $options['user_groups'];
-        $this->assetCategoryCodes = isset($options['asset_category_codes']) ? $options['asset_category_codes'] : [];
+        $this->locales            = $options['locales'] ?? [];
+        $this->channels           = $options['channels'] ?? [];
+        $this->categories         = $options['categories'] ?? [];
+        $this->userRoles          = $options['user_roles'] ?? [];
+        $this->userGroups         = $options['user_groups'] ?? [];
+        $this->assetCategoryCodes = $options['asset_category_codes'] ?? [];
 
         $this->faker = Factory::create();
         if (isset($globalConfig['seed'])) {
@@ -130,11 +130,15 @@ class UserGenerator implements GeneratorInterface
         $user->setEnabled($userConfig['enable']);
 
         foreach ($userConfig['groups'] as $groupCode) {
-            $user->addGroup($this->userGroups[$groupCode]);
+            if (isset($this->userGroups[$groupCode])) {
+                $user->addGroup($this->userGroups[$groupCode]);
+            }
         }
 
         foreach ($userConfig['roles'] as $roleCode) {
-            $user->addRole($this->userRoles[$roleCode]);
+            if (isset($this->userRoles[$roleCode])) {
+                $user->addRole($this->userRoles[$roleCode]);
+            }
         }
 
         if (isset($userConfig['catalog_locale'])) {
@@ -154,7 +158,7 @@ class UserGenerator implements GeneratorInterface
         if (isset($userConfig['default_tree'])) {
             $categoryCode = $userConfig['default_tree'];
             $user->setDefaultTree($this->categories[$categoryCode]);
-        } else {
+        } elseif (isset($this->categories[ChannelGenerator::DEFAULT_TREE])) {
             $user->setDefaultTree($this->categories[ChannelGenerator::DEFAULT_TREE]);
         }
 
@@ -205,7 +209,7 @@ class UserGenerator implements GeneratorInterface
             'last_name'      => $user->getLastname(),
             'catalog_locale' => $user->getCatalogLocale()->getCode(),
             'catalog_scope'  => $user->getCatalogScope()->getCode(),
-            'default_tree'   => $user->getDefaultTree()->getCode(),
+            'default_tree'   => $user->getDefaultTree() ? $user->getDefaultTree()->getCode() : null,
             'roles'          => implode(',', $userRoleCodes),
             'groups'         => implode(',', $userGroupCodes),
             'enabled'        => $user->isEnabled() ? '1' : '0',

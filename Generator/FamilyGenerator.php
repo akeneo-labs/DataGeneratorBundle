@@ -66,9 +66,9 @@ class FamilyGenerator implements GeneratorInterface
      */
     public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $this->locales    = $options['locales'];
-        $this->attributes = $options['attributes'];
-        $this->channels   = $options['channels'];
+        $this->locales    = $options['locales'] ?? [];
+        $this->attributes = $options['attributes'] ?? [];
+        $this->channels   = $options['channels'] ?? [];
 
         $count                     = (int) $entitiesConfig['count'];
         $attributesCount           = (int) $entitiesConfig['attributes_count'] - 1;
