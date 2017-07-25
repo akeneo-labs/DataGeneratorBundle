@@ -12,7 +12,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Yaml;
 
 /**
- * Generate native YML file for attribute option useable as fixtures
+ * Generate native YML file for attribute option usable as fixtures
  *
  * @author    Claire Fortin <claire.fortin@akeneo.com>
  * @copyright 2015 Akeneo SAS (http://www.akeneo.com)
