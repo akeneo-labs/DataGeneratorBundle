@@ -247,7 +247,6 @@ class ChannelGenerator implements GeneratorInterface
 
             $data[] = [
                 'code'       => $channel->getCode(),
-                'label'      => $channel->getLabel(),
                 'tree'       => self::DEFAULT_TREE,
                 'locales'    => implode(',', $localeCodes),
                 'currencies' => implode(',', $currencyCodes),

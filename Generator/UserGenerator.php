@@ -217,7 +217,7 @@ class UserGenerator implements GeneratorInterface
         ];
 
         if (count($this->assetCategoryCodes) > 0) {
-            $result["default_asset_tree"] = $this->faker->randomElement($this->assetCategoryCodes);
+            $result['default_asset_tree'] = $this->faker->randomElement($this->assetCategoryCodes);
         }
 
         return $result;
