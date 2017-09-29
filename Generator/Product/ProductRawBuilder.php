@@ -107,7 +107,7 @@ class ProductRawBuilder
             $nbAttr,
             $nbAttrDeviation
         );
-        $attributes   = $this->getRandomAttributesFromFamily($family, $randomNbAttr);
+        $attributes = $this->getRandomAttributesFromFamily($family, $randomNbAttr);
 
         foreach ($attributes as $attribute) {
             $valueData = $this->generateValue($attribute, $forcedAttributes);

@@ -6,6 +6,7 @@ parameters:
     pim_data_generator.generator.attribute.class:               Pim\Bundle\DataGeneratorBundle\Generator\AttributeGenerator
     pim_data_generator.generator.attribute_option.class:        Pim\Bundle\DataGeneratorBundle\Generator\AttributeOptionGenerator
     pim_data_generator.generator.family.class:                  Pim\Bundle\DataGeneratorBundle\Generator\FamilyGenerator
+    pim_data_generator.generator.family_variant.class:          Pim\Bundle\DataGeneratorBundle\Generator\FamilyVariantGenerator
     pim_data_generator.generator.attribute_group.class:         Pim\Bundle\DataGeneratorBundle\Generator\AttributeGroupGenerator
     pim_data_generator.generator.category.class:                Pim\Bundle\DataGeneratorBundle\Generator\CategoryGenerator
     pim_data_generator.generator.user_group.class:              Pim\Bundle\DataGeneratorBundle\Generator\UserGroupGenerator
@@ -74,6 +75,13 @@ services:
 
     pim_data_generator.generator.family:
         class: '%pim_data_generator.generator.family.class%'
+        arguments:
+            - '@pim_data_generator.writer.csv_writer'
+        tags:
+            - { name: pim_data_generator.generator }
+
+    pim_data_generator.generator.family_variant:
+        class: '%pim_data_generator.generator.family_variant.class%'
         arguments:
             - '@pim_data_generator.writer.csv_writer'
         tags:
