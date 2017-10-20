@@ -11,6 +11,15 @@ So you need a PIM system with channels, locales and currency already setup.
 
 From that, this bundle will generate valid product and attribute data.
 
+Compatibility
+-------------
+
+This bundle is compatible with Akeneo PIM 1.3, 1.4, 1.5 & 1.6.
+
+As Akeneo PIM 1.7 exposes a Web API, this Web API can be used to inject data without having to install a bundle in it.
+
+Here is an example of a [simple command line tool](https://github.com/nidup/akeneo-data-generator) which generates & injects data through the Web API.
+
 Installation
 ------------
 ```bash
