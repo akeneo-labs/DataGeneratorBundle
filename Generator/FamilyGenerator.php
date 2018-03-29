@@ -45,9 +45,6 @@ class FamilyGenerator implements GeneratorInterface
     protected $faker;
 
     /** @var array */
-    protected $families = [];
-
-    /** @var array */
     protected $attributes = [];
 
     /** @var array */
@@ -66,9 +63,9 @@ class FamilyGenerator implements GeneratorInterface
      */
     public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $this->locales    = $options['locales'];
-        $this->attributes = $options['attributes'];
-        $this->channels   = $options['channels'];
+        $this->locales    = $options['locales'] ?? [];
+        $this->attributes = $options['attributes'] ?? [];
+        $this->channels   = $options['channels'] ?? [];
 
         $count                     = (int) $entitiesConfig['count'];
         $attributesCount           = (int) $entitiesConfig['attributes_count'] - 1;
@@ -86,7 +83,7 @@ class FamilyGenerator implements GeneratorInterface
         for ($i = 0; $i < $count; $i++) {
             $family = [];
 
-            $family['code'] =self::FAMILY_CODE_PREFIX.$i;
+            $family['code'] = self::FAMILY_CODE_PREFIX.$i;
 
             foreach ($this->getLocalizedRandomLabels() as $localeCode => $label) {
                 $family['label-'.$localeCode] = $label;
@@ -112,8 +109,6 @@ class FamilyGenerator implements GeneratorInterface
             $progress->advance();
         }
 
-        $this->families = $families;
-
         $this->writer
             ->setFilename(sprintf(
                 '%s%s%s',
@@ -124,26 +119,6 @@ class FamilyGenerator implements GeneratorInterface
             ->write($families);
 
         return [];
-    }
-
-    /**
-     * Return the generated families as Family object
-     *
-     * @return array
-     */
-    public function getFamilyObjects()
-    {
-        $familyObjects = [];
-
-        foreach ($this->families as $code => $family) {
-            $familyObject = new Family();
-
-            $familyObject->setCode($code);
-
-            $familyObjects[] = $familyObject;
-        }
-
-        return $familyObjects;
     }
 
     /**

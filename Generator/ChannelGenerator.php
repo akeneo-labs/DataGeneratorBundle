@@ -183,11 +183,14 @@ class ChannelGenerator implements GeneratorInterface
     {
         $channels = [];
 
-        foreach ($channelsConfig as $channelConfig) {
+        foreach ($channelsConfig as $channelCode => $channelConfig) {
             $channel = new Channel();
 
-            $channel->setCode($channelConfig['code']);
-            $channel->setLabel($channelConfig['label']);
+            $channel->setCode($channelCode);
+
+            if (isset($channelConfig['label'])) {
+                $channel->setLabel($channelConfig['label']);
+            }
 
             foreach ($channelConfig['locales'] as $localeCode) {
                 $locale = $this->locales[$localeCode];
@@ -244,7 +247,6 @@ class ChannelGenerator implements GeneratorInterface
 
             $data[] = [
                 'code'       => $channel->getCode(),
-                'label'      => $channel->getLabel(),
                 'tree'       => self::DEFAULT_TREE,
                 'locales'    => implode(',', $localeCodes),
                 'currencies' => implode(',', $currencyCodes),

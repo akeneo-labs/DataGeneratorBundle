@@ -67,8 +67,8 @@ class AttributeGenerator implements GeneratorInterface
      */
     public function generate(array $globalConfig, array $entitiesConfig, ProgressBar $progress, array $options = [])
     {
-        $this->locales         = $options['locales'];
-        $this->attributeGroups = $options['attribute_groups'];
+        $this->locales         = $options['locales'] ?? [];
+        $this->attributeGroups = $options['attribute_groups'] ?? [];
 
         $count = (int) $entitiesConfig['count'];
 
@@ -76,8 +76,8 @@ class AttributeGenerator implements GeneratorInterface
         $scopableProbability    = (float) $entitiesConfig['scopable_probability'];
         $locScopableProbability = (float) $entitiesConfig['localizable_and_scopable_probability'];
         $gridFilterProbability  = (float) $entitiesConfig['useable_as_grid_filter_probability'];
-        $minVariantAxes         = (int) $entitiesConfig['min_variant_axes'];
-        $minVariantAttributes   = (int) $entitiesConfig['min_variant_attributes'];
+        $minVariantAxes         = (int) ($entitiesConfig['min_variant_axes'] ?? 0);
+        $minVariantAttributes   = (int) ($entitiesConfig['min_variant_attributes'] ?? 0);
         $identifier             = $entitiesConfig['identifier_attribute'];
 
         $this->faker = Factory::create();
@@ -89,9 +89,11 @@ class AttributeGenerator implements GeneratorInterface
 
         $this->attributes[$identifier] = [
             'code'                   => $identifier,
-            'type'                   => 'pim_catalog_identifier',
+            'type'                   => AttributeTypes::IDENTIFIER,
             'group'                  => $this->getRandomAttributeGroupCode(),
             'useable_as_grid_filter' => 1,
+            'scopable'               => 0,
+            'localizable'            => 0,
         ];
 
         $forceAttributes = $entitiesConfig['force_attributes'];
@@ -99,9 +101,11 @@ class AttributeGenerator implements GeneratorInterface
         foreach ($forceAttributes as $forceAttribute) {
             list($code, $type) = explode('=', $forceAttribute);
             $this->attributes[trim($code)] = [
-                'code'  => trim($code),
-                'type'  => trim($type),
-                'group' => $this->getRandomAttributeGroupCode(),
+                'code'        => trim($code),
+                'type'        => trim($type),
+                'group'       => $this->getRandomAttributeGroupCode(),
+                'scopable'    => 0,
+                'localizable' => 0,
             ];
         }
 
@@ -131,12 +135,40 @@ class AttributeGenerator implements GeneratorInterface
                 $attribute['scopable']    = (int) $this->faker->boolean($scopableProbability);
             }
 
-            if ('pim_catalog_metric' === $type) {
+            if (AttributeTypes::METRIC === $type) {
                 $attribute = array_merge($attribute, $this->getMetricProperties());
             }
 
-            if ('pim_catalog_image' === $type || 'pim_catalog_file' === $type) {
-                $attribute = array_merge($attribute, $this->getMediaProperties());
+            if (AttributeTypes::IMAGE === $type) {
+                $attribute['allowed_extensions'] = implode(
+                    ',',
+                    $this->faker->randomElements(['gif', 'jpeg', 'jpg', 'png', 'tif', 'tiff'], 2)
+                );
+            }
+
+            if (AttributeTypes::FILE === $type) {
+                $attribute['allowed_extensions'] = implode(
+                    ',',
+                    $this->faker->randomElements(['csv', 'doc', 'docx', 'mp3', 'pdf', 'ppt', 'pptx', 'rtf', 'txt'], 2)
+                );
+            }
+
+            if (in_array(
+                $attribute['type'],
+                [AttributeTypes::METRIC, AttributeTypes::NUMBER, AttributeTypes::PRICE_COLLECTION]
+            )) {
+                $attribute['decimals_allowed'] = (int) $this->faker->boolean(50);
+            }
+
+            if (in_array(
+                $attribute['type'],
+                [AttributeTypes::METRIC, AttributeTypes::NUMBER]
+            )) {
+                $attribute['negative_allowed'] = (int) $this->faker->boolean(50);
+            }
+
+            if (AttributeTypes::TEXTAREA === $attribute['type']) {
+                $attribute['wysiwyg_enabled'] = (int) $this->faker->boolean(50);
             }
 
             $this->attributes[$attribute['code']] = $attribute;
@@ -226,13 +258,13 @@ class AttributeGenerator implements GeneratorInterface
     {
         $attributeType = null;
         $typesToAvoid = [
-            'pim_catalog_identifier',
-            'pim_reference_data_multiselect',
-            'pim_reference_data_simpleselect',
+            AttributeTypes::IDENTIFIER,
+            AttributeTypes::REFERENCE_DATA_MULTI_SELECT,
+            AttributeTypes::REFERENCE_DATA_SIMPLE_SELECT,
             'pim_assets_collection',
         ];
 
-        while ((null === $attributeType) || in_array($attributeType, $typesToAvoid)) {
+        while (null === $attributeType || in_array($attributeType, $typesToAvoid)) {
             $attributeType = $this->faker->randomElement($this->getAttributeTypeCodes());
         }
 
@@ -291,7 +323,7 @@ class AttributeGenerator implements GeneratorInterface
         $smallType = str_replace('pim_catalog_', '', $type);
 
         foreach ($this->locales as $locale) {
-            $labels[$locale->getCode()] = sprintf("%s %s", $smallType, implode(' ', $this->faker->words(2)));
+            $labels[$locale->getCode()] = sprintf('%s %s', $smallType, implode(' ', $this->faker->words(2)));
         }
 
         return $labels;
@@ -305,23 +337,8 @@ class AttributeGenerator implements GeneratorInterface
     protected function getMetricProperties()
     {
         return [
-            "metric_family"       => "Length",
-            "default_metric_unit" => "METER"
-        ];
-    }
-
-    /**
-     * Provide media specific properties
-     *
-     * @return array
-     */
-    protected function getMediaProperties()
-    {
-        return [
-            'allowed_extensions' => implode(
-                ',',
-                $this->faker->randomElements(['png', 'jpg', 'pdf'], 2)
-            )
+            'metric_family'       => 'Length',
+            'default_metric_unit' => 'METER',
         ];
     }
 

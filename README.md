@@ -51,18 +51,43 @@ Configuration file examples
 ---------------------------
 Generating base fixtures:
 
+**Be careful! The order of the entries under `entities` is important.**
+
 ```yaml
 data_generator:
-    output_dir: /tmp/fixtures/
+    output_dir: /path/to/your/pim/src/Pim/Bundle/InstallerBundle/Resources/fixtures/data_generator/
     entities:
+        locales: ~
+        channels:
+            mobile:
+                locales: [en_US, fr_FR]
+                currencies: [USD, EUR]
+            magento:
+                locales: [en_US, fr_FR, de_DE, es_ES]
+                currencies: [USD, EUR]
+            paper:
+                locales: [en_US, fr_FR, de_DE, es_ES, it_IT]
+                currencies: [USD, EUR]
+            website:
+                locales: [en_US, fr_FR, de_DE, es_ES, it_IT]
+                currencies: [USD, EUR]
+            marketplace:
+                locales: [en_US]
+                currencies: [USD]
+        attribute_groups: ~
+        categories: ~
         attributes:
-            count: 200
-            identifier_attribute: "sku"
+            count: 2000
+            identifier_attribute: sku
+            force_attributes: [name=pim_catalog_text]
+        attribute_options:
+            count_per_attribute: 5
         families:
-            count: 30
-            attributes_count: 60
-            identifier_attribute: "sku"
-            label_attribute: "label"
+            count: 10
+            attributes_count: 200
+            identifier_attribute: sku
+            label_attribute: name
+
 ```
 
 Generating products:
