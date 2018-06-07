@@ -79,9 +79,7 @@ class ProductRawBuilder
     public function buildBaseProduct(FamilyInterface $family, $id, $groups)
     {
         $product                             = [];
-        $product[$this->getIdentifierCode()] = $id;
-        $product['family']                   = $family->getCode();
-        $product['groups']                   = $groups;
+        $product['identifier'] = $id;
 
         return $product;
     }
@@ -107,11 +105,17 @@ class ProductRawBuilder
             $nbAttr,
             $nbAttrDeviation
         );
-        $attributes   = $this->getRandomAttributesFromFamily($family, $randomNbAttr);
+        $attributes = $this->getRandomAttributesFromFamily($family, $randomNbAttr);
+        $values = [];
 
         foreach ($attributes as $attribute) {
-            $valueData = $this->generateValue($attribute, $forcedAttributes);
-            $product   = array_merge($product, $valueData);
+            $values[$attribute->getCode()] = $this->generateValue($attribute, $forcedAttributes);
+        }
+
+        if (!isset($product['values'])) {
+            $product['values'] = $values;
+        } else {
+            $product['values'] = array_merge($product['values'], $values);
         }
     }
 
@@ -130,13 +134,19 @@ class ProductRawBuilder
         array $mandatoryAttributes
     ) {
         $this->getAttributesFromFamily($family);
+        $values = [];
 
         foreach ($mandatoryAttributes as $attribute) {
             if (isset($this->attributesByFamily[$family->getCode()][$attribute])) {
                 $attribute = $this->attributesByFamily[$family->getCode()][$attribute];
-                $valueData = $this->generateValue($attribute, $forcedAttributes);
-                $product   = array_merge($product, $valueData);
+                $values[$attribute->getCode()] = $this->generateValue($attribute, $forcedAttributes);
             }
+        }
+
+        if (!isset($product['values'])) {
+            $product['values'] = $values;
+        } else {
+            $product['values'] = array_merge($product['values'], $values);
         }
     }
 
@@ -150,14 +160,20 @@ class ProductRawBuilder
     public function fillInAllRequirementAttributes(FamilyInterface $family, array &$product, array $forcedAttributes)
     {
         $this->getAttributesFromFamily($family);
+        $values = [];
 
         foreach ($family->getAttributeRequirements() as $requirement) {
             $attributeCode = $requirement->getAttributeCode();
             if ($requirement->isRequired() && $attributeCode !== $this->getIdentifierCode()) {
                 $attribute = $this->attributesByFamily[$family->getCode()][$attributeCode];
-                $valueData = $this->generateValue($attribute, $forcedAttributes);
-                $product   = array_merge($product, $valueData);
+                $values[$attributeCode] = $this->generateValue($attribute, $forcedAttributes);
             }
+        }
+
+        if (!isset($product['values'])) {
+            $product['values'] = $values;
+        } else {
+            $product['values'] = array_merge($product['values'], $values);
         }
     }
 
@@ -183,7 +199,7 @@ class ProductRawBuilder
     private function generateValue(AttributeInterface $attribute, array $forceProperties)
     {
         if (isset($forceProperties[$attribute->getCode()])) {
-            return [$attribute->getCode() => $forceProperties[$attribute->getCode()]];
+            return $this->valueRawBuilder->build($attribute, $forceProperties[$attribute->getCode()]);
         }
 
         return $this->valueRawBuilder->build($attribute);

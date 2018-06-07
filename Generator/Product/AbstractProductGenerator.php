@@ -71,9 +71,10 @@ class AbstractProductGenerator
         $family = $this->getRandomFamily($faker);
         $product = $this->productRawBuilder->buildBaseProduct($family, $id, '');
 
-        $this->productRawBuilder->fillInRandomCategories($product, $nbCategories);
         $this->productRawBuilder->fillInRandomAttributes($family, $product, $forcedValues, $nbAttr, $nbAttrDeviation);
         $this->productRawBuilder->fillInMandatoryAttributes($family, $product, $forcedValues, $mandatoryAttributes);
+
+        $product['values'] = json_encode($product['values']);
 
         return $product;
     }
@@ -95,8 +96,9 @@ class AbstractProductGenerator
         $family = $this->getRandomFamily($faker);
         $product = $this->productRawBuilder->buildBaseProduct($family, $id, '');
 
-        $this->productRawBuilder->fillInRandomCategories($product, $nbCategories);
         $this->productRawBuilder->fillInAllRequirementAttributes($family, $product, $forcedValues);
+
+        $product['values'] = json_encode($product['values']);
 
         return $product;
     }
@@ -116,13 +118,13 @@ class AbstractProductGenerator
 
         $csvFile = fopen($outputFile, 'w');
 
-        fputcsv($csvFile, $headers, $delimiter);
+        fputcsv($csvFile, $headers, $delimiter, "'");
         $headersAsKeys = array_fill_keys($headers, "");
 
         while ($bufferedProduct = fgets($buffer)) {
             $product     = unserialize($bufferedProduct);
             $productData = array_merge($headersAsKeys, $product);
-            fputcsv($csvFile, $productData, $delimiter);
+            fputcsv($csvFile, $productData, $delimiter, "'");
         }
         fclose($csvFile);
         fclose($buffer);

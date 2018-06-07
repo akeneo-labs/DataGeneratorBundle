@@ -71,33 +71,11 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
         $percentageComplete  = $entitiesConfig['percentage_complete'];
         $allAttributeKeys    = $entitiesConfig['all_attribute_keys'];
 
-        if ($variantGroupCount > 0) {
-            foreach ($this->groupRepository->getAllVariantGroups() as $variantGroup) {
-                $this->variantGroupDataProviders[] = new VariantGroupDataProvider($variantGroup, $variantGroupCount);
-            }
-        }
-
-        if (count($this->variantGroupDataProviders) * $variantGroupCount > $count) {
-            throw new \Exception(sprintf(
-                'You require too much products per variant group (%s). '.
-                'There is only %s variant groups for %s required products',
-                $variantGroupCount,
-                count($this->variantGroupDataProviders),
-                $count
-            ));
-        }
 
         $faker = $this->initFaker($seed);
 
         for ($i = $startIndex; $i < ($startIndex + $count); $i++) {
             $isComplete = (bool)($faker->numberBetween(0, 100) < $percentageComplete);
-            $variantGroupDataProvider = $this->getNextVariantGroupProvider($faker);
-            $variantGroupAttributes = [];
-
-            if (null !== $variantGroupDataProvider) {
-                $variantGroupAttributes = $variantGroupDataProvider->getAttributes();
-                $product['groups'] = $variantGroupDataProvider->getCode();
-            }
 
             if (!$isComplete) {
                 $product = $this->buildRawProduct(
@@ -105,7 +83,7 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
                     $forcedValues,
                     $mandatoryAttributes,
                     self::IDENTIFIER_PREFIX . $i,
-                    $nbAttrBase - count($variantGroupAttributes),
+                    $nbAttrBase,
                     $nbAttrDeviation,
                     $categoriesCount
                 );
@@ -118,48 +96,14 @@ class ProductGenerator extends AbstractProductGenerator implements GeneratorInte
                 );
             }
 
-            if (null !== $variantGroupDataProvider) {
-                $product = array_merge($product, $variantGroupDataProvider->getData());
-            }
-
             $this->bufferizeProduct($product, $tmpFile);
             $progress->advance();
-        }
-
-        if (true === $allAttributeKeys) {
-            $keys = array_unique(array_merge($this->attributeKeyProvider->getAllAttributesKeys(), $this->headers));
-            sort($keys);
-            $this->headers = $keys;
         }
 
         $this->writeCsvFile($this->headers, $outputFile, $tmpFile, $delimiter);
         unlink($tmpFile);
 
         return [];
-    }
-
-    /**
-     * Get a random variantGroupProvider. If this is the last usage of it, removes it from the list.
-     * If there is no remaining VariantGroupProvider, returns null.
-     *
-     * @param Faker\Generator $faker
-     *
-     * @return null|VariantGroupDataProvider
-     */
-    private function getNextVariantGroupProvider(Faker\Generator $faker)
-    {
-        $variantGroupProvider = null;
-
-        if (count($this->variantGroupDataProviders) > 0) {
-            $variantGroupProviderIndex = $faker->numberBetween(0, count($this->variantGroupDataProviders) - 1);
-            $variantGroupProvider = $this->variantGroupDataProviders[$variantGroupProviderIndex];
-
-            if ($variantGroupProvider->isLastUsage()) {
-                array_splice($this->variantGroupDataProviders, $variantGroupProviderIndex, 1);
-            }
-        }
-
-        return $variantGroupProvider;
     }
 
     /**
