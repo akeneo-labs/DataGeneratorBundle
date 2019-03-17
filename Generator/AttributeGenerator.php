@@ -114,12 +114,12 @@ class AttributeGenerator implements GeneratorInterface
             $attribute['group'] = $this->getRandomAttributeGroupCode();
 
             if (AttributeTypes::OPTION_SIMPLE_SELECT === $type && $minVariantAxes > 0) {
-                // Configure a minimum set of non localizable and non scopable select axes for variant groups.
+                // Configure a minimum set of non localizable and non scopable select axes for family variants.
                 $attribute['localizable'] = 0;
                 $attribute['scopable']    = 0;
                 $minVariantAxes--;
             } elseif (AttributeTypes::TEXT === $type && $minVariantAttributes > 0) {
-                // Configure a minimum set of non localizable and non scopable text attributes for variant groups.
+                // Configure a minimum set of non localizable and non scopable text attributes for family variants.
                 $attribute['localizable'] = 0;
                 $attribute['scopable']    = 0;
                 $minVariantAttributes--;

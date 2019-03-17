@@ -86,10 +86,10 @@ class FamilyGenerator implements GeneratorInterface
         for ($i = 0; $i < $count; $i++) {
             $family = [];
 
-            $family['code'] =self::FAMILY_CODE_PREFIX.$i;
+            $family['code'] = self::FAMILY_CODE_PREFIX . $i;
 
             foreach ($this->getLocalizedRandomLabels() as $localeCode => $label) {
-                $family['label-'.$localeCode] = $label;
+                $family['label-' . $localeCode] = $label;
             }
 
             $family['attribute_as_label'] = $this->labelAttribute;
@@ -105,7 +105,7 @@ class FamilyGenerator implements GeneratorInterface
                 $attributeReqs = $this->faker->randomElements($nonMediaAttributeCodes, $requirementsCount);
                 $attributeReqs = array_merge([$this->identifierAttribute], $attributeReqs);
 
-                $family['requirements-'.$channel->getCode()] = implode(self::ATTRIBUTE_DELIMITER, $attributeReqs);
+                $family['requirements-' . $channel->getCode()] = implode(self::ATTRIBUTE_DELIMITER, $attributeReqs);
             }
 
             $families[$family['code']] = $family;
@@ -123,7 +123,7 @@ class FamilyGenerator implements GeneratorInterface
             ))
             ->write($families);
 
-        return [];
+        return ['families' => $this->getFamilyObjects()];
     }
 
     /**
